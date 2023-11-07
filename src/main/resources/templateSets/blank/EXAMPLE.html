@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport">
+    <title th:text="'Beispiel für '+${material.term} "></title>
+    <th:block th:fragment="head">
+    </th:block>
+</head>
+<body>
+<main>
+    <div th:fragment="content">
+        <header>
+            <h1 th:text="${material.term}"></h1>
+        </header>
+        <hr>
+        <section>
+            <div th:if="${material.imageExample}">
+                <figure>
+                    <img alt="Bild Fehlt" th:src="${material.imageName}">
+                    <figcaption th:text="${material.values.TITLE}">Caption</figcaption>
+                </figure>
+                <p th:text="${material.values.text}" th:unless="${material.values.text.blank}"></p>
+            </div>
+            <div th:unless="${material.imageExample}">
+                <p th:text="${material.values.text}"></p>
+            </div>
+        </section>
+    </div>
+</main>
+<footer>
+</footer>
+</body>
+</html>

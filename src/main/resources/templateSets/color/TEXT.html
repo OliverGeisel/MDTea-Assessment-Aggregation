@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport">
+    <th:block th:fragment="head">
+        <link rel="stylesheet" th:href="${rootPath}+'/css/bootstrap.min.css'">
+    </th:block>
+    <title th:text="'Text: '+${material.name} "></title>
+</head>
+<body>
+<main>
+    <div class="container" th:fragment="content">
+        <h2 class="text-light" th:text="${material.headline}" th:unless="${material.headline.isBlank}"></h2>
+        <p class="text-light" th:text="${material.text}">
+        </p>
+    </div>
+</main>
+<footer>
+    <div class="container">
+
+    </div>
+</footer>
+</body>
+</html>

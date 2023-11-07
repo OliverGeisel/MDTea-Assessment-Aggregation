@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport">
+    <th:block th:fragment="head">
+    </th:block>
+    <title th:text="'Text: '+${material.name} "></title>
+</head>
+<body>
+<main>
+    <div th:fragment="content">
+        <h2 th:text="${material.headline}" th:unless="${material.headline.isBlank}"></h2>
+        <p th:text="${material.text}">
+        </p>
+    </div>
+</main>
+<footer>
+    <div>
+
+    </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Generator</title>
+</head>
+<body>
+<main>
+
+    <section>
+        <form action="generator/def">
+            <select name="template">
+                <option th:each="option: ${templates}" th:text="${option}" th:value="${option}">
+                </option>
+            </select>
+            <br>
+            <select name="definition">
+                <option th:each="option: ${definitions}" th:text="${option}" th:value="${option}">
+                </option>
+            </select>
+            <input type="submit">
+        </form>
+    </section>
+</main>
+
+
+</body>
+</html>

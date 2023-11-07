@@ -1,0 +1,172 @@
+{
+  "meta": {
+    "name": "Neuer Testkurs",
+    "description": "Hallo,\nDas ist ein Testkurs f\u00fcr Debugging und Tests",
+    "year": 2023,
+    "type": "Universit\u00e4t",
+    "level": "Anfang",
+    "extra": [
+      {
+        "name": "Extra-Wert",
+        "value": "Hallo"
+      },
+      {
+        "name": "Studentenzahl",
+        "value": "15"
+      }
+    ]
+  },
+  "content": {
+    "goal-1": {
+      "key": "goal-1",
+      "expression": "Know",
+      "target": "MasterKey-Word",
+      "completeSentence": "Complete text!",
+      "content": [
+        "Inhalt 1",
+        "Inhalt 2"
+      ]
+    },
+    "goal-2": {
+      "key": "goal-2",
+      "expression": "Translate",
+      "target": "Algorithmus",
+      "completeSentence": "\u00dcbertrage einen Algorithmus in eine beliebige Progammierprache.",
+      "content": [
+        "Algorithmus-Begriff",
+        "Programmiersprache"
+      ]
+    },
+    "goal-3": {
+      "key": "goal-3",
+      "expression": "Translate",
+      "target": "Java",
+      "completeSentence": "\u00dcbertrage die Features von Java in einfache Beispiele.",
+      "content": [
+        "Java 19",
+        "Programmiersprache"
+      ]
+    }
+  },
+  "structure": [
+    {
+      "key": "chapter-1",
+      "name": "Java 19",
+      "weight": 8.0,
+      "alternatives": [
+        "Java"
+      ],
+      "topic": "Java 19",
+      "groups": [
+        {
+          "key": "group-1-1",
+          "name": "Java 19 Features",
+          "alternatives": [
+            "Java 19",
+            "Java"
+          ],
+          "topic": "Java 19",
+          "tasks": [
+            {
+              "key": "task-1-1-1",
+              "name": "Java Feature: Pattern Matching for switch",
+              "topic": "Java 19",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "Pattern Matching for switch"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "chapter-2",
+      "name": "Algorithmen",
+      "weight": 6.0,
+      "alternatives": [],
+      "topic": "Algorithmus-Begriff",
+      "groups": [
+        {
+          "key": "group-2-1",
+          "name": "Algorithmus Definition",
+          "alternatives": [
+            "Algorithmus"
+          ],
+          "topic": "Algorithmus-Begriff",
+          "tasks": [
+            {
+              "key": "task-2-1-1",
+              "name": "Definition Algorithmus",
+              "topic": "Algorithmus-Begriff",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "Algorithmus"
+              ]
+            },
+            {
+              "key": "task-2-1-2",
+              "name": "Geschichte Algorithmus",
+              "topic": "Algorithmus-Begriff",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            }
+          ]
+        },
+        {
+          "key": "group-2-2",
+          "name": "Programmierung",
+          "alternatives": [
+            "Programmiersprache"
+          ],
+          "topic": "Programmiersprache-TERM",
+          "tasks": [
+            {
+              "key": "task-2-2-1",
+              "name": "Programmier Paradigmen",
+              "topic": "Programmiersprache",
+              "relevance": "OPTIONAL",
+              "alternatives": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "chapter-3",
+      "name": "Kapitel 3",
+      "weight": 2.0,
+      "alternatives": [],
+      "groups": [
+        {
+          "key": "group-3-1",
+          "name": "Gruppe 3-1",
+          "alternatives": [],
+          "tasks": [
+            {
+              "key": "task-3-1-1",
+              "name": "Unbekannt",
+              "topic": "Thema",
+              "relevance": "OPTIONAL",
+              "alternatives": []
+            },
+            {
+              "key": "task-3-1-2",
+              "name": "Ein Task",
+              "topic": "Thema",
+              "relevance": "OPTIONAL",
+              "alternatives": []
+            },
+            {
+              "key": "task-3-1-3",
+              "name": "Programmier Paradigmen",
+              "topic": "Programmiersprache",
+              "relevance": "OPTIONAL",
+              "alternatives": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

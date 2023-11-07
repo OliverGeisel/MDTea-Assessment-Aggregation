@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport">
+    <th:block th:fragment="head">
+        <link rel="stylesheet" th:href="${rootPath}+'/css/bootstrap.min.css'">
+    </th:block>
+    <title th:text="'Synonyme für '+${material.term} "></title>
+</head>
+<body>
+<main>
+    <div class="container" th:fragment="content">
+        <header>
+            <h1 class="text-center text-light" style="color: var(--bs-red); " th:text="${material.headline}"></h1>
+        </header>
+        <hr>
+        <ol th:if="${material.numerated}">
+            <li class="text-light" th:each="synonym:${material.entries}" th:text="${synonym}"></li>
+        </ol>
+        <ul th:unless="${material.numerated}">
+            <li class="text-light" th:each="synonym:${material.entries}" th:text="${synonym}"></li>
+        </ul>
+    </div>
+</main>
+<footer>
+    <div class="container">
+
+    </div>
+</footer>
+</body>
+</html>

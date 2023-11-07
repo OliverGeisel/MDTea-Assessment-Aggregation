@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Kurs - '+${course.metadata.name.get}">Title</title>
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Inter:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&amp;display=swap"
+          rel="stylesheet">
+    <link href="fonts/font-awesome.min.css" rel="stylesheet">
+    <link href="fonts/material-icons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.0/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body class="bg-dark">
+<main class="container">
+    <header>
+        <h1 class="header text-light" th:text="${courseName}"></h1>
+    </header>
+    <hr>
+    <section>
+        <header>
+            <h1 class="header text-light">Informationen</h1>
+        </header>
+        <article th:object="${course.metadata}">
+            <p class="text-secondary">Name: <span th:text="*{name.orElse('')}"></span></p>
+            <p class="text-secondary">Beschreibung: <span th:text="*{description.orElse('')}"></span></p>
+            <p class="text-secondary">Jahr: <span th:text="*{year.orElse('')}"></span></p>
+            <p class="text-secondary">Typ: <span th:text="*{type.orElse('')}"></span></p>
+            <p class="text-secondary">Schwierigkeit: <span th:text="*{level.orElse('')}"></span></p>
+            <div th:unless="*{otherInfos.isEmpty}">
+                <br>
+                <p th:each="extra:*{otherInfos.entrySet}">
+                    <span class="text-secondary" th:text="${extra.key}"></span>:
+                    <span class="text-secondary" th:text="${extra.value}"></span>
+                </p>
+            </div>
+        </article>
+    </section>
+    <hr>
+    <section>
+        <header>
+            <h1 class="header text-light">Struktur</h1>
+        </header>
+        <div class="table-responsive">
+            <table class="table table-active">
+                <thead>
+                <tr>
+                    <th>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="chapter : ${course.courseOrder.chapterOrder}">
+                    <td th:unless="${chapter.materialCount == 0}">
+                        <a class="link-info link-opacity-75" th:href="@{${chapter.name}+'/overview.html'}">
+                            <h2 th:text="${chapter.name}"></h2>
+                        </a>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-dark">
+                                <tbody>
+                                <tr th:each="group : ${chapter.groupOrder}">
+                                    <td th:unless="${group.materialCount==0}">
+                                        <a class="link-info link-opacity-75"
+                                           th:href="@{${chapter.name}+'/'+${group.name}+'/overview.html'}">
+                                            <h3 th:text="${group.name}"></h3>
+                                        </a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+<footer class="text-center bg-dark">
+    <div class="container text-white py-4 py-lg-5">
+        <ul class="list-inline">
+        </ul>
+        <p class="text-muted mb-0">Copyright © 2023 MDTea-Gen</p>
+    </div>
+</footer>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/bold-and-dark.js"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport">
+    <th:block th:fragment="head">
+        <link rel="stylesheet" th:href="${rootPath}+'/css/bootstrap.min.css'">
+    </th:block>
+    <title th:text="'Liste für '+${material.term} "></title>
+</head>
+<body>
+<main>
+    <div class="container" th:fragment="content">
+        <header>
+            <h1 class="text-center text-light" style="color: var(--bs-red); " th:text="${material.headline}"></h1>
+        </header>
+        <hr>
+        <main>
+            <div th:if="${material.numerated}">
+                <h2 class="text-light" th:text="${material.headline}"></h2>
+                <ul>
+                    <li class="text-light" th:each="entry:${material.entries}" th:text="${entry}"></li>
+                </ul>
+            </div>
+            <div th:unless="${material.numerated}">
+                <h2 class="text-light" th:text="${material.headline}"></h2>
+                <ol>
+                    <li class="text-light" th:each="entry:${material.entries}" th:text="${entry}"></li>
+                </ol>
+            </div>
+        </main>
+    </div>
+</main>
+<footer>
+    <div class="container">
+
+    </div>
+</footer>
+</body>
+</html>

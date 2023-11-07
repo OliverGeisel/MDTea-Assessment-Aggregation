@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport">
+    <th:block th:fragment="head">
+        <link rel="stylesheet" th:href="${rootPath}+'/css/bootstrap.min.css'">
+    </th:block>
+    <title th:text="'Code: '+${material.title} "></title>
+</head>
+<body>
+<main>
+    <div class="container" th:fragment="content">
+        <header>
+            <h1 class="text-center text-light" th:text="${material.title}"></h1>
+        </header>
+        <hr>
+        <h2 class="text-light"> Sprache: <span th:text="${material.language}"></span></h2>
+        <code class="text-light" th:utext="${material.code}">
+
+        </code>
+    </div>
+</main>
+<footer>
+    <div class="container">
+
+    </div>
+</footer>
+</body>
+</html>

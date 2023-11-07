@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html data-bs-theme="dark" lang="de" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Projects - MDTea-Gen</title>
+    <th:block th:include="main :: head-tag"></th:block>
+    <link href="https://fonts.googleapis.com/css?family=Inter:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&amp;display=swap"
+          rel="stylesheet">
+</head>
+
+<body>
+<nav th:replace="main :: navigation">
+</nav>
+<section class="py-5">
+    <div class="container py-5">
+        <div class="row mb-5">
+            <div class="col-md-8 col-xl-6 text-center mx-auto">
+                <h2 class="fw-bold">Bearbeiten</h2>
+                <p class="text-muted">Bearbeite einen bestehenden Kurs nach deinen Wünschen</p>
+            </div>
+        </div>
+        <p th:if="${courses.size}==0">
+            Es sind keine Kurse vorhanden.
+            <br>
+            <a th:href="@{/generator}">Erstelle einen neuen Kurs</a>
+        </p>
+        <div class="row row-cols-1 row-cols-md-2 mx-auto" style="max-width: 900px;" th:remove="all-but-first">
+            <div class="col mb-4" th:each="course : ${courses}">
+                <div><a href="#">
+                    <img class="rounded img-fluid shadow w-100 fit-cover" src="assets/img/products/1.jpg"
+                         style="height: 250px;"></a>
+                    <div class="py-4">
+                        <span class="badge bg-primary mb-2" th:text="${course.metadata.type.get}">Website</span>
+                        <span class="badge bg-secondary mb-2" th:text="${course.metadata.level.get}">Website</span>
+                        <h4 class="fw-bold" th:text="${course.metadata.name.get}"></h4>
+                        <p class="text-muted" th:utext="${course.metadata.description.get.replace('\n','<br>')}">Nullam
+                            id dolor id nibh ultricies vehicula ut id elit. Cras justo odio, dapibus ac facilisis in,
+                            egestas eget quam. Donec id elit non mi porta gravida at eget metus.</p>
+                    </div>
+                    <a th:href="'/edit/'+${{course.id}}">
+                        <button class="btn btn-primary">
+                            Bearbeiten
+                        </button>
+                    </a>
+                    <a th:href="@{'/edit/'+${course.id}+'/delete'}">
+                        <button class="btn btn-danger">
+                            Löschen
+                        </button>
+                    </a>
+                </div>
+            </div>
+            <div class="col mb-4">
+                <div><a href="#"><img class="rounded img-fluid shadow w-100 fit-cover" src="assets/img/products/2.jpg"
+                                      style="height: 250px;"></a>
+                    <div class="py-4"><span class="badge bg-primary mb-2">Website</span>
+                        <h4 class="fw-bold">Lorem libero donec</h4>
+                        <p class="text-muted">Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo odio,
+                            dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget
+                            metus.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col mb-4">
+                <div><a href="#"><img class="rounded img-fluid shadow w-100 fit-cover" src="assets/img/products/3.jpg"
+                                      style="height: 250px;"></a>
+                    <div class="py-4"><span class="badge bg-primary mb-2">Website</span>
+                        <h4 class="fw-bold">Lorem libero donec</h4>
+                        <p class="text-muted">Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo odio,
+                            dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget
+                            metus.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col mb-4">
+                <div><a href="#"><img class="rounded img-fluid shadow w-100 fit-cover" src="assets/img/products/1.jpg"
+                                      style="height: 250px;"></a>
+                    <div class="py-4"><span class="badge bg-primary mb-2">Website</span>
+                        <h4 class="fw-bold">Lorem libero donec</h4>
+                        <p class="text-muted">Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo odio,
+                            dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget
+                            metus.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<footer th:replace="main :: footer"></footer>
+</body>
+
+</html>

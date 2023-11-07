@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Services - MDTea-Gen</title>
+    <th:block th:include="~{main::head-tag}"></th:block>
+    <link href="https://fonts.googleapis.com/css?family=Inter:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&amp;display=swap"
+          rel="stylesheet">
+</head>
+
+<body>
+<nav th:replace="~{main::navigation}"></nav>
+<section class="py-5">
+    <div class="container py-5">
+        <div class="row mb-4 mb-lg-5">
+            <div class="col-md-8 col-xl-6 text-center mx-auto">
+                <p class="fw-bold text-success mb-2">Generieren</p>
+                <h3 class="fw-bold">Wähle ein TemplateSet</h3>
+            </div>
+        </div>
+        <div class="row row-cols-1 row-cols-md-2 mx-auto" style="max-width: 900px;">
+            <div class="col mb-5"><img class="rounded img-fluid shadow" src="images/blank-ex.png"></div>
+            <div class="col d-md-flex align-items-md-end align-items-lg-center mb-5">
+                <div>
+                    <h5 class="fw-bold">BLANK</h5>
+                    <p class="text-muted mb-4">Einfach nur schwarzer Text auf weißem Grund.<br>Kein CSS und keine
+                        Animation.</p>
+                    <form th:action="@{/generator/plan-selection}">
+                        <input name="template" th:value="${blank}" type="hidden" value="blank">
+                        <button class="btn btn-primary shadow" type="submit">Learn more</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="row row-cols-1 row-cols-md-2 mx-auto" style="max-width: 900px;">
+            <div class="col order-md-last mb-5"><img class="rounded img-fluid shadow" src="images/color-ex.png">
+            </div>
+            <div class="col d-md-flex align-items-md-end align-items-lg-center mb-5">
+                <div>
+                    <h5 class="fw-bold">Farbig</h5>
+                    <p class="text-muted mb-4">Etwas schöner mit CSS Design.</p>
+                    <form th:action="@{/generator/plan-selection}">
+                        <input name="template" th:value="${color}" type="hidden" value="color">
+                        <button class="btn btn-primary shadow" type="submit">Learn more</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="row row-cols-1 row-cols-md-2 mx-auto" style="max-width: 900px;">
+            <div class="col mb-5"><img class="rounded img-fluid shadow" src="assets/img/products/3.jpg"></div>
+            <div class="col d-md-flex align-items-md-end align-items-lg-center mb-5">
+                <div>
+                    <h5 class="fw-bold">Weitere</h5>
+                    <p class="text-muted mb-4">Es gibt noch mehr. Wähle eins der Designs.</p>
+                    <form th:action="@{/generator/plan-selection}">
+                        <select class="form-select" name="template">
+                            <option class="form-select" th:each="option: ${templates}" th:text="${option.name}"
+                                    th:value="${option.name}">
+                            </option>
+                        </select>
+                        <button class="btn btn-primary shadow" type="submit">Learn more</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<footer th:replace="~{main::footer}"></footer>
+</body>
+
+</html>

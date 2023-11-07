@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="Run all Unit-Tests" type="JUnit" factoryName="JUnit">
+        <module name="MDTea-Assesment-Aggregation"/>
+        <option name="METHOD_NAME" value=""/>
+        <option name="TEST_OBJECT" value="tags"/>
+        <tag value="UnitTest"/>
+        <method v="2">
+            <option name="Make" enabled="true"/>
+        </method>
+    </configuration>
+</component>

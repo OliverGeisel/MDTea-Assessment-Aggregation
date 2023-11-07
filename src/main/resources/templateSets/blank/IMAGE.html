@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport">
+    <title th:text="'Bild: '+${material.headline} "></title>
+    <th:block th:fragment="head">
+    </th:block>
+</head>
+<body>
+<main>
+    <div th:fragment="content">
+        <header>
+            <h1 th:text="${material.headline}"></h1>
+        </header>
+        <hr>
+        <section>
+            <figure>
+                <img alt="Bild Fehlt" th:src="${material.imageName}">
+                <figcaption th:text="${material.headline}">Caption</figcaption>
+            </figure>
+            <p th:text="${material.imageDescription} ?: '' "></p>
+        </section>
+    </div>
+</main>
+<footer>
+</footer>
+</body>
+</html>

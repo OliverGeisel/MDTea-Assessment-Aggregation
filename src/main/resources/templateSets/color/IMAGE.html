@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport">
+    <th:block th:fragment="head">
+        <link rel="stylesheet" th:href="${rootPath}+'/css/bootstrap.min.css'">
+    </th:block>
+    <title th:text="'Bild: '+${material.headline} "></title>
+</head>
+<body>
+<main>
+    <div class="container" th:fragment="content">
+        <header>
+            <h1 class="text-center text-light" th:text="${material.headline}"></h1>
+        </header>
+        <hr>
+        <section>
+
+            <figure class="figure">
+                <img alt="Bild Fehlt" class="img-fluid" th:src="${material.imageName}">
+                <figcaption class="figure-caption text-light" th:text="${material.headline}">Caption</figcaption>
+            </figure>
+            <p class="text-center text-light" th:text="${material.imageDescription} ?: '' "></p>
+        </section>
+    </div>
+</main>
+<footer>
+    <div class="container">
+
+    </div>
+</footer>
+</body>
+</html>

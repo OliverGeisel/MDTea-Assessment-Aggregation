@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html data-bs-theme="dark" lang="de" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Projects - MDTea-Gen</title>
+    <th:block th:include="main :: head-tag"></th:block>
+    <link href="https://fonts.googleapis.com/css?family=Inter:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&amp;display=swap"
+          rel="stylesheet">
+</head>
+
+<body>
+<nav th:replace="main :: navigation">
+</nav>
+<main class="container">
+    <section class="py-5" id="metadata-section">
+        <h3>Allgemeine Informationen</h3>
+        <div class="p-3">
+            <form>
+                <label class="form-label">Name: <input class="form-control" name="name"
+                                                       th:value="${course.metadata.name.get}"></label>
+                <label class="form-label">Jahr: <input class="form-control" min="2000" name="year" step="1"
+                                                       th:value="${course.metadata.year.get}" type="number"></label>
+                <label class="form-label">Stufe: <input class="form-control" name="level"
+                                                        th:value="${course.metadata.level.get}"></label>
+                <label class="form-label">Art: <input class="form-control" name="type"
+                                                      th:value="${course.metadata.type.get}"></label>
+                <label class="form-label">Beschreibung: <textarea class="form-control form-control-plaintext"
+                                                                  cols="40" name="description" rows="5"
+                                                                  th:text="${course.metadata.description.get}"></textarea>
+                </label>
+                <div class="container" id="more-fields" th:if="${course.metadata.otherInfos.size}!=0">
+                    <h4>Weitere Daten</h4>
+                    <th:block th:each="info : ${course.metadata.otherInfos}">
+                        <p class="m-1">
+                            <th:block th:text="${info.key}"></th:block>
+                            : <span th:text="${info.value}"></span></p>
+                    </th:block>
+                </div>
+            </form>
+        </div>
+    </section>
+    <section class="border border-light border-4 m-3 p-2" id="Themen">
+        <header>
+            <h3>Themen</h3>
+        </header>
+        <div class="container border border-secondary border-3 m-2 " style="margin-left: 20px"
+             th:each="chapter,statc : ${course.courseOrder.chapterOrder}"
+             th:id="'chapter-'+${chapter.name.replace(' ','-')}">
+            <div class="row">
+                <h4 class="col-lg order-first" th:text="${chapter.name}"></h4>
+                <span class="col-lg order">
+                    <label th:for="'relvance-chapter-'+${chapter.name}">Relevanz:</label>
+                    <span class="form-control bg-secondary-light" th:id="'relvance-chapter-'+${chapter.name}"
+                          th:text="${chapter.relevance}"></span>
+                </span>
+                <div class="col-lg-2 order">
+                    <div class="d-flex align-items-center">
+                        <div class="container align-content-center">
+                            <form class="col" method="post" th:unless="${statc.first}">
+                                <button class="btn badge bg-secondary-light" name="up" th:value="${chapter.id}"><i
+                                        class="bi bi-arrow-up-circle"></i>
+                                </button>
+                            </form>
+                            <form class="col" method="post" th:unless="${statc.last}">
+                                <button class="btn badge bg-secondary-light" name="down" th:value="${chapter.id}"><i
+                                        class="bi bi-arrow-down-circle"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg order-last">
+                    <form method="post"
+                          th:action="@{${course.id}+'/deletePart'}">
+                        <button class="btn badge bg-danger" name="id"
+                                th:value="${chapter.id}">
+                            <i class="bi bi-trash-fill"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <div class="container">
+                    <div class="row border border-success border-2 m-2 pt-1 pb-1" style="margin-left: 15px"
+                         th:each="group, statg : ${chapter.groupOrder}"
+                         th:id="'group-'+${group.name.replace(' ','-')}">
+                        <div class="row">
+                            <h5 class="col-md order-first" th:text="${group.name}"></h5>
+                            <span class="col-md order form-select bg-success-light"
+                                  th:text="${group.relevance}"></span>
+                            <div class="col-md-3">
+                                <div class="row">
+                                    <div class="col-md-2 order">
+                                        <form method="post" th:unless="${statg.first}">
+                                            <input name="chapter" th:value="${chapter.id}" type="hidden">
+                                            <button class="btn badge bg-success" name="up" th:value="${group.id}"><i
+                                                    class="bi bi-arrow-up-circle"></i>
+                                            </button>
+                                        </form>
+                                        <form method="post" th:unless="${statg.last}">
+                                            <input name="chapter" th:value="${chapter.id}" type="hidden">
+                                            <button class="btn badge bg-success" name="down" th:value="${group.id}"><i
+                                                    class="bi bi-arrow-down-circle"></i></button>
+                                        </form>
+                                    </div>
+                                    <div class="col-md-1 order-last">
+                                        <form class="col-1" method="post"
+                                              th:action="@{${course.id}+'/deletePart'}">
+                                            <button class="btn badge bg-danger" name="id"
+                                                    th:value="${group.id}">
+                                                <i class="bi bi-trash-fill"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="container">
+                                <div class="row border border-primary p-1 pt-1 mt-1" style="margin-left: 10px"
+                                     th:each="task, stat : ${group.taskOrder}"
+                                     th:id="'task-'+${task.name.replace(' ','-')}">
+                                    <div class="row">
+                                        <h6 class="col-sm mt-2 order-first" th:text="${task.name}"></h6>
+                                        <div class="col-sm order">
+                                            <form method="post" th:action="${course.id}+'/relevance'">
+                                                <select class="form-select bg-primary" name="relevance">
+                                                    <option class="form-select" th:each="relevance : ${RELEVANCE}"
+                                                            th:selected="${relevance}==${task.relevance}"
+                                                            th:text="${relevance}">
+                                                    </option>
+                                                </select>
+                                                <button class="btn badge bg-primary" data-bs-target="#taskModal"
+                                                        data-bs-toggle="modal" name="task" th:value="${task.id}"
+                                                        type="submit"><i
+                                                        class="bi bi-arrow-clockwise"></i></button>
+                                            </form>
+                                        </div>
+                                        <div class="col-sm-1 order">
+                                            <form method="post" th:unless="${stat.first}">
+                                                <input name="group" th:value="${group.id}" type="hidden">
+                                                <button class="btn badge bg-primary" name="up" th:value="${task.id}"><i
+                                                        class="bi bi-arrow-up-circle"></i>
+                                                </button>
+                                            </form>
+                                            <form method="post" th:unless="${stat.last}">
+                                                <input name="group" th:value="${group.id}" type="hidden">
+                                                <button class="btn badge bg-primary" name="down" th:value="${task.id}">
+                                                    <i class="bi bi-arrow-down-circle"></i></button>
+                                            </form>
+                                        </div>
+                                        <div class="col-sm-1 order-last">
+                                            <form class="col-1" method="post"
+                                                  th:action="@{${course.id}+'/deletePart'}">
+                                                <button class="btn badge bg-danger" name="id"
+                                                        th:value="${task.id}">
+                                                    <i class="bi bi-trash-fill"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="container pt-2">
+                                        <div class="row pt-1" th:each="material,stat:${task.materialOrder}"
+                                             th:id="'material-'+${material.id}">
+                                            <p class="col-sm order-first m-1 mt-2" th:text="${material.shortName}"></p>
+                                            <div class="col-sm-3 order-last">
+                                                <div class="container">
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <form th:action="@{/view}">
+                                                                <input name="templateSet"
+                                                                       th:value="${course.templateName}" type="hidden">
+                                                                <input name="materialId" th:value="${material.id}"
+                                                                       type="hidden">
+                                                                <span class="col order-5"><button class="btn btn-dark"
+                                                                                                  type="submit">
+                                            <i class="bi bi-binoculars-fill"></i>
+                                        </button>
+                                        </span>
+                                                            </form>
+                                                        </div>
+                                                        <div class="col">
+                                                            <div class="col">
+                                                                <form method="post" th:unless="${stat.first}">
+                                                                    <input name="task" th:value="${task.id}"
+                                                                           type="hidden">
+                                                                    <button class="btn badge bg-primary" name="up"
+                                                                            th:value="${material.id}"><i
+                                                                            class="bi bi-arrow-up-circle"></i>
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                            <div class="col">
+                                                                <form method="post" th:unless="${stat.last}">
+                                                                    <input name="task" th:value="${task.id}"
+                                                                           type="hidden">
+                                                                    <button class="btn badge bg-primary" name="down"
+                                                                            th:value="${material.id}">
+                                                                        <i class="bi bi-arrow-down-circle"></i>
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col">
+                                                            <form method="post"
+                                                                  th:action="@{${course.id}+'/deletePart'}">
+                                                                <button class="btn badge bg-danger" name="id"
+                                                                        th:value="${material.id}">
+                                                                    <i class="bi bi-trash-fill"></i>
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="container" id="export">
+        <header>
+            <h3>Exportieren</h3>
+        </header>
+        <article>
+            <form method="post" th:action="${course.id}+'/export'">
+                <button class="btn btn-primary" disabled name="export" value="pdf">PDF</button>
+                <button class="btn btn-primary" name="export" th:disabled="${!course.valid}" value="html">HTML</button>
+            </form>
+        </article>
+    </section>
+    <section class="container" id="delete">
+        <header>
+            <h3>Löschen</h3>
+        </header>
+        <article>
+            <form method="post" th:action="${course.id}+'/delete'">
+                <button class="btn btn-danger" name="delete" value="true">Löschen</button>
+            </form>
+        </article>
+    </section>
+</main>
+<footer th:replace="main :: footer"></footer>
+</body>
+
+</html>

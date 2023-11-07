@@ -1,0 +1,770 @@
+{
+  "meta": {
+    "name": "Informatik Sachsen 11-12 Grundkurs",
+    "description": "Ein Kursplan nach dem s\u00e4chsischen Lehrplan f\u00fcr Informatik in der 11. und 12. Klasse für Gymnasien.",
+    "year": 2023,
+    "type": "Gymnasium",
+    "level": "Klasse 11-12",
+    "extra": [
+      {
+        "name": "Grundkurs",
+        "value": "true"
+      },
+      {
+        "name": "Jahre",
+        "value": "2"
+      }
+    ]
+  },
+  "content": {
+    "goal-0": {
+      "key": "goal-0",
+      "expression": "Know",
+      "target": "Informatik",
+      "completeSentence": "Kennen des Begriffes Informatik",
+      "content": [
+        "Informatik",
+        "Wissenschaft Informatik",
+        "Informatik als Technik",
+        "Informatik als Werkzeug"
+      ]
+    },
+    "goal-1": {
+      "key": "goal-1",
+      "expression": "Know",
+      "target": "Kommunikationsebenen",
+      "completeSentence": "Kennen grundlegender Kommunikationsebenen.",
+      "content": [
+        "Mensch - Mensch",
+        "Mensch - Maschine",
+        "Maschine - Maschine"
+      ]
+    },
+    "goal-2": {
+      "key": "goal-2",
+      "expression": "Know",
+      "target": "vernetzte Systeme",
+      "completeSentence": "Kennen wesentlicher Strukturen vernetzter Systeme.",
+      "content": [
+        "Vernetzung und Kooperation in Wissenschaft",
+        "virtuelle Welten",
+        "Nachteile von Vernetzung",
+        "Vorteile von Vernetzung",
+        "Vernetzung und Kooperation in Gesellschaft"
+      ]
+    },
+    "goal-3": {
+      "key": "goal-3",
+      "expression": "Translate",
+      "target": "Kommunikationsebenen",
+      "completeSentence": "\u00dcbertragen der Kommunikationsebenen und \nVernetzungsstrukturen auf Computernetze",
+      "content": [
+        "Schichtmodell",
+        "Dienste im Intranet",
+        "Dienste im Internet"
+      ]
+    },
+    "goal-4": {
+      "key": "goal-4",
+      "expression": "Control",
+      "target": "Netzdienste",
+      "completeSentence": "Beherrschen des bewussten Umgangs mit ausgew\u00e4hlten Netzdiensten",
+      "content": [
+        "Netzdienste"
+      ]
+    },
+    "goal-5": {
+      "key": "goal-5",
+      "expression": "First-Look",
+      "target": "Dokumentmanagement",
+      "completeSentence": "Einblick gewinnen in Dokumentmanagement",
+      "content": [
+        "Dokumentmanagement"
+      ]
+    },
+    "goal-6": {
+      "key": "goal-6",
+      "expression": "First-Look",
+      "target": "Inhaltsmanagement",
+      "completeSentence": "Einblick gewinnen in Inhaltsmanagement",
+      "content": [
+        "Inhaltsmanagement"
+      ]
+    },
+    "goal-7": {
+      "key": "goal-7",
+      "expression": "First-Look",
+      "target": "Modellierung",
+      "completeSentence": "Einblick gewinnen in die Systematik informatischer Modellierung",
+      "content": [
+        "Modellbegriff",
+        "Klassifizierung von Modellen in der Informatik"
+      ]
+    },
+    "goal-8": {
+      "key": "goal-8",
+      "expression": "Use",
+      "target": "Modellierung",
+      "completeSentence": "Anwenden auf informatische Problemstellungen",
+      "content": [
+        "Problemstellung"
+      ]
+    },
+    "goal-9": {
+      "key": "goal-9",
+      "expression": "Know",
+      "target": "Informationssicherheit",
+      "completeSentence": "Kennen von Anforderungen an die Informationssicherheit",
+      "content": [
+        "Informationssicherheit",
+        "Vertraulichkeit",
+        "Integrit\u00e4t",
+        "Verf\u00fcgbarkeit",
+        "Authentizit\u00e4t",
+        "Verbindlichkeit",
+        "Anerkennung"
+      ]
+    },
+    "goal-10": {
+      "key": "goal-10",
+      "expression": "First-Look",
+      "target": "Kryptologie",
+      "completeSentence": "Einblick gewinnen in die Kryptologie im gesellschaftlichen Kontext",
+      "content": [
+        "Kryptologie",
+        "Kryptographie"
+      ]
+    },
+    "goal-11": {
+      "key": "goal-11",
+      "expression": "Know",
+      "target": "Verfahren der Vertraulichkeit",
+      "completeSentence": "Kennen von Verfahren zur Gewährleistung der Vertraulichkeit",
+      "content": [
+        "Verfahren der Vertraulichkeit",
+        "Symmetrische Verfahren",
+        "Asymmetrische Verfahren",
+        "nicht kryptographische Verfahren"
+      ]
+    },
+    "goal-12": {
+      "key": "goal-12",
+      "expression": "Know",
+      "target": "Verfahren der Integrität",
+      "completeSentence": "Kennen von Verfahren zur Gewährleistung der Integrität",
+      "content": [
+        "Verfahren der Integrität"
+      ]
+    },
+    "goal-13": {
+      "key": "goal-13",
+      "expression": "Know",
+      "target": "Verfahren der Authentizität",
+      "completeSentence": "Kennen von Verfahren zur Gewährleistung der Authentizität",
+      "content": [
+        "Verfahren der Authentizität"
+      ]
+    },
+    "goal-14": {
+      "key": "goal-14",
+      "expression": "Control",
+      "target": "Sicherheit von Informationen",
+      "completeSentence": "Beherrschen der Nutzung von Verfahren zur Gewährleistung der Sicherheit von Informationen",
+      "content": [
+        "Sicherheit von Informationen",
+        "Datensicherung",
+        "Datenschutz",
+        "Datensicherheit"
+      ]
+    }
+  },
+  "structure": [
+    {
+      "key": "chapter-0",
+      "name": "Informatik Überblick",
+      "weight": 1.0,
+      "alternatives": [
+        "Informatik \u00dcberblick",
+        "Informatik"
+      ],
+      "topic": "Informatik",
+      "groups": [
+        {
+          "key": "group-0-1",
+          "name": "Informatik als Wissenschaft",
+          "alternatives": [
+            "Informatik"
+          ],
+          "topic": "Wissenschaft Informatik",
+          "tasks": [
+            {
+              "key": "task-0-1-1",
+              "name": "Der Begriff Informatik",
+              "topic": "Wissenschaft Informatik",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "Informatik"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "chapter-1",
+      "name": "Kommunikation in Netzen",
+      "weight": 8.0,
+      "alternatives": [
+        "Kommunikationsebenen"
+      ],
+      "topic": "Kommunikation",
+      "groups": [
+        {
+          "key": "group-1-1",
+          "name": "Kommunikationsebenen",
+          "alternatives": [],
+          "topic": "Mensch - Mensch",
+          "tasks": [
+            {
+              "key": "task-1-1-1",
+              "name": "Mensch-Mensch Kommunikation",
+              "topic": "Mensch - Mensch",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                ""
+              ]
+            },
+            {
+              "key": "task-1-1-2",
+              "name": "Mensch-Maschine Kommunikation",
+              "topic": "Mensch - Maschine",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-1-1-3",
+              "name": "Maschine-Maschine Kommunikation",
+              "topic": "Maschine - Maschine",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            }
+          ]
+        },
+        {
+          "key": "group-1-2",
+          "name": "Vernetzte Systeme",
+          "alternatives": [],
+          "topic": "Vernetzung und Kooperation in Gesellschaft",
+          "tasks": [
+            {
+              "key": "task-1-2-1",
+              "name": "Vernetzung in der Gesellschaft",
+              "topic": "Vernetzung und Kooperation in Gesellschaft",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-1-2-2",
+              "name": "Vernetzung in der Wissenschaft",
+              "topic": "Vernetzung und Kooperation in Wissenschaft",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-1-2-3",
+              "name": "Vorteile der Vernetzung",
+              "topic": "Vorteile der Vernetzung",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-1-2-4",
+              "name": "Nachteile der Vernetzung",
+              "topic": "Nachteile der Vernetzung",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-1-2-5",
+              "name": "Virtuelle Welten",
+              "topic": "virtuelle Welten",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "Virtuelle Welt"
+              ]
+            }
+          ]
+        },
+        {
+          "key": "group-1-3",
+          "name": "Computernetze",
+          "alternatives": [],
+          "topic": "Schichtmodell",
+          "tasks": [
+            {
+              "key": "task-1-3-1",
+              "name": "Kommunikationsprotokolle",
+              "topic": "Schichtmodell",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-1-3-2",
+              "name": "Leitungsvermittlung",
+              "topic": "Schichtmodell",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-1-3-3",
+              "name": "Paketvermittlung",
+              "topic": "Schichtmodell",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-1-3-4",
+              "name": "Statische Adressierung",
+              "topic": "Schichtmodell",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-1-3-5",
+              "name": "Dynamische Adressierung",
+              "topic": "Schichtmodell",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            }
+          ]
+        },
+        {
+          "key": "group-1-4",
+          "name": "Netzdienste",
+          "alternatives": [],
+          "topic": "Dienste im Intranet",
+          "tasks": [
+            {
+              "key": "task-1-4-1",
+              "name": "Kommunikationsm\u00f6glichkeiten",
+              "topic": "Vernetzung und Kooperation in Gesellschaft",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-1-4-2",
+              "name": "Botnetze",
+              "topic": "Vernetzung und Kooperation in Gesellschaft",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-1-4-3",
+              "name": "Filterblasen",
+              "topic": "Vernetzung und Kooperation in Gesellschaft",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-1-4-4",
+              "name": "Darknet",
+              "topic": "Vernetzung und Kooperation in Gesellschaft",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            }
+          ]
+        },
+        {
+          "key": "group-1-5",
+          "name": "Dokumentmanagement",
+          "alternatives": [],
+          "topic": "",
+          "tasks": [
+            {
+              "key": "task-1-5-1",
+              "name": "Applikationen",
+              "topic": "",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-1-5-2",
+              "name": "Rechtestruktur",
+              "topic": "",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-1-5-3",
+              "name": "Sicherheitseinstellung",
+              "topic": "",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            }
+          ]
+        },
+        {
+          "key": "group-1-6",
+          "name": "Inhaltsmanagement",
+          "alternatives": [],
+          "topic": "",
+          "tasks": [
+            {
+              "key": "task-1-6-1",
+              "name": "Applikationen",
+              "topic": "",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-1-6-2",
+              "name": "Rechtestruktur",
+              "topic": "",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-1-6-3",
+              "name": "Sicherheitseinstellung",
+              "topic": "",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "chapter-2",
+      "name": "Informatische Modelle",
+      "weight": 4.0,
+      "alternatives": [],
+      "topic": "",
+      "groups": [
+        {
+          "key": "group-2-1",
+          "name": "Modelle",
+          "alternatives": [],
+          "topic": "Modell",
+          "tasks": [
+            {
+              "key": "task-2-1-1",
+              "name": "Abbild von Realit\u00e4t und Vitrualit\u00e4t",
+              "topic": "",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-2-1-2",
+              "name": "Ziel der Modellierung",
+              "topic": "",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-2-1-3",
+              "name": "Anforderungen",
+              "topic": "",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-2-1-4",
+              "name": "Grenzen",
+              "topic": "",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            }
+          ]
+        },
+        {
+          "key": "group-2-2",
+          "name": "Klassifizierung von Modellen",
+          "alternatives": [],
+          "topic": "",
+          "tasks": [
+            {
+              "key": "task-2-2-1",
+              "name": "Abstraktionsgrad",
+              "topic": "",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-2-2-2",
+              "name": "Darstellungsart",
+              "topic": "",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-2-2-3",
+              "name": "Zielorientierung",
+              "topic": "",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            }
+          ]
+        },
+        {
+          "key": "group-2-3",
+          "name": "Modelle in Problemstellungen",
+          "alternatives": [],
+          "topic": "",
+          "tasks": [
+            {
+              "key": "task-2-3-1",
+              "name": "Schrittfolge der Modellierung",
+              "topic": "",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-2-3-2",
+              "name": "Modellierungswerkzeuge nutzen",
+              "topic": "",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "chapter-3",
+      "name": "Sicherheit von Informationen",
+      "weight": 12.0,
+      "alternatives": [],
+      "topic": "Informationssicherheit",
+      "groups": [
+        {
+          "key": "group-3-1",
+          "name": "Anforderungen der Informationssicherheit",
+          "alternatives": [],
+          "topic": "Informationssicherheit",
+          "tasks": [
+            {
+              "key": "task-3-1-1",
+              "name": "Vertraulichkeit",
+              "topic": "Vertraulichkeit",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-3-1-2",
+              "name": "Integrit\u00e4t",
+              "topic": "Integrität",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-3-1-3",
+              "name": "Authentizit\u00e4t",
+              "topic": "Authentizität",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-3-1-4",
+              "name": "Verbindlichkeit",
+              "topic": "Verbindlichkeit",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            }
+          ]
+        },
+        {
+          "key": "group-3-2",
+          "name": "Kryptologie  in der Gesellschaft",
+          "alternatives": [],
+          "topic": "Kryptologie",
+          "tasks": [
+            {
+              "key": "task-3-2-1",
+              "name": "Kryptographie",
+              "topic": "Kryptologie",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-3-2-2",
+              "name": "Kryptoanalyse",
+              "topic": "Kryptologie",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            }
+          ]
+        },
+        {
+          "key": "group-3-3",
+          "name": "Symmetrische Verfahren",
+          "alternatives": [],
+          "topic": "Symmetrische Verfahren",
+          "tasks": [
+            {
+              "key": "task-3-3-1",
+              "name": "C\u00e4sar",
+              "topic": "Symmetrische Verfahren",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-3-3-2",
+              "name": "Vigenere",
+              "topic": "Symmetrische Verfahren",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-3-3-3",
+              "name": "Enigma",
+              "topic": "Symmetrische Verfahren",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-3-3-4",
+              "name": "DES",
+              "topic": "Symmetrische Verfahren",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-3-3-5",
+              "name": "AES",
+              "topic": "Symmetrische Verfahren",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-3-3-6",
+              "name": "SSL",
+              "topic": "Symmetrische Verfahren",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            }
+          ]
+        },
+        {
+          "key": "group-3-4",
+          "name": "Asymetrische Verfahren",
+          "alternatives": [],
+          "topic": "Asymmetrische Verfahren",
+          "tasks": [
+            {
+              "key": "task-3-4-1",
+              "name": "RSA",
+              "topic": "Asymmetrische Verfahren",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "RSA",
+                "RSA-Verfahren",
+                "RSA-Algorithmus",
+                "Verschlüsselung"
+              ]
+            },
+            {
+              "key": "task-3-4-2",
+              "name": "ElGamal",
+              "topic": "Asymmetrische Verfahren",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            }
+          ]
+        },
+        {
+          "key": "group-3-5",
+          "name": "Nicht kryptographische Verfahren",
+          "alternatives": [],
+          "topic": "nicht kryptographische Verfahren",
+          "tasks": [
+            {
+              "key": "task-3-5-1",
+              "name": "Steganographie",
+              "topic": "nicht kryptographische Verfahren",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            }
+          ]
+        },
+        {
+          "key": "group-3-6",
+          "name": "Integrit\u00e4t",
+          "alternatives": [],
+          "topic": "Verfahren der Integrität",
+          "tasks": [
+            {
+              "key": "task-3-6-1",
+              "name": "One-Way-Hash Funktion",
+              "topic": "One-Way-Hash Funktion",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "One-Way-Hash Function",
+                "Einweg Hashfunktion",
+                "Hashfunktion"
+              ]
+            }
+          ]
+        },
+        {
+          "key": "group-3-7",
+          "name": "Authentizit\u00e4t",
+          "alternatives": [],
+          "topic": "Authentizität",
+          "tasks": [
+            {
+              "key": "task-3-7-1",
+              "name": "elektronische Unterschrift",
+              "topic": "Authentizität",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            }
+          ]
+        },
+        {
+          "key": "group-3-8",
+          "name": "Gew\u00e4hrleisten von der Sicherheit",
+          "alternatives": [],
+          "topic": "Sicherheit von Informationen",
+          "tasks": [
+            {
+              "key": "task-3-8-1",
+              "name": "Datenschutz",
+              "topic": "Datenschutz",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-3-8-2",
+              "name": "Datensicherheit",
+              "topic": "Datensicherheit",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-3-8-3",
+              "name": "Datenmissbrauch",
+              "topic": "",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-3-8-4",
+              "name": "Werkzeuge",
+              "topic": "",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            },
+            {
+              "key": "task-3-8-5",
+              "name": "Einsatz in Programmierumgebungen",
+              "topic": "",
+              "relevance": "MANDATORY",
+              "alternatives": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
