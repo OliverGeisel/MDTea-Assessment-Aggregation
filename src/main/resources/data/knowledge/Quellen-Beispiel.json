@@ -1,0 +1,30 @@
+{
+  "knowledge": [],
+  "structure": {},
+  "sources": [
+    {
+      "type": "INTERNAL_MEDIA",
+      "id": "InternalMedia1-INTERNAL_MEDIA",
+      "name": "Internes Medium innerhalb der Organisation",
+      "content": "Tests sind wichtig"
+    },
+    {
+      "type": "RESOLVABLE_REFERENCE",
+      "id": "ResRef1-RESOLVABLE_REFERENCE",
+      "name": "Externes Medium 1",
+      "content": ""
+    },
+    {
+      "type": "NOT_RESOLVABLE_REFERENCE",
+      "id": "NoResRef1-NOT_RESOLVABLE_REFERENCE",
+      "name": "Quelle, die nicht in Besitz ist",
+      "content": ""
+    },
+    {
+      "type": "UNKNOWN_SOURCE",
+      "id": "UNBEKANNT-UNKNOWN_SOURCE",
+      "name": "Unbekannte Quelle",
+      "content": ""
+    }
+  ]
+}

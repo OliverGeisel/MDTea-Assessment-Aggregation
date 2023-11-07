@@ -1,0 +1,1394 @@
+{
+  "knowledge": [
+    {
+      "type": "TERM",
+      "id": "TermBeispiel-TERM",
+      "structure": "Bereich1",
+      "content": "Termbeispiel",
+      "relations": [
+        {
+          "relation_id": "Objekt-TERM",
+          "relation_type": "has"
+        }
+      ]
+    },
+    {
+      "type": "DEFINITION",
+      "id": "DefinitionsBeispiel-DEFINITION",
+      "structure": "Bereich1",
+      "content": "Definiert TermBeispie",
+      "relations": [
+        {
+          "relation_id": "TermBeispiel-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Objekt-TERM",
+      "structure": "Bereich1-2",
+      "content": "Objekt",
+      "relations": [
+        {
+          "relation_id": "TermBeispiel-TERM",
+          "relation_type": "part-of"
+        }
+      ]
+    },
+    {
+      "type": "FACT",
+      "id": "FactB-FACT",
+      "structure": "Java",
+      "content": "Fakten sind immer wahr!",
+      "relations": []
+    },
+    {
+      "type": "TERM",
+      "id": "Algorithmus-TERM",
+      "structure": "Algorithmus-Begriff",
+      "content": "Algorithmus",
+      "relations": [
+        {
+          "relation_id": "Algorithmus-DEFINITION",
+          "relation_type": "defined-by"
+        },
+        {
+          "relation_id": "Algorithmus-2-DEFINITION",
+          "relation_type": "defined-by"
+        }
+      ]
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Algorithmus-DEFINITION",
+      "structure": "Algorithmus-Begriff",
+      "content": "Ein Algorithmus ist eine eindeutige Handlungsvorschrift zur Lösung eines Problems oder einer Klasse von Problemen.",
+      "relations": [
+        {
+          "relation_id": "Algorithmus-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "EXAMPLE",
+      "id": "Algorithmus-EXAMPLE",
+      "structure": "Algorithmus-Begriff",
+      "content": "image:Algorithmus.png;title:Algorithmus",
+      "relations": [
+        {
+          "relation_id": "Algorithmus-TERM",
+          "relation_type": "example-for"
+        }
+      ]
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Algorithmus-2-DEFINITION",
+      "structure": "Algorithmus-Begriff",
+      "content": "Ein Algorithmus ist eine eine geordnete Reihenfolge von Handlungsschritten, die ein Problem lösen. Er kennzeichnet sich durch Endlichkeit, Eindeutigkeit, Determiniertheit und Effektivität.",
+      "relations": [
+        {
+          "relation_id": "Algorithmus-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "id": "Algorithmus-TEXT",
+      "structure": "Algorithmus-Begriff",
+      "content": "headline:Beispieltext;text:Algorithmen sind in der Informatik von zentraler Bedeutung. Sie sind die Grundlage für die Entwicklung von Programmen und Software. Sie sind heute in fast allen Bereichen des Lebens zu finden. Beispiele sind die Routenplanung, die Wettervorhersage, die Verschlüsselung von Daten, die Bildbearbeitung, die Spracherkennung und die Simulation von Prozessen.",
+      "relations": [
+        {
+          "relation_id": "Algorithmus-TERM",
+          "relation_type": "related"
+        }
+      ]
+    },
+    {
+      "type": "CODE",
+      "id": "Test-Code-CODE",
+      "structure": "Java",
+      "content": "Java\nBeispiel.java\npublic class Beispiel{\n\tprivate int number;\n}",
+      "relations": []
+    },
+    {
+      "type": "CODE",
+      "id": "Java-Pattern-Matching-CODE",
+      "structure": "Java 19",
+      "content": "Java\nPatternMatchingBeispiel.java\npublic class PatternMatchingBeispiel{\n\tprivate int number;\n\tpublic void setNumber(int number){\n\t\tthis.number = number;\n\t}\n\tpublic int getNumber(){\n\t\treturn number;\n\t}\n\tpublic void patternMatching(){\n\t\tswitch(object):\n\t\t\tcase Integer i -> System.out.println(i);\n\t\t\tcase String s -> System.out.println(s);\n\t\t\tdefault -> System.out.println(\"Kein String oder Integer\");\n\t}\n}",
+      "relations": []
+    },
+    {
+      "type": "TERM",
+      "id": "Informatik-TERM",
+      "structure": "Wissenschaft Informatik",
+      "content": "Informatik",
+      "relations": []
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Informatik-DEFINITION",
+      "structure": "Wissenschaft Informatik",
+      "content": "Informatik ist die die Wissenschaft von der systematischen Verarbeitung von Informationen mit Hilfe von Digitalrechnern.",
+      "relations": [
+        {
+          "relation_id": "Informatik-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Informatik-Definition-2-DEFINITION",
+      "structure": "Wissenschaft Informatik",
+      "content": "Informatik ist die Wissenschaft, Technik und Anwendung der maschinellen Verarbeiteung und \u00dcbermittling von Informationen.",
+      "relations": [
+        {
+          "relation_id": "Informatik-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Informatik-Definition-3-DEFINITION",
+      "structure": "Wissenschaft Informatik",
+      "content": "Kunstwort aus: Informationen + Automaik.",
+      "relations": [
+        {
+          "relation_id": "Informatik-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "QUESTION",
+      "id": "Informatik-Wissenschaft-Technik-Frage-QUESTION",
+      "structure": "Wissenschaft Informatik",
+      "content": "Ist die Informatik Technik oder Wissenschaft?",
+      "relations": []
+    },
+    {
+      "type": "ANSWER",
+      "id": "Wissenschaft-Technik-Frage-Antwort-ANSWER",
+      "structure": "Wissenschaft Informatik",
+      "content": "Beides!",
+      "relations": [
+        {
+          "relation_id": "Informatik-Wissenschaft-Technik-Frage-QUESTION",
+          "relation_type": "related"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Informatiksystem-TERM",
+      "structure": "Wissenschaft Informatik",
+      "content": "Informatiksystem",
+      "relations": []
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Informatiksystem-DEFINITION",
+      "structure": "Wissenschaft Informatik",
+      "content": "Der Begriff Informatiksystem beschreibt die Einheit aus Hardware und Software sowie Netzen einschlie\u00dflich aller durch sie angestrebten und verursachten Gestaltung- und Qualifizierungsprozesse bez\u00fcglich Arbeit und Organisation.",
+      "relations": [
+        {
+          "relation_id": "Informatiksystem-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Information-TERM",
+      "structure": "Wissenschaft Informatik",
+      "content": "Information",
+      "relations": []
+    },
+    {
+      "type": "TERM",
+      "id": "Unterrichtung-TERM",
+      "structure": "Wissenschaft Informatik",
+      "content": "Unterrichtung",
+      "relations": [
+        {
+          "relation_id": "Information-TERM",
+          "relation_type": "is-Synonym-for"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Mitteilung-TERM",
+      "structure": "Wissenschaft Informatik",
+      "content": "Mitteilung",
+      "relations": [
+        {
+          "relation_id": "Information-TERM",
+          "relation_type": "is-Synonym-for"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Auskunft-TERM",
+      "structure": "Wissenschaft Informatik",
+      "content": "Auskunft",
+      "relations": [
+        {
+          "relation_id": "Information-TERM",
+          "relation_type": "is-Synonym-for"
+        }
+      ]
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Information-2-DEFINITION",
+      "structure": "Wissenschaft Informatik",
+      "content": "Information ist eine allgemeine Eigenschaft der uns umgebenen Welt.\nInformationen werden sowohl in der belebten und unbelebten Natur als auch in der menschlichen Gesellschaft aufgenommen, gespeichert, verarbeitet und weitergegeben.",
+      "relations": [
+        {
+          "relation_id": "Information-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "NODE",
+      "id": "Eigenschaften-Information-NODE",
+      "structure": "Wissenschaft Informatik",
+      "content": "Eigenschaften von Information\n\n- Information ist immer an einen stofflich(-energetischen) Tr\u00e4ger gebunden. Kristallgitter, DNS und Buch sind in den Beispielen jeweils Informationstr\u00e4ger\n- Information bewirkt etwas. \n- Information l\u00e4sst sich beliebig vervielf\u00e4ltigen (Das vorhandensein von Informationstr\u00e4gern vorarusgesetzt)",
+      "relations": [
+        {
+          "relation_id": "Information-TERM",
+          "relation_type": "related"
+        }
+      ]
+    },
+    {
+      "type": "NODE",
+      "id": "Information-\u00dcbertragung-NODE",
+      "structure": "Wissenschaft Informatik",
+      "content": "Informationen werden mit Zeichen oder Signalen \u00fcbertragen.",
+      "relations": [
+        {
+          "relation_id": "Information-TERM",
+          "relation_type": "related"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Zeichenkette-TERM",
+      "structure": "Wissenschaft Informatik",
+      "content": "Zeichenkette",
+      "relations": []
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Zeichenkette-DEFINITION",
+      "structure": "Wissenschaft Informatik",
+      "content": "Eine Zeichenkette ist eine Folge von Elementen (Buchstaben, Zahlen, Symbolen) eines Alphabets.",
+      "relations": [
+        {
+          "relation_id": "Zeichenkette-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Signal-TERM",
+      "structure": "Wissenschaft Informatik",
+      "content": "Signal",
+      "relations": []
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Signal-DEFINITION",
+      "structure": "Wissenschaft Informatik",
+      "content": "Ein Signal ist eine duch Messger\u00e4te erfassbare physikalische Var\u00e4nderung. Signale dienen zur Darstellung von Zeichen.",
+      "relations": [
+        {
+          "relation_id": "Signal-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Ton-TERM",
+      "structure": "Wissenschaft Informatik",
+      "content": "Ton",
+      "relations": [
+        {
+          "relation_id": "Signal-TERM",
+          "relation_type": "related"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "elektrischer Impuls-TERM",
+      "structure": "Wissenschaft Informatik",
+      "content": "elektrischer Impuls",
+      "relations": [
+        {
+          "relation_id": "Signal-TERM",
+          "relation_type": "related"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Lichtblitz-TERM",
+      "structure": "Wissenschaft Informatik",
+      "content": "Lichtblitz",
+      "relations": [
+        {
+          "relation_id": "Signal-TERM",
+          "relation_type": "related"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Nachricht-TERM",
+      "structure": "Wissenschaft Informatik",
+      "content": "Nachricht",
+      "relations": []
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Nachricht-DEFINITION",
+      "structure": "Wissenschaft Informatik",
+      "content": "Eine Nachricht ist eine endliche Zeichenkette oder eine endliche Folge von Signalen, die von einem Sender (Quelle) \u00fcber einen Kanal (der st\u00f6ranf\u00e4llig sein kann) an einen Empf\u00e4nger (Senke) \u00fcbermittelt wird",
+      "relations": []
+    },
+    {
+      "type": "TERM",
+      "id": "Sender-TERM",
+      "structure": "Wissenschaft Informatik",
+      "content": "Sender",
+      "relations": [
+        {
+          "relation_id": "Nachricht-DEFINITION",
+          "relation_type": "related"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Quelle-TERM",
+      "structure": "Wissenschaft Informatik",
+      "content": "Quelle",
+      "relations": [
+        {
+          "relation_id": "Sender-TERM",
+          "relation_type": "is-Synonym-for"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Empf\u00e4nger-TERM",
+      "structure": "Wissenschaft Informatik",
+      "content": "Empf\u00e4nger",
+      "relations": [
+        {
+          "relation_id": "Nachricht-DEFINITION",
+          "relation_type": "related"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Senke-TERM",
+      "structure": "Wissenschaft Informatik",
+      "content": "Senke",
+      "relations": [
+        {
+          "relation_id": "Empf\u00e4nger-TERM",
+          "relation_type": "is-Synonym-for"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Datum-TERM",
+      "structure": "Wissenschaft Informatik",
+      "content": "Datum",
+      "relations": [
+        {
+          "relation_id": "Zeichenkette-TERM",
+          "relation_type": "has"
+        }
+      ]
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Datum-DEFINITION",
+      "structure": "Wissenschaft Informatik",
+      "content": "Automatisch bzw. elektrisch verarbeitbare Informationen fasst man mit dem Begriff Daten (einzel Datum).",
+      "relations": [
+        {
+          "relation_id": "Datum-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Bit-TERM",
+      "structure": "Wissenschaft Informatik",
+      "content": "Bit",
+      "relations": []
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Bit-DEFINITION",
+      "structure": "Wissenschaft Informatik",
+      "content": "Die kleinste Einheit der Darstellung, die zwei m\u00f6gliche Werte (0/1) annehmen kann, nennt man Bit.",
+      "relations": [
+        {
+          "relation_id": "Bit-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "TEXT",
+      "id": "Informatik-Gesellschaft-TEXT",
+      "structure": "Informatik Gesellschaft",
+      "content": "text: Die Informatik ist u.a. eine Ingenieurwissenschaft. Ihr Ziel ist die Konstruktion und Anwendung nutzbringender, k\u00fcnstlicher Systeme zur Verarbeitung von Informationen. Damit ist klar, dass Informatik nicht im wertneutralem Raum stattfindet. Es steht immer die Frage \"Nutzen f\u00fcr wen?\" und damit auch nach der sozialen Verantwortung der Informatiker.\n\nEtwa seit 1960 kann man von der Informatik als eigenst\u00e4ndige Wissenschaft sprechen. Sie hat inzwischen eine Vielzahl Untergliederungegn und Spezialdisziplinen hervorgebracht.",
+      "relations": []
+    },
+    {
+      "type": "TERM",
+      "id": "Theoretische-Informatik-TERM",
+      "structure": "Theoretische Informatik",
+      "content": "Theoretische Informatik",
+      "relations": [
+        {
+          "relation_id": "Informatik-TERM",
+          "relation_type": "part-of"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Praktische-Informatik-TERM",
+      "structure": "Praktische Informatik",
+      "content": "Praktische Informatik",
+      "relations": [
+        {
+          "relation_id": "Informatik-TERM",
+          "relation_type": "part-of"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Technische-Informatik-TERM",
+      "structure": "Technische Informatik",
+      "content": "Technische Informatik",
+      "relations": [
+        {
+          "relation_id": "Informatik-TERM",
+          "relation_type": "part-of"
+        }
+      ]
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Technische-Informatik-DEFINITION",
+      "structure": "Technische Informatik",
+      "content": "Die Technische Informatik befasst sich mit dem funktionalen Aufbau von Computern und dazugeh\u00f6rigen Peripherieger\u00e4ten einschlie\u00dfllichRechnernetze sowie dem logischen und terchnischen Entwurf von Schaltungen und Ger\u00e4ten.",
+      "relations": [
+        {
+          "relation_id": "Technische-Informatik-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Praktische-Informatik-DEFINITION",
+      "structure": "Praktische Informatik",
+      "content": "Die Praktische Informatik besch\u00e4ftigt sich mit den Methoden und Hilfsmitteln zum Entwurf und zur Umsetzung von Probleml\u00f6sungen auf dem Computer.",
+      "relations": [
+        {
+          "relation_id": "Praktische-Informatik-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Theoretische-Informatik-DEFINITION",
+      "structure": "Theoretische Informatik",
+      "content": "In der Theoretischen Informatik werden die grundlegenden Strukturen und Prozesse mit mathematischen Hilfsmitteln modelliert und untersucht. Die tehoretische Informatik zeigt prinzipielle Grenzen und schafft gleichzeitig Voraussetzungen f\u00fcr Neues.",
+      "relations": [
+        {
+          "relation_id": "Theoretische-Informatik-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Angewandte-Informatik-DEFINITION",
+      "structure": "Angewandte Informatik",
+      "content": "Die Angewante Informatik ist eigentlich der Oberbegriff f\u00fcr die Verwendung in anderen Faqchgebieten, die ihre wesentliche Ergebnisse nur mit dem Computer erreichen k\u00f6nnen.",
+      "relations": [
+        {
+          "relation_id": "Angewandte-Informatik-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "EXAMPLE",
+      "id": "Technisches-Informationssystem-EXAMPLE",
+      "structure": "Wissenschaft Informatik",
+      "content": "content:;image:Informationssystem.png;title:Schematische darstellung eines Informationssystems",
+      "relations": [
+        {
+          "relation_id": "Informationssystem-TERM",
+          "relation_type": "example-for"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Datenschutz-TERM",
+      "structure": "Datenschutz",
+      "content": "Datenschutz",
+      "relations": []
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Datenschutz-DEFINITION",
+      "structure": "Datenschutz",
+      "content": "Gesamtheit der Standards der gesetzlichen und betrieblichen Regelungen zum Schutz der Rechte der Gemeinschaft sowie nat\u00fcrlicher und juristischer Personen vor Verltzung der Vertraulichkeit, der Integrit\u00e4t und der Sicherheit des Informationshasuhaltes bzw. der Informationsmenge.",
+      "relations": [
+        {
+          "relation_id": "Datenschutz-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Datensicherung-TERM",
+      "structure": "Datenschutz",
+      "content": "Datensicherung",
+      "relations": []
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Datensicherung-DEFINITION",
+      "structure": "Datenschutz",
+      "content": "Ma\u00dfnahmen, Vorkehrungen und Einrichtungen zur Verwirklichung des Datenschutzes und zur Erreichung des erforderlichen Grades an Datensicherheit.",
+      "relations": [
+        {
+          "relation_id": "Datensicherung-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Datensicherheit-TERM",
+      "structure": "Datensicherheit",
+      "content": "Datensicherheit",
+      "relations": []
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Datensicherheit-DEFINITION",
+      "structure": "Datensicherheit",
+      "content": "Ziel besteht darin, nicht nur personenbezogene Daten vor unerlaubten Zugriff zu sch\u00fctzen, sondern auch das IT-System selbst zu sichern vor Datenverlusten, Verf\u00e4lschungen, Zerts\u00f6rung und unachtgem\u00e4\u00dfen Gebrauch.",
+      "relations": []
+    },
+    {
+      "type": "TERM",
+      "id": "Vertraulichkeit-TERM",
+      "structure": "Datensicherheit",
+      "content": "Vertraulichkeit",
+      "relations": []
+    },
+    {
+      "type": "TERM",
+      "id": "Integrit\u00e4t-TERM",
+      "structure": "Datensicherheit",
+      "content": "Integrit\u00e4t",
+      "relations": [
+        {
+          "relation_id": "Ziele-Kryptologie-NODE",
+          "relation_type": "part-of"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Verf\u00fcgbarkeit-TERM",
+      "structure": "Datensicherheit",
+      "content": "Verf\u00fcgbarkeit",
+      "relations": []
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Vertraulichkeit-DEFINITION",
+      "structure": "Datensicherheit",
+      "content": "Ein System gew\u00e4hrleistet Vertraulichkeit, wenn die in ihm enthaltenen Informationen nur berechtigten Subjekten zur Kenntnis gelangen. Eine Information ist dann vertraulich, wenn sie nur berechtigten Subjekten zur Kenntnis gelangt ist.",
+      "relations": [
+        {
+          "relation_id": "Vertraulichkeit-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Integrit\u00e4t-DEFINITION",
+      "structure": "Datensicherheit",
+      "content": "Integit\u00e4t ist die Eigenschaft eines Systems, die besagt, dass es nur erlaubte und intendierte Ver\u00e4nderungegn der in ihm enthaltenen Informationen zul\u00e4sst. Eine Information ist dann integer, wenn an ihr nur zul\u00e4ssige Veranderungen vorgenommen wurden.",
+      "relations": [
+        {
+          "relation_id": "Integrit\u00e4t-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Verf\u00fcgbarkeit-DEFINITION",
+      "structure": "Datensicherheit",
+      "content": "Die Verf\u00fcgbarkeit eines Systems bezeichnet die Eigenschaft, bestimmte Dienstleistungen in zugesicherter Form und Qualit\u00e4t in einem zugesicherten Zeitrau, erbringen zu k\u00f6nnen. Verf\u00fcgnarkeit einer Information ist darin inbegriffen. Sie besagt, dass die Informationen Qualit\u00e4t in einem zugesicherten Zeitraum in einer erwarteten oder geforderten Form und Qualit\u00e4t zur Verf\u00fcgung steht.",
+      "relations": [
+        {
+          "relation_id": "Verf\u00fcgbarkeit-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "IMAGE",
+      "id": "AsymmetrischBeispiele-IMAGE",
+      "structure": "Asymmetrische Verfahren",
+      "content": "imageName:AsymmetrischBeispiele.png;imageDescription:;headline:Beispiele der asymmetrischen Verfahren",
+      "relations": [
+        {
+          "relation_id": "Asymmetrisches-Verfahren-TERM",
+          "relation_type": "related"
+        }
+      ]
+    },
+    {
+      "type": "IMAGE",
+      "id": "AsymmetrischeVerfahren-IMAGE",
+      "structure": "Datensicherheit",
+      "content": "imageName:AsymmetrischeVerfahren.png;imageDescription:;headline:Erklärung des asymmetrischen Verfahrens",
+      "relations": [
+        {
+          "relation_id": "Asymmetrisches-Verfahren-TERM",
+          "relation_type": "related"
+        }
+      ]
+    },
+    {
+      "type": "IMAGE",
+      "id": "Datenschutz-IMAGE",
+      "structure": "Datenschutz",
+      "content": "imageName:Datenschutz.png;imageDescription:;headline:Mindmap Datenschutz",
+      "relations": [
+        {
+          "relation_id": "Datenschutz-TERM",
+          "relation_type": "related"
+        }
+      ]
+    },
+    {
+      "type": "IMAGE",
+      "id": "Datenschutzmodelle-IMAGE",
+      "structure": "Datenschutz",
+      "content": "imageName:Datenschutzmodelle.png;imageDescription:;headline:Datenschutzmodell",
+      "relations": [
+        {
+          "relation_id": "Datenschutz-TERM",
+          "relation_type": "related"
+        }
+      ]
+    },
+    {
+      "type": "IMAGE",
+      "id": "Mosaikmodell-IMAGE",
+      "structure": "Datenschutz",
+      "content": "imageName:Mosaikmodell.png;imageDescription:;headline:Das Mosakikmodell für Datenschutz",
+      "relations": [
+        {
+          "relation_id": "Datenschutz-TERM",
+          "relation_type": "related"
+        },
+        {
+          "relation_id": "Datenschutzmodell-TERM",
+          "relation_type": "is"
+        }
+      ]
+    },
+    {
+      "type": "IMAGE",
+      "id": "Rollentheorie-IMAGE",
+      "structure": "Datenschutz",
+      "content": "imageName:Rollentheorie.png;imageDescription:;headline:Das Rollentheorie-Modell für Datenschutz",
+      "relations": [
+        {
+          "relation_id": "Datenschutz-TERM",
+          "relation_type": "related"
+        },
+        {
+          "relation_id": "Datenschutzmodell-TERM",
+          "relation_type": "is"
+        }
+      ]
+    },
+    {
+      "type": "IMAGE",
+      "id": "Sphaere-IMAGE",
+      "structure": "Datenschutz",
+      "content": "imageName:Sphaerenmodell.png;imageDescription:;headline:Das Rollentheorie-Modell für Datenschutz",
+      "relations": [
+        {
+          "relation_id": "Datenschutz-TERM",
+          "relation_type": "related"
+        },
+        {
+          "relation_id": "Datenschutzmodell-TERM",
+          "relation_type": "is"
+        }
+      ]
+    },
+    {
+      "type": "IMAGE",
+      "id": "RSA-IMAGE",
+      "structure": "Asymmetrische Verfahren",
+      "content": "imageName:RSA.png;imageDescription:;headline:Das RSA Verfahren mit Beispiel",
+      "relations": [
+        {
+          "relation_id": "RSA-TERM",
+          "relation_type": "related"
+        }
+      ]
+    },
+    {
+      "type": "IMAGE",
+      "id": "ZitatBSI-IMAGE",
+      "structure": "Datensicherheit",
+      "content": "imageName:ZitatBSI.png;imageDescription:;headline:Zitat des BSI Präsedenten",
+      "relations": []
+    },
+    {
+      "type": "IMAGE",
+      "id": "Kryptologie-IMAGE",
+      "structure": "Kryptologie",
+      "content": "imageName:Kryptologie.png;imageDescription:;headline:Übersicht der Teilgebiete der Kryptologie",
+      "relations": [
+        {
+          "relation_id": "Kryptologie-TERM",
+          "relation_type": "related"
+        }
+      ]
+    },
+    {
+      "type": "IMAGE",
+      "id": "Modern-IMAGE",
+      "structure": "Kryptographie",
+      "content": "imageName:Modern.png;imageDescription:;headline:Moderne Verschlüsselungsverfahren",
+      "relations": [
+        {
+          "relation_id": "Kryptographie-TERM",
+          "relation_type": "related"
+        }
+      ]
+    },
+    {
+      "type": "IMAGE",
+      "id": "Klassisch-IMAGE",
+      "structure": "Kryptographie",
+      "content": "imageName:Klassisch.png;imageDescription:;headline:Klassische Verschlüsselungsverfahren",
+      "relations": [
+        {
+          "relation_id": "Kryptographie-TERM",
+          "relation_type": "related"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Kryptologie-TERM",
+      "structure": "Kryptologie",
+      "content": "Kryptologie",
+      "relations": []
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Kryptologie-DEFINITION",
+      "structure": "Kryptologie",
+      "content": "Wissenschaft und Teilgebiet der angewandten Mathematik.",
+      "relations": [
+        {
+          "relation_id": "Kryptologie-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Kryptographie-TERM",
+      "structure": "Kryptographie",
+      "content": "Kryptographie",
+      "relations": []
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Kryptographie-DEFINITION",
+      "structure": "Kryptographie",
+      "content": "Das Wort Kryptographie stammt aus dem Griechischen und setzt sich aus den Worten kryptos (geheim, verborgen) und graphein (schreiben) zusammen. Somit ist Kryptographie die Kunst der Geheimschriften bzw. im modernen Sprachgebracu der Verschl\u00fcsselung.",
+      "relations": [
+        {
+          "relation_id": "Kryptographie-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Steganographie-TERM",
+      "structure": "Steganographie",
+      "content": "Steganographie",
+      "relations": []
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Steganographie-DEFINITION",
+      "structure": "Steganographie",
+      "content": "Die Kunst des Verstecken einer Nachricht",
+      "relations": [
+        {
+          "relation_id": "Steganographie-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Kryptoanalyse-TERM",
+      "structure": "Kryptologie",
+      "content": "Kryptoanalyse",
+      "relations": []
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Kryptoanalyse-DEFINITION",
+      "structure": "Kryptologie",
+      "content": "Besch\u00e4ftigt sich mit der Analyse von verschl\u00fcsselten Daten.",
+      "relations": [
+        {
+          "relation_id": "Kryptoanalyse-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Kryptosystem-TERM",
+      "structure": "Kryptologie",
+      "content": "Kryptosystem",
+      "relations": []
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Kryptosystem-DEFINITION",
+      "structure": "Kryptologie",
+      "content": "Die Gesamtheit der Elemente, die bei der Schaffung eines Mittels f\u00fcr eine sichere Kommunikation zwischen zwei Personen benutzt werden (Verschl\u00fcsselungs- und Entschl\u00fcsselungssystem)",
+      "relations": [
+        {
+          "relation_id": "Kryptosystem-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Informationssystem-TERM",
+      "structure": "Wissenschaft Informatik",
+      "content": "Informationssystem",
+      "relations": []
+    },
+    {
+      "type": "TERM",
+      "id": "Klartext-TERM",
+      "structure": "Kryptologie",
+      "content": "Klartext",
+      "relations": []
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Klartext-DEFINITION",
+      "structure": "Kryptologie",
+      "content": "Botschaft des Absenders an einem Empf\u00e4nger.",
+      "relations": [
+        {
+          "relation_id": "Klartext-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Chiffretext-TERM",
+      "structure": "Kryptologie",
+      "content": "Chiffretext",
+      "relations": []
+    },
+    {
+      "type": "TERM",
+      "id": "Asymmetrisches-Verfahren-TERM",
+      "structure": "Asymmetrische Verfahren",
+      "content": "Asymmetrisches Verfahren",
+      "relations": [
+        {
+          "relation_id": "RSA-TERM",
+          "relation_type": "has"
+        },
+        {
+          "relation_id": "El-Gamal-TERM",
+          "relation_type": "has"
+        },
+        {
+          "relation_id": "Diffie-Hellman-TERM",
+          "relation_type": "has"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "RSA-TERM",
+      "structure": "Asymmetrische Verfahren",
+      "content": "RSA",
+      "relations": [
+        {
+          "relation_id": "RSA-Long-TERM",
+          "relation_type": "is-Acronym-for"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "RSA-Long-TERM",
+      "structure": "Asymmetrische Verfahren",
+      "content": "Rivest–Shamir–Adleman",
+      "relations": []
+    },
+    {
+      "type": "TERM",
+      "id": "Diffie-Hellman-TERM",
+      "structure": "Asymmetrische Verfahren",
+      "content": "Diffie Hellman",
+      "relations": [
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "El-Gamal-TERM",
+      "structure": "Asymmetrische Verfahren",
+      "content": "El Gamal",
+      "relations": [
+      ]
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Chiffretext-DEFINITION",
+      "structure": "Kryptologie",
+      "content": "Umwandlung des Klartextes in eine f\u00fcr die \u00dcbertragung geeignete geheime Form mit Hilfe eines kryptografischen Algorithmus (die Verschl\u00fcsselungsmethode) und gewisser Schl\u00fcsselparameter. Um die Botschaft wieder lesen zu k\u00f6nnen, muss der Empf\u00e4nger einen hierzu passenden kryptographischen Algorithmus (die Entschl\u00fcsselungsmethode) und die gleichen Schl\u00fcsselparameter haben, um den Chiffretext in den Klartext (die Botschaft) zur\u00fcckwandeln zu k\u00f6nnen.",
+      "relations": [
+        {
+          "relation_id": "Chiffretext-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "NODE",
+      "id": "Ziele-Kryptologie-NODE",
+      "structure": "Kryptologie",
+      "content": "Ziele-Kryptologie",
+      "relations": [
+        {
+          "relation_id": "Kryptologie-TERM",
+          "relation_type": "related"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Geheimhaltung-TERM",
+      "structure": "Kryptologie",
+      "content": "Geheimhaltung",
+      "relations": [
+        {
+          "relation_id": "Ziele-Kryptologie-NODE",
+          "relation_type": "part-of"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Integrit\u00e4t-TERM",
+      "structure": "Kryptologie",
+      "content": "Integrit\u00e4t",
+      "relations": [
+        {
+          "relation_id": "Ziele-Kryptologie-NODE",
+          "relation_type": "part-of"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Authentizit\u00e4t-TERM",
+      "structure": "Kryptologie",
+      "content": "Authentizit\u00e4t",
+      "relations": [
+        {
+          "relation_id": "Ziele-Kryptologie-NODE",
+          "relation_type": "part-of"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Anonymit\u00e4t-TERM",
+      "structure": "Kryptologie",
+      "content": "Anonymit\u00e4t",
+      "relations": [
+        {
+          "relation_id": "Ziele-Kryptologie-NODE",
+          "relation_type": "part-of"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "C\u00e4sar-Verschl\u00fcsselung-TERM",
+      "structure": "Symmetrische Verfahren",
+      "content": "C\u00e4sar-Verschl\u00fcsselung",
+      "relations": []
+    },
+    {
+      "type": "TEXT",
+      "id": "C\u00e4sar-Verschl\u00fcsselung-TEXT",
+      "structure": "Symmetrische Verfahren",
+      "content": "headline:Die Cäsar-Verschlüsselung;text:Die C\u00e4sar-Verschl\u00fcsselung ist ein einfaches Verschl\u00fcsselungsverfahren, bei dem jeder Buchstabe des Klartextes um eine bestimmte Anzahl von Stellen im Alphabet verschoben wird. Die Anzahl der Stellen wird als Schl\u00fcssel bezeichnet. Die C\u00e4sar-Verschl\u00fcsselung ist ein Spezialfall der Vigenere-Verschl\u00fcsselung mit dem Schl\u00fcsselwort \"A\".",
+      "relations": [
+        {
+          "relation_id": "C\u00e4sar-Verschl\u00fcsselung-TERM",
+          "relation_type": "related"
+        }
+      ]
+    },
+    {
+      "type": "EXAMPLE",
+      "id": "C\u00e4sar-Verschl\u00fcsselung-EXAMPLE",
+      "structure": "Symmetrische Verfahren",
+      "content": "content:;image:Caesar.png;title:Ein Beispiel f\u00fcr die C\u00e4sar-Verschl\u00fcsselung",
+      "relations": [
+        {
+          "relation_id": "C\u00e4sar-Verschl\u00fcsselung-TERM",
+          "relation_type": "example-for"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Vigenere-Verschl\u00fcsselung-TERM",
+      "structure": "Symmetrische Verfahren",
+      "content": "Vigenere-Verschl\u00fcsselung",
+      "relations": []
+    },
+    {
+      "type": "TEXT",
+      "id": "Vigenere-Verschl\u00fcsselung-TEXT",
+      "structure": "Symmetrische Verfahren",
+      "content": "headline:Die Vigenere-Verschl\u00fcsselung;text:Die Vigenere-Verschl\u00fcsselung ist ein Verschl\u00fcsselungsverfahren, bei dem jeder Buchstabe des Klartextes um eine bestimmte Anzahl von Stellen im Alphabet verschoben wird.",
+      "relations": [
+        {
+          "relation_id": "Vigenere-Verschl\u00fcsselung-TERM",
+          "relation_type": "related"
+        }
+      ]
+    },
+    {
+      "type": "EXAMPLE",
+      "id": "Vigenere-Verschl\u00fcsselung-EXAMPLE",
+      "structure": "Symmetrische Verfahren",
+      "content": "content:;image:VigenereBSP.png;title:Ein Beispiel f\u00fcr die Vigenere-Verschl\u00fcsselung",
+      "relations": [
+        {
+          "relation_id": "Vigenere-Verschl\u00fcsselung-TERM",
+          "relation_type": "example-for"
+        }
+      ]
+    },
+    {
+      "type": "IMAGE",
+      "id": "Vigenere-Verschl\u00fcsselung-IMAGE",
+      "structure": "Symmetrische Verfahren",
+      "content": "imageName:VigenereTabelle.png;headline:Ein Beispiel f\u00fcr die Vigenere-Verschl\u00fcsselung",
+      "relations": [
+        {
+          "relation_id": "Vigenere-Verschl\u00fcsselung-TERM",
+          "relation_type": "related"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "DES-TERM",
+      "structure": "Symmetrische Verfahren",
+      "content": "DES",
+      "relations": [
+        {
+          "relation_id": "DES-Long-TERM",
+          "relation_type": "is-Acronym-for"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "DES-Long-TERM",
+      "structure": "Symmetrische Verfahren",
+      "content": "Digital Encription Standard",
+      "relations": []
+    },
+    {
+      "type": "TERM",
+      "id": "AES-TERM",
+      "structure": "Symmetrische Verfahren",
+      "content": "AES",
+      "relations": [
+        {
+          "relation_id": "AES-Long-TERM",
+          "relation_type": "is-Acronym-for"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "AES-Long-TERM",
+      "structure": "Symmetrische Verfahren",
+      "content": "Advanced Encryption Standard",
+      "relations": []
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Geheimhaltung-DEFINITION",
+      "structure": "Kryptologie",
+      "content": "Das Ziel der Geheimhaltung ist die vertrauliche Übermittlung von Nachrichten. Als Frage formuliert: Wie kann ich jemanden eine Nachricht übermitteln, ohne dass ein Unbefugter Kenntnis vom Inhalt dieser Nachricht erlangt?",
+      "relations": [
+        {
+          "relation_id": "Geheimhaltung-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Authentizit\u00e4t-DEFINITION",
+      "structure": "Kryptologie",
+      "content": "Authentizität bedeutet, dass der Empfänger einer Nachricht sicher sein kann, dass die Nachricht tatsächlich von dem Absender stammt, der vorgibt, der Absender zu sein. Als Frage formuliert: Wie kann ich sicher sein, dass eine Nachricht tatsächlich von dem Absender stammt, der vorgibt, der Absender zu sein?",
+      "relations": [
+        {
+          "relation_id": "Authentizit\u00e4t-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "DEFINITION",
+      "id": "Anonymität-DEFINITION",
+      "structure": "Kryptologie",
+      "content": "Anonymität ist eine spezielle Form der Geheimhaltung, im allgemeinen die Geheimhaltung des Namens.Darüber hinaus gibt es es weitere Formen der Anonymität, z.B. die Anonymität des Geldes. So ist es nicht möglich, den Weg einer Münze zurückzuverfolgen, d.h. die Vorbesitzer eines Geldstückes zu bestimmen (außer jenen, von dem man die Münze erhalten hat). Bezüglich der Kommunikation bzw. des Nachrichtenaustausches können drei Arten von Anonymität unterschieden werden: Anonymität des Absenders, Anonymität des Empfängers und Anonymität der Kommunikationsbeziehung.",
+      "relations": [
+        {
+          "relation_id": "Anonymit\u00e4t-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "type": "UNKNOWN_SOURCE",
+      "id": "Unbekannt-UNKNOWN_SOURCE",
+      "name": "",
+      "content": ""
+    }
+  ],
+  "structure": {
+    "name": "Informatik",
+    "key": "_root",
+    "children": [
+      {
+        "key": "_root/0",
+        "name": "Wissenschaft Informatik",
+        "children": []
+      },
+      {
+        "key": "_root/1",
+        "name": "Informatik Gesellschaft",
+        "children": []
+      },
+      {
+        "key": "_root/2",
+        "name": "Theoretische Informatik",
+        "children": []
+      },
+      {
+        "key": "_root/3",
+        "name": "Angewandte Informatik",
+        "children": []
+      },
+      {
+        "key": "_root/9",
+        "name": "Praktische Informatik",
+        "children": []
+      },
+      {
+        "key": "_root/4",
+        "name": "Technische Informatik",
+        "children": []
+      },
+      {
+        "key": "_root/5",
+        "name": "Sicherheit von Informationen",
+        "children": [
+          {
+            "key": "_root/5/1",
+            "name": "Datenschutz und Datensicherheit",
+            "children": [
+              {
+                "key": "_root/5/1/1",
+                "name": "Datenschutz",
+                "children": []
+              },
+              {
+                "key": "_root/5/1/2",
+                "name": "Datensicherheit",
+                "children": [
+                  {
+                    "key": "_root/1",
+                    "name": "Kryptologie",
+                    "children": [
+                      {
+                        "key": "_root/1/1",
+                        "name": "Verschl\u00fcsselung",
+                        "children": [
+                          {
+                            "key": "_root/1/1/1",
+                            "name": "Kryptographie",
+                            "children": [
+                              {
+                                "key": "_root/1/1/1/1",
+                                "name": "Symmetrische Verfahren",
+                                "children": []
+                              },
+                              {
+                                "key": "_root/1/1/1/2",
+                                "name": "Asymmetrische Verfahren",
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "key": "_root/1/1/2",
+                            "name": "Steganographie",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "key": "_root/1/2",
+                        "name": "Entschl\u00fcsselung",
+                        "children": [
+                          {
+                            "key": "_root/1/2/1",
+                            "name": "Kryptanalyse",
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "_root/6",
+        "name": "Bereich1",
+        "children": [
+          {
+            "key": "_root/6/1",
+            "name": "Algorithmus",
+            "children": [
+              {
+                "key": "_root/6/1/1",
+                "name": "Algorithmus-Begriff",
+                "children": []
+              },
+              {
+                "key": "_root/6/1/2",
+                "name": "Bereich1-1-2",
+                "children": []
+              }
+            ]
+          },
+          {
+            "key": "_root/6/2",
+            "name": "Bereich1-2",
+            "children": []
+          }
+        ]
+      },
+      {
+        "key": "_root/7",
+        "name": "Java",
+        "children": [
+          {
+            "key": "_root/7/1",
+            "name": "Java 19",
+            "children": []
+          },
+          {
+            "key": "_root/7/2",
+            "name": "Java 20",
+            "children": []
+          },
+          {
+            "key": "_root/7/3",
+            "name": "Java 8",
+            "children": []
+          }
+        ]
+      }
+    ]
+  }
+}

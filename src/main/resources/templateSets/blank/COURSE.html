@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Kurs - '+${course.metadata.name.get}">Title</title>
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport">
+</head>
+<body>
+<main>
+    <header>
+        <h1 th:text="${courseName}"></h1>
+    </header>
+    <hr>
+    <section>
+        <header>
+            <h1>Informationen</h1>
+        </header>
+        <article th:object="${course.metadata}">
+            <p>Name: <span th:text="*{name.orElse('')}"></span></p>
+            <p>Beschreibung: <span th:text="*{description.orElse('')}"></span></p>
+            <p>Jahr: <span th:text="*{year.orElse('')}"></span></p>
+            <p>Typ: <span th:text="*{type.orElse('')}"></span></p>
+            <p>Schwierigkeit: <span th:text="*{level.orElse('')}"></span></p>
+            <div th:unless="*{otherInfos.isEmpty}">
+                <br>
+                <p th:each="extra:*{otherInfos.entrySet}">
+                    <span th:text="${extra.key}"></span>:
+                    <span th:text="${extra.value}"></span>
+                </p>
+            </div>
+        </article>
+    </section>
+    <hr>
+    <section>
+        <header>
+            <h1>Struktur</h1>
+        </header>
+        <div>
+            <table>
+                <thead>
+                <tr>
+                    <th>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="chapter : ${course.courseOrder.chapterOrder}">
+                    <td th:unless="${chapter.materialCount == 0}">
+                        <a th:href="@{${chapter.name}+'/overview.html'}">
+                            <h2 th:text="${chapter.name}"></h2>
+                        </a>
+                        <div>
+                            <table>
+                                <tbody>
+                                <tr th:each="group : ${chapter.groupOrder}">
+                                    <td th:unless="${group.materialCount==0}">
+                                        <a
+                                                th:href="@{${chapter.name}+'/'+${group.name}+'/overview.html'}">
+                                            <h3 th:text="${group.name}"></h3>
+                                        </a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+<footer>
+    <div>
+        <ul>
+        </ul>
+        <p>Copyright © 2023 MDTea-Gen</p>
+    </div>
+</footer>
+</body>
+</html>

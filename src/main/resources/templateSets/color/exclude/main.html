@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<nav th:fragment="navigation-material">
+    <ul>
+        <li th:href="/${navigation.level.chapter}" th:text="${navigation.level.chapter}"></li>
+        <li th:href="@{/${navigation.level.chapter}/${navigation.level.group}}"
+            th:text="${navigation.level.group}"></li>
+        <li th:href="@{/${navigation.level.chapter}/${navigation.level.group}/${navigation.level.task}}"
+            th:text="${navigation.level.task}"></li>
+    </ul>
+</nav>
+<nav th:fragment="navigation-group">
+    <ul>
+        <li th:href="/${navigation.level.chapter}" th:text="${navigation.level.chapter}"></li>
+        <li th:href="@{/${navigation.level.chapter}/${navigation.level.group}}"
+            th:text="${navigation.level.group}"></li>
+    </ul>
+</nav>
+<nav th:fragment="navigation-chapter">
+    <ul>
+        <li th:href="/${navigation.level.chapter}" th:text="${navigation.level.chapter}"></li>
+    </ul>
+</nav>
+
+<div th:fragment="step">
+    <a th:href="${navigation.Back}" th:if="${navigation.hasPrevious}">
+        <button type="submit">Zurück</button>
+    </a>
+    <a th:href="@{'Material'+'_'+${navigation.count -1}}" th:if="${navigation.hasNext}">
+        <button type="submit">Weiter</button>
+    </a>
+    <a th:href="${navigation.nextTask}" th:unless="${navigation.hasNext}">
+        <button>Abschluss</button>
+    </a>
+</div>
+</body>
+</html>

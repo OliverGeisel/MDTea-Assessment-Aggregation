@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Materialübersicht</title>
+    <th:block th:replace="main::head-tag"></th:block>
+</head>
+<body>
+<nav th:replace="main::navigation"></nav>
+<main class="container">
+    <header>
+        <h1>
+            Materialien
+        </h1>
+    </header>
+    <div class="row card" th:each="material:${materials}">
+        <p th:text="${material.name}"></p>
+        <p th:text="${material.id}"></p>
+        <p th:text="${material.term}"></p>
+        <p th:text="${material.structureId}"></p>
+        <p th:text="${material.type}"></p>
+        <hr>
+    </div>
+</main>
+<footer th:replace="main::footer"></footer>
+</body>
+</html>

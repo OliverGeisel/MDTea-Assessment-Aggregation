@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport">
+    <title th:text="${title}">Title</title>
+    <th:block th:include="~{${material.templateInfo.templateType.type}:: head}"></th:block>
+    <link href="https://fonts.googleapis.com/css?family=Inter:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&amp;display=swap"
+          rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="${rootPath}+'/fonts/font-awesome.min.css'">
+    <link rel="stylesheet" th:href="${rootPath}+'/fonts/material-icons.min.css'">
+</head>
+<body class="bg-dark container">
+<script th:src="${rootPath}+'/js/bootstrap.min.js'"></script>
+<script th:src="${rootPath}+'/js/bold-and-dark.js'"></script>
+<nav class="navbar navbar-dark navbar-expand-md sticky-top py-3" id="mainNav">
+    <div class="container"><a class="navbar-brand d-flex align-items-center" th:href="${rootPath}+'/course.html'"><span
+            class="bs-icon-sm bs-icon-circle bs-icon-primary shadow d-flex justify-content-center align-items-center me-2 bs-icon"><svg
+            class="bi bi-bezier" fill="currentColor" height="1em" viewBox="0 0 16 16" width="1em"
+            xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0 10.5A1.5 1.5 0 0 1 1.5 9h1A1.5 1.5 0 0 1 4 10.5v1A1.5 1.5 0 0 1 2.5 13h-1A1.5 1.5 0 0 1 0 11.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm10.5.5A1.5 1.5 0 0 1 13.5 9h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM6 4.5A1.5 1.5 0 0 1 7.5 3h1A1.5 1.5 0 0 1 10 4.5v1A1.5 1.5 0 0 1 8.5 7h-1A1.5 1.5 0 0 1 6 5.5v-1zM7.5 4a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1z"
+                              fill-rule="evenodd"></path>
+                        <path d="M6 4.5H1.866a1 1 0 1 0 0 1h2.668A6.517 6.517 0 0 0 1.814 9H2.5c.123 0 .244.015.358.043a5.517 5.517 0 0 1 3.185-3.185A1.503 1.503 0 0 1 6 5.5v-1zm3.957 1.358A1.5 1.5 0 0 0 10 5.5v-1h4.134a1 1 0 1 1 0 1h-2.668a6.517 6.517 0 0 1 2.72 3.5H13.5c-.123 0-.243.015-.358.043a5.517 5.517 0 0 0-3.185-3.185z"></path>
+                </svg></span><span th:text="${courseName}"></span></a>
+        <button class="navbar-toggler" data-bs-target="#navcol-1" data-bs-toggle="collapse"><span
+                class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navcol-1">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item"><a class="nav-link" th:href="${rootPath}+'/Course.html'"
+                                        th:text="Kursübersicht"></a></li>
+                <li class="nav-item"><a class="nav-link"
+                                        th:href="${rootPath}+'/'+${navigation.level.chapter}+'/overview.html'"
+                                        th:text="${navigation.level.chapter}"></a></li>
+                <li class="nav-item"><a class="nav-link"
+                                        th:href="@{${rootPath}+'/'+${navigation.level.chapter}+'/'+${navigation.level.group}+'/overview.html'}"
+                                        th:text="${navigation.level.group}"></a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{../overview.html}"
+                                        th:text="${navigation.level.task}"></a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<main>
+    <section>
+        <div th:replace="~{${material.templateInfo.templateType.type} :: content}"></div>
+    </section>
+    <section id="task-navigation">
+        <a th:href="${navigation.previousMaterial}+'.html'" th:if="${navigation.hasPrevious}">
+            <button class="btn btn-danger" type="submit">Zurück</button>
+        </a>
+        <a th:href="${navigation.nextMaterial}+'.html'" th:if="${navigation.hasNext}">
+            <button class="btn btn-success" type="submit">Weiter</button>
+        </a>
+        <a th:href="@{'../'+${navigation.nextTask}+'/Material_0.html'}"
+           th:if="${!navigation.hasNext && navigation.hasNextTask}">
+            <button class="btn btn-info" type="submit">Nächste Aufgabe</button>
+        </a>
+        <a th:href="@{'../overview.html'}"
+           th:if="${ !navigation.hasNext && !navigation.hasNextTask}">
+            <button class="btn btn-info" type="submit">Zurück zur Übersicht</button>
+        </a>
+        <a th:href="@{'../../'+${navigation.nextGroup}+'/overview.html'}"
+           th:if="${ !navigation.hasNext && navigation.hasNextTask}">
+            <button class="btn btn-info" type="submit">Nächste Gruppe</button>
+        </a>
+    </section>
+</main>
+<footer></footer>
+</body>
+</html>

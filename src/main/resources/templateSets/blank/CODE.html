@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport">
+    <title th:text="'Code: '+${material.title} "></title>
+    <th:block th:fragment="head">
+    </th:block>
+</head>
+<body>
+<main>
+    <div th:fragment="content">
+        <header>
+            <h1 th:text="${material.title}"></h1>
+        </header>
+        <hr>
+        <h2> Sprache: <span th:text="${material.language}"></span></h2>
+        <code th:utext="${material.code}">
+
+        </code>
+    </div>
+</main>
+<footer>
+</footer>
+</body>
+</html>

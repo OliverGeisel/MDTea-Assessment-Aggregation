@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Planwahl</title>
+    <th:block th:include="main :: head-tag"></th:block>
+    <style>
+        .drop-zone {
+            border: 2px dashed #bbb;
+            height: 200px;
+            text-align: center;
+            padding: 40px;
+            cursor: pointer;
+        }
+
+        .drop-zone.highlight {
+            background-color: #f7f7f7;
+        }
+    </style>
+    <script>
+        let selectedFile;
+
+        function handleFileSelect(evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+
+            const files = evt.dataTransfer.files; // Dateien aus dem Drag-and-Drop-Ereignis extrahieren
+
+            // Sicherstellen, dass nur eine Datei ausgewählt wurde
+            if (files.length === 1) {
+                selectedFile = files[0]; // Die ausgewählte Datei speichern
+                document.getElementById("fileName").innerHTML = selectedFile.name; // Den Dateinamen anzeigen
+                const form = document.getElementById("uploadForm");
+                const formData = new FormData(form);
+                formData.set("plan", selectedFile);
+            } else {
+                alert("Bitte nur eine Datei auswählen.");
+            }
+        }
+
+        function handleDragOver(evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+            evt.dataTransfer.dropEffect = 'copy'; // Visuelles Feedback für Drag-and-Drop setzen
+        }
+
+        function handleFileInput(evt) {
+            const files = evt.target.files; // Dateien aus dem Eingabefeld extrahieren
+
+            // Sicherstellen, dass nur eine Datei ausgewählt wurde
+            if (files.length === 1) {
+                selectedFile = files[0]; // Die ausgewählte Datei speichern
+                document.getElementById("fileName").innerHTML = selectedFile.name; // Den Dateinamen anzeigen
+                const form = document.getElementById("uploadForm");
+                const formData = new FormData(form);
+                formData.set("plan", selectedFile);
+            } else {
+                alert("Bitte nur eine Datei auswählen.");
+            }
+        }
+
+        function uploadFile() {
+            if (selectedFile) {
+                const form = document.getElementById("uploadForm");
+                const formData = new FormData(form);
+                formData.append("plan", selectedFile); // Die ausgewählte Datei dem Formular hinzufügen
+            }
+        }
+    </script>
+</head>
+<body class="container">
+<nav th:replace="main::navigation"></nav>
+<main>
+    <section>
+        <h2> Gewähltes Template: <span th:text="${templateSetName}"></span></h2>
+        <form enctype="multipart/form-data" method="post" th:action="@{/generator/overview}">
+            <input name="template" th:value="${templateSetName}" type="hidden">
+            <h3> Bitte den Lehrplan angeben</h3>
+            <div class="row mt-2">
+                <div class="col-md-6">
+                    <div class="drop-zone" id="dropZone" ondragover="handleDragOver(event)"
+                         ondrop="handleFileSelect(event)">
+                        <h4>Drag &amp; Drop</h4>
+                        <p>Ziehe deine Datei hierhin, um sie hochzuladen.</p>
+                        <p id="fileName"></p>
+                    </div>
+                    <p class="m-3">oder</p>
+                    <label for="fileInput">Datei auswählen:</label>
+                    <input class="form-control-file" id="fileInput" name="plan" onchange="handleFileInput(event)"
+                           style="display: none;"
+                           type="file">
+                    <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()"
+                            type="button">Datei per Drag & Drop auswählen
+                    </button>
+                </div>
+                <div class="col-md-6">
+                    <label for="curriculum">Lehrplan</label>
+                    <select class="form-select input-group" id="curriculum" name="curriculum">
+                        <option th:each="option: ${curriculums}" th:text="${option}" th:value="${option}">
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn btn-primary m-1" onclick="uploadFile()" type="submit">Senden</button>
+        </form>
+    </section>
+</main>
+
+
+</body>
+</html>

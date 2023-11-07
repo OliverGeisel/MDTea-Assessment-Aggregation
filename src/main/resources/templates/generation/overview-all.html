@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Neuer Kurs Übersicht</title>
+    <th:block th:replace="main::head-tag"></th:block>
+</head>
+<body>
+<div class="container">
+
+    <main>
+        <nav th:replace="~{main::navigation}"></nav>
+        <header>
+            <h1>Neuer Kurs Übersicht</h1>
+            <br>
+            <h2>Template: <span th:text="${template}"></span></h2>
+            <br>
+            <h2>Lehrplan: <span th:text="${plan}"></span></h2>
+        </header>
+        <section>
+            <h3>Daten</h3>
+            <div class="p-3">
+                <p>Name: <span th:text="${meta.name.get}"></span></p>
+                <p>Jahr: <span th:text="${meta.year.get}"></span></p>
+                <p>Stufe: <span th:text="${meta.level.get}"></span></p>
+                <p>Art: <span th:text="${meta.type.get}"></span></p>
+                <p>Beschreibung:
+                <div class="ms-2">
+                    <span th:utext="${meta.description.get.replace('\n','<br>')}"></span></p>
+                </div>
+            </div>
+            <div class="container" id="more-fields" th:if="${meta.otherInfos.size}!=0">
+                <h4>Weitere Daten</h4>
+                <th:block th:each="info : ${meta.otherInfos}">
+                    <p class="ms-1">
+                        <th:block th:text="${info.key}"></th:block>
+                        : <span th:text="${info.value}"></span></p>
+                </th:block>
+            </div>
+        </section>
+        <section class="border border-light border-4 m-3 p-2" id="themen">
+            <header>
+                <h3>Themen</h3>
+            </header>
+            <div class="border border-light border-3 m-2 " style="margin-left: 20px"
+                 th:each="chapter : ${structure.order}">
+                <h4 th:text="${chapter.name}"></h4>
+                <div class="border border-danger border-2 m-2" style="margin-left: 15px"
+                     th:each="group : ${chapter.parts}">
+                    <h5 th:text="${group.name}"></h5>
+                    <div class="border border-primary border-1 p-1" style="margin-left: 10px"
+                         th:each="task : ${group.parts}">
+                        <h6 th:text="${task.name}"></h6>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section>
+            <form class="form-control " th:action="@{generate}">
+                <input name="template" th:value="${template}" type="hidden">
+                <input name="plan" th:value="${plan}" type="hidden">
+                <button class="btn btn-primary" onclick="history.back()" type="button">Zurück</button>
+                <input class="btn btn-primary" type="submit" value="Generieren">
+            </form>
+        </section>
+    </main>
+    <footer th:replace="main::footer"></footer>
+</div>
+</body>
+</html>

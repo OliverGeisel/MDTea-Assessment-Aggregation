@@ -1,0 +1,68 @@
+{
+  "meta": {
+    "reference-base": "http://lpdb.schule-sachsen.de/lpdb/web/downloads/2345_lp_gy_informatik_2019.pdf",
+    "level": "11-12",
+    "school": "TU-Dresden",
+    "class": "SWT",
+    "year": 2022,
+    "description": "Curriculum for computer since in saxony for class level 11 and 12",
+    "school-subject": "Computer since",
+    "general-goals": []
+  },
+  "rules": {},
+  "curriculum": {
+    "learning-area": [
+      {
+        "name": "Kommunikation in Netzen",
+        "number": 1,
+        "time": 8,
+        "spots": [
+          {
+            "description": "Kennen grundlegender Kommunikationsebenen",
+            "comments": [
+              "Mensch-Mensch",
+              "Mensch - Maschine",
+              "Maschine-Maschine"
+            ]
+          },
+          {
+            "description": "Kennen wesentlicher Strukturen vernetzter Systeme",
+            "comments": [
+              "Vernetzung und Kooperation in Wissenschaft und Gesellschaft",
+              "virtuelle Welten",
+              "Vor- und Nachteile von Vernetzung",
+              "Werteorientierung"
+            ]
+          },
+          {
+            "description": "Übertragen der Kommunikationsebenen und Vernetzungsstrukturen auf Computernetze\n- Schichtenmodell\n- Dienste im Intra- und Internet\n",
+            "comments": [
+              "einfache Kommunikationsprotokolle",
+              "Leitungs- und Paketvermittlung",
+              "dynamische und statische Adressierung"
+            ]
+          },
+          {
+            "description": "Beherrschen des bewussten Umgangs mit ausgewählten Netzdiensten",
+            "comments": [
+              "situationsgerechte Auswahl digitaler Kommunikationsmöglichkeiten",
+              "kritische Bewertung von Botnetzen, Filterblasen, Darknet"
+            ]
+          },
+          {
+            "description": "Einblick gewinnen in Dokument- und Inhaltsmanagement",
+            "comments": [
+              "Einsatz spezifischer Applikationen",
+              "Rechtestruktur und Sicherheitseinstellungen"
+            ]
+          }
+        ]
+      },
+      {}
+    ]
+  },
+  "curriculum-goal": {
+  },
+  "curse-structure": {
+  }
+}

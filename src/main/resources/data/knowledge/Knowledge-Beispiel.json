@@ -1,0 +1,93 @@
+{
+  "knowledge": [
+    {
+      "type": "TERM",
+      "id": "\u00b4TermBeispiel-TERM",
+      "structure": "Bereich1",
+      "content": "",
+      "relations": [
+        {
+          "relation_id": "Objekt-TERM",
+          "relation_type": "has"
+        }
+      ]
+    },
+    {
+      "type": "DEFINITION",
+      "id": "DefinitionsBeispiel-DEFINITION",
+      "structure": "Bereich1",
+      "content": "Definiert TermBeispie",
+      "relations": [
+        {
+          "relation_id": "TermBeispiel-TERM",
+          "relation_type": "defines"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Objekt-TERM",
+      "structure": "Bereich1-1",
+      "content": "",
+      "relations": [
+        {
+          "relation_id": "TermBeispiel-TERM",
+          "relation_type": "part-of"
+        }
+      ]
+    },
+    {
+      "type": "FACT",
+      "id": "FactB-FACT",
+      "structure": "Bereich2",
+      "content": "Fakten sind immer wahr!",
+      "relations": []
+    }
+  ],
+  "sources": [
+    {
+      "type": "UNKNOWN_SOURCE",
+      "id": "Unbekannt-UNKNOWN_SOURCE",
+      "name": "",
+      "content": ""
+    }
+  ],
+  "structure": {
+    "name": "Beispiel Bereich",
+    "key": "_root",
+    "children": [
+      {
+        "key": "_root/1",
+        "name": "Bereich1",
+        "children": [
+          {
+            "key": "_root/1/1",
+            "name": "Bereich1-1",
+            "children": [
+              {
+                "key": "_root/1/1/1",
+                "name": "Bereich1-1-1",
+                "children": []
+              },
+              {
+                "key": "_root/1/1/2",
+                "name": "Bereich1-1-2",
+                "children": []
+              }
+            ]
+          },
+          {
+            "key": "_root/1/2",
+            "name": "Bereich1-2",
+            "children": []
+          }
+        ]
+      },
+      {
+        "key": "_root/2",
+        "name": "Bereich2",
+        "children": []
+      }
+    ]
+  }
+}
