@@ -1,7 +1,7 @@
 package de.olivergeisel.materialgenerator.generation.generator;
 
+import de.olivergeisel.materialgenerator.aggregation.model.KnowledgeModel;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
-import de.olivergeisel.materialgenerator.core.knowledge.metamodel.KnowledgeModel;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateSet;
 
 /**

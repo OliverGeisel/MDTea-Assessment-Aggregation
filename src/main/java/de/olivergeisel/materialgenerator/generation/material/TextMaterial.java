@@ -1,6 +1,6 @@
 package de.olivergeisel.materialgenerator.generation.material;
 
-import de.olivergeisel.materialgenerator.core.knowledge.metamodel.element.Text;
+import de.olivergeisel.materialgenerator.aggregation.model.element.Text;
 import de.olivergeisel.materialgenerator.generation.templates.template_infos.TemplateInfo;
 import de.olivergeisel.materialgenerator.generation.templates.template_infos.TextTemplate;
 import jakarta.persistence.Column;

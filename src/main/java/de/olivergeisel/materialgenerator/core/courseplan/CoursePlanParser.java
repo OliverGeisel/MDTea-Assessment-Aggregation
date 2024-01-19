@@ -1,11 +1,11 @@
 package de.olivergeisel.materialgenerator.core.courseplan;
 
+import de.olivergeisel.materialgenerator.aggregation.model.structure.KnowledgeObject;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentGoal;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentGoalExpression;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentTarget;
 import de.olivergeisel.materialgenerator.core.courseplan.meta.CourseMetadata;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.*;
-import de.olivergeisel.materialgenerator.core.knowledge.metamodel.structure.KnowledgeObject;
 import org.apache.tomcat.util.json.JSONParser;
 import org.apache.tomcat.util.json.ParseException;
 import org.slf4j.Logger;

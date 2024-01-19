@@ -1,6 +1,7 @@
 package de.olivergeisel.materialgenerator.core.courseplan.structure;
 
-import de.olivergeisel.materialgenerator.core.knowledge.metamodel.structure.KnowledgeObject;
+
+import de.olivergeisel.materialgenerator.aggregation.model.structure.KnowledgeObject;
 
 public class PotenzialKnowledgeObject extends KnowledgeObject {
 

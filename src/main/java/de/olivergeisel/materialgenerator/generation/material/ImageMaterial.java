@@ -1,6 +1,6 @@
 package de.olivergeisel.materialgenerator.generation.material;
 
-import de.olivergeisel.materialgenerator.core.knowledge.metamodel.element.Image;
+import de.olivergeisel.materialgenerator.aggregation.model.element.Image;
 import de.olivergeisel.materialgenerator.generation.templates.template_infos.TemplateInfo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

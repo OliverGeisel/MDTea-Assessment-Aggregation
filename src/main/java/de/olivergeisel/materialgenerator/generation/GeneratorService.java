@@ -1,8 +1,8 @@
 package de.olivergeisel.materialgenerator.generation;
 
+import de.olivergeisel.materialgenerator.aggregation.KnowledgeManagement;
+import de.olivergeisel.materialgenerator.aggregation.model.element.KnowledgeElement;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
-import de.olivergeisel.materialgenerator.core.knowledge.KnowledgeManagement;
-import de.olivergeisel.materialgenerator.core.knowledge.metamodel.element.KnowledgeElement;
 import de.olivergeisel.materialgenerator.finalization.FinalizationService;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourse;
 import de.olivergeisel.materialgenerator.generation.generator.TranslateGenerator;

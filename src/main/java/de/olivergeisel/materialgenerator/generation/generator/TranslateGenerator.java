@@ -1,13 +1,13 @@
 package de.olivergeisel.materialgenerator.generation.generator;
 
+import de.olivergeisel.materialgenerator.aggregation.model.KnowledgeModel;
+import de.olivergeisel.materialgenerator.aggregation.model.element.*;
+import de.olivergeisel.materialgenerator.aggregation.model.relation.Relation;
+import de.olivergeisel.materialgenerator.aggregation.model.relation.RelationType;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentGoal;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentGoalExpression;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentTarget;
-import de.olivergeisel.materialgenerator.core.knowledge.metamodel.KnowledgeModel;
-import de.olivergeisel.materialgenerator.core.knowledge.metamodel.element.*;
-import de.olivergeisel.materialgenerator.core.knowledge.metamodel.relation.Relation;
-import de.olivergeisel.materialgenerator.core.knowledge.metamodel.relation.RelationType;
 import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
 import de.olivergeisel.materialgenerator.generation.material.*;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateSet;

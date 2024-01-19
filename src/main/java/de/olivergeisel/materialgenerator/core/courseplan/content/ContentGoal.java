@@ -1,5 +1,7 @@
 package de.olivergeisel.materialgenerator.core.courseplan.content;
 
+import de.olivergeisel.materialgenerator.aggregation.model.KnowledgeModel;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -10,7 +12,7 @@ import java.util.List;
  * The Goal has an expression that is a level of complexity based on Bloom-Taxonomie. <br>
  * Every Goal has a Master-Keyword which link the goal with the structure from the knowledgemodel.
  * Normally you define an educational goal as complete sentence.
- * In the complete Sentence are more than one keyword from the {@link de.olivergeisel.materialgenerator.core.knowledge.metamodel.KnowledgeModel}. So the relevant keywords are in the
+ * In the complete Sentence are more than one keyword from the {@link KnowledgeModel}. So the relevant keywords are in the
  * specific Words.
  * <br>
  * Example: "Kennenlernen der Grundlagen der Programmierung mit Java"
@@ -21,7 +23,7 @@ import java.util.List;
  * @see ContentGoalExpression
  * @see ContentTarget
  * @see de.olivergeisel.materialgenerator.core.courseplan.CoursePlan
- * @see de.olivergeisel.materialgenerator.core.knowledge.metamodel.KnowledgeModel
+ * @see KnowledgeModel
  * @see de.olivergeisel.materialgenerator.core.knowledge.metamodel.element.KnowledgeElement
  * @since 0.2.0
  */
