@@ -1,7 +1,7 @@
 package de.olivergeisel.materialgenerator.aggregation.extraction;
 
 import de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_prompts.PromptAnswer;
-import de.olivergeisel.materialgenerator.aggregation.model.element.KnowledgeElement;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,93 +9,86 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.LinkedList;
+import java.util.List;
 
 public class GPT_Session {
 
 	private static final Logger logger = LoggerFactory.getLogger(GPT_Session.class);
 
-	public Process run() {
-		logger.info("open connection to GPT");
-		var workingDir = System.getProperty("user.dir");
-		ProcessBuilder pb = new ProcessBuilder("python", STR."\{workingDir}/gpt-connection/main.py");
-		Process process;
-		int exitCode = -1;
-		try {
-			process = pb.start();
 
-
-			InputStream inputStream = process.getInputStream();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-			String line;
-			while ((line = reader.readLine()) != null) {
-				System.out.println(line);
-			}
-
-			// Warte auf das Ende des Prozesses
-			exitCode = process.waitFor();
-		} catch (IOException | InterruptedException e) {
-			throw new RuntimeException(e);
-		} finally {
-			System.out.println("Python-Programm beendet mit Exit-Code: " + exitCode);
-		}
-		return process;
-
-
+	private static <T extends KnowledgeElement, A extends PromptAnswer<T>> RequestParameters createParameters(
+			GPT_Request<T, A> request) {
+		return new RequestParameters(request);
 	}
 
-	private void prepare() {
-		;
-	}
-
-	private String requestLocalModel() {
-		logger.info("open connection to GPT");
-		var workingDir = System.getProperty("user.dir");
-		ProcessBuilder pb = new ProcessBuilder("python", STR."\{workingDir}/gpt-connection/main.py");
-		Process process;
+	private static <T extends KnowledgeElement, A extends PromptAnswer<T>> StringBuilder runConnection(
+			GPT_Request<T, A> request)
+			throws ServerNotAvailableException {
+		final var workingDir = System.getProperty("user.dir");
+		var parameters = createParameters(request);
+		var prompt = STR."\"\{request.getPrompt().getPrompt()}\""; // " are needed for the python script
+		List<String> programArgs = new LinkedList<>(List.of("python", STR."\{workingDir}/gpt-connection/main.py",
+				STR."\{prompt}"));
+		programArgs.addAll(parameters.toList());
+		ProcessBuilder pb = new ProcessBuilder(programArgs);
 		int exitCode = -1;
+		Process process;
 		StringBuilder answer = new StringBuilder();
 		try {
 			process = pb.start();
-
-
 			InputStream inputStream = process.getInputStream();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 			String line;
 			while ((line = reader.readLine()) != null) {
 				answer.append(line);
 			}
-
-			// Warte auf das Ende des Prozesses
 			exitCode = process.waitFor();
+			if (exitCode == 3) { // server isn't running
+				logger.error("The server isn't running. Please start the server and try again.");
+				var url = request.getUrl().orElse("localhost:4891/v1");
+				url = url.isBlank() ? "localhost:4891/v1" : url;
+				throw new ServerNotAvailableException(STR."""
+				The server behind "\{url}" is not responding.""");
+			}
 		} catch (IOException | InterruptedException e) {
 			throw new RuntimeException(e);
 		} finally {
 			logger.info(STR."Connection-(Python) was closed with code: \{exitCode}");
 		}
+		return answer;
+	}
+
+	private <T extends KnowledgeElement, A extends PromptAnswer<T>> String requestLocalModel(
+			GPT_Request<T, A> request) {
+		logger.info("open connection to a local GPT-Model. Model-Name: {} - Parameters: {}", request.getModelName(),
+				request.getPromptParameters());
+		StringBuilder answer = runConnection(request);
 		return answer.toString();
-
-
 	}
 
-	private String requestRemoteModel() {
-		return null;
+	private <T extends KnowledgeElement, A extends PromptAnswer<T>> String requestRemoteModel(GPT_Request<T, A> request)
+			throws ServerNotAvailableException {
+		logger.info("open connection to a GPT/Model-Server. Model-Name: {} - Parameters: {}", request.getModelName(),
+				request.getPromptParameters());
+		StringBuilder answer = runConnection(request);
+		return answer.toString();
 	}
-
 
 	/**
-	 * Reqest the prompt in the {@link GPT_Request} and set+return the answer.
+	 * Request the prompt in the {@link GPT_Request} and set+return the answer.
 	 *
 	 * @param request The request to be sent to the GPT-model
 	 * @param <T>     The type of the {@link KnowledgeElement} this request is for.
 	 * @return The answer to the request
 	 */
-	public <T extends KnowledgeElement> PromptAnswer<T> request(GPT_Request<T> request) {
-		prepare();
+	public <T extends KnowledgeElement, A extends PromptAnswer<T>> A request(GPT_Request<T, A> request)
+			throws ServerNotAvailableException {
 		String response;
 		if (request.getModelLocation() == GPT_Request.ModelLocation.LOCAL) {
-			response = requestLocalModel();
+			response = requestLocalModel(request);
 		} else {
-			response = requestRemoteModel();
+			response = requestRemoteModel(request);
 		}
 		request.getAnswer().setAnswer(response);
 		return request.getAnswer();

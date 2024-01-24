@@ -2,7 +2,7 @@ package de.olivergeisel.materialgenerator.aggregation.extraction;
 
 import de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_prompts.ElementPrompt;
 import de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_prompts.PromptAnswer;
-import de.olivergeisel.materialgenerator.aggregation.model.element.KnowledgeElement;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
 
 import java.util.Optional;
 
@@ -20,25 +20,27 @@ import java.util.Optional;
  * @see PromptAnswer
  * @since 1.1.0
  */
-public class GPT_Request<T extends KnowledgeElement> {
+public class GPT_Request<T extends KnowledgeElement, A extends PromptAnswer<T>> {
 
 	private ElementPrompt<T> prompt;
-	private PromptAnswer<T>  answer;
+	private A                answer;
 	private ModelLocation    modelLocation;
 	private String           modelName;
-	// configuration for the request
+	private Optional<String> url;
 	private Optional<String> apiKey  = Optional.empty();
+	// configuration for the request
 	private int              retries = 1;
 	private int              maxTokens;
 	private double           temperature;
 	private double           topP;
 	private double           frequencyPenalty;
 
-	public GPT_Request(ElementPrompt<T> prompt, PromptAnswer<T> answer, String modelName, ModelLocation location,
-			int maxTokens,
-			double temperature, double topP, double frequencyPenalty, int retries) {
+	public GPT_Request(ElementPrompt<T> prompt, A answer, String url, String modelName,
+			ModelLocation location, int maxTokens, double temperature, double topP, double frequencyPenalty,
+			int retries) {
 		this.prompt = prompt;
 		this.answer = answer;
+		this.url = Optional.ofNullable(url);
 		this.modelLocation = location;
 		this.modelName = modelName;
 		this.maxTokens = maxTokens;
@@ -49,6 +51,18 @@ public class GPT_Request<T extends KnowledgeElement> {
 	}
 
 	//region setter/getter
+	public Optional<String> getUrl() {
+		return url;
+	}
+
+	public void setUrl(Optional<String> url) {
+		this.url = url;
+	}
+
+	public PromptParameters getPromptParameters() {
+		return new PromptParameters(retries, maxTokens, temperature, topP);
+	}
+
 	public ElementPrompt<T> getPrompt() {
 		return prompt;
 	}
@@ -122,14 +136,14 @@ public class GPT_Request<T extends KnowledgeElement> {
 		this.frequencyPenalty = frequencyPenalty;
 	}
 
-	public PromptAnswer<T> getAnswer() throws IllegalStateException {
+	public A getAnswer() throws IllegalStateException {
 		if (answer == null) {
 			throw new IllegalStateException("Answer is not set yet");
 		}
 		return answer;
 	}
 
-	public void setAnswer(PromptAnswer<T> answer) {
+	public void setAnswer(A answer) {
 		this.answer = answer;
 	}
 //endregion

@@ -1,7 +1,7 @@
 package de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_prompts;
 
 
-import de.olivergeisel.materialgenerator.aggregation.model.element.KnowledgeElement;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
 
 /**
  * Represents a Prompt for a specific Element-Type.

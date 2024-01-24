@@ -1,7 +1,7 @@
 package de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_prompts;
 
 import de.olivergeisel.materialgenerator.aggregation.extraction.GPT_Request;
-import de.olivergeisel.materialgenerator.aggregation.model.element.KnowledgeElement;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
 
 /**
  * This class represents a prompt-answer pair for a specific {@link KnowledgeElement}.
@@ -17,23 +17,23 @@ import de.olivergeisel.materialgenerator.aggregation.model.element.KnowledgeElem
  */
 public abstract class PromptAnswer<T extends KnowledgeElement> {
 
-	private final String      prompt;
+	private final ElementPrompt<T> prompt;
 	private final DeliverType deliverType;
 	private       String      answer;
 
 
-	protected PromptAnswer(String prompt, String answer, DeliverType deliverType) {
+	protected PromptAnswer(ElementPrompt<T> prompt, String answer, DeliverType deliverType) {
 		this.prompt = prompt;
 		this.answer = answer;
 		this.deliverType = deliverType;
 	}
 
-	protected PromptAnswer(String prompt, DeliverType deliverType) {
+	protected PromptAnswer(ElementPrompt<T> prompt, DeliverType deliverType) {
 		this(prompt, null, deliverType);
 	}
 
 	//region setter/getter
-	public String getPrompt() {
+	public ElementPrompt<T> getPrompt() {
 		return prompt;
 	}
 
@@ -53,4 +53,10 @@ public abstract class PromptAnswer<T extends KnowledgeElement> {
 		return answer != null;
 	}
 //endregion
+
+	@Override
+	public String toString() {
+		return STR."PromptAnswer{prompt='\{prompt}', deliverType=\{deliverType}, answer='\{answer}'}";
+	}
+
 }
