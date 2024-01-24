@@ -16,6 +16,7 @@ import java.util.UUID;
  * @since 0.2.0
  */
 @Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class MaterialOrderPart {
 
 	@Id
