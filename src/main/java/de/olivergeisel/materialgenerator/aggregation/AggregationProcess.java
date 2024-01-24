@@ -1,6 +1,7 @@
 package de.olivergeisel.materialgenerator.aggregation;
 
 import de.olivergeisel.materialgenerator.aggregation.collect.SourceFragmentCollection;
+import de.olivergeisel.materialgenerator.aggregation.extraction.GPT_Request;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Definition;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Example;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
@@ -23,20 +24,21 @@ import java.util.List;
  */
 public class AggregationProcess {
 
-	private final LocalDateTime            start       = LocalDateTime.now();
-	private       List<MultipartFile>      sources;
-	private       SourceFragmentCollection sourceFragmentCollection;
-	private       String                   currentFragment;
-	private       String                   areaOfKnowledge;
-	private       String                   apiKey;
-	private       String                   url;
-	private       String                   modelName;
-	private       List<Term>               terms       = new LinkedList<>();
-	private       List<Definition>         definitions = new LinkedList<>();
-	private       List<Example>            examples    = new LinkedList<>();
-	private       List<Relation>           relations   = new LinkedList<>();
-	private       boolean                  complete    = false;
-	private       Step                     step        = Step.INITIAL;
+	private final LocalDateTime             start         = LocalDateTime.now();
+	private       List<MultipartFile>       sources;
+	private       GPT_Request.ModelLocation modelLocation = GPT_Request.ModelLocation.REMOTE;
+	private       SourceFragmentCollection  sourceFragmentCollection;
+	private       String                    currentFragment;
+	private       String                    areaOfKnowledge;
+	private       String                    apiKey;
+	private       String                    url;
+	private       String                    modelName;
+	private       List<Term>                terms         = new LinkedList<>();
+	private       List<Definition>          definitions   = new LinkedList<>();
+	private       List<Example>             examples      = new LinkedList<>();
+	private       List<Relation>            relations     = new LinkedList<>();
+	private       boolean                   complete      = false;
+	private       Step                      step          = Step.INITIAL;
 
 	public AggregationProcess() {
 		sources = new LinkedList<>();
@@ -132,6 +134,15 @@ public class AggregationProcess {
 
 	public void setAreaOfKnowledge(String areaOfKnowledge) {
 		this.areaOfKnowledge = areaOfKnowledge;
+	}
+
+	public GPT_Request.ModelLocation getModelLocation() {
+		return modelLocation;
+	}
+
+	public void setModelLocation(
+			GPT_Request.ModelLocation modelLocation) {
+		this.modelLocation = modelLocation;
 	}
 
 	public String getApiKey() {

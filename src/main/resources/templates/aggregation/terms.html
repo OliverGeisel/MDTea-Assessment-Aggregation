@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Konfiguration</title>
+    <th:block th:replace="~{main::head-tag}"></th:block>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div th:replace="~{main::navigation}"></div>
+
+<main class="flex-grow-1 container-fluid">
+    <div th:replace="~{main::aggregationProgress}"></div>
+    <header class="flex-header"><h1>Konfiguration für NLP</h1></header>
+    <section class="container-fluid">
+        <form>
+            <div class="input-group-lg">
+                <label>Typ</label>
+                <div>
+                    <input name="connectionType" th:checked="${process.modelLocation.toString()}=='LOCAL'"
+                           th:text="#{aggregation.modelType.local}"
+                           th:value="local"
+                           type="radio">
+                </div>
+                <div>
+                    <input name="connectionType" th:checked="${process.modelLocation.toString()}=='REMOTE'"
+                           th:text="#{aggregation.modelType.remote}"
+                           th:value="remote"
+                           type="radio">
+                </div>
+            </div>
+            <label class="form-control">
+                Modellname:<select class="form-select" name="modelName">
+                <option th:each="model : ${models}" th:selected="${model}==${process.modelName}" th:text="${model}"
+                        th:value="${model}">Model
+                </option>
+            </select>
+            </label>
+            <label class="form-control">
+                API-Key:
+                <input class="form-text" name="apiKey" th:placeholder="'Nur wenn remote genutzt'"
+                       th:value="${process.apiKey}"
+                       title="Nur wenn remote genutzt">
+                Server-Url:
+                <input class="form-text" name="url" placeholder="http://localhost:4891/v1 is default"
+                       th:placeholder="'Nur wenn remote genutzt'"
+                       title="Nur wenn remote genutzt">
+            </label>
+        </form>
+    </section>
+    <hr>
+    <section class="container-fluid">
+        <div class="alert alert-danger" role="alert" th:if="${error}">
+            <p th:text="${error}"></p>
+        </div>
+        <div th:unless="${error}">
+            <header>
+                <h3>Antwort</h3>
+            </header>
+            <article class="row" id="next-step">
+                <header><h4>Weiter zu den Definitionen</h4></header>
+                <form method="post" th:action="@{definitons}" th:disabled="${process.terms.isEmpty()}">
+                    <button class="btn btn-primary">Weiter</button>
+                </form>
+            </article>
+            <hr>
+            <article class="mt-2">
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
+                    <div class="col-lg-6">
+                        <div class="row">
+                            <div class="card col-md-5 col-lg-5 m-2 text-bg-primary" th:each="term:${terms}">
+                                <div class="card-header">
+                                    <i class="bi bi-pen"></i>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-title">Name:<span th:text="${term.content}"></span></p>
+                                    <p class="card-text">Id:<span th:text="${term.id}"></span></p>
+                                    <p class="card-text">Type:<span th:text="${term.type}"></span></p>
+                                    <p class="card-text">TermName:<span th:text="${term.termName}"></span></p>
+                                </div>
+                                <div class="card-footer">
+                                    <a th:href="@{/aggregation/term/{id}(id=${term.id})}">
+                                        <button class="btn btn-primary">Details</button>
+                                    </a>
+                                    <i class="bi bi-trash text-danger"></i>
+                                    <i class="bi bi-plus-square text-success"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="card mb-2 text-bg-success">
+                            <div class="card-header">
+                                <i class="bi bi-pen"></i>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-title">Name:<span>NAME</span></p>
+                                <p class="card-text">Id:<span>1234564</span></p>
+                                <p class="card-text">Type:<span>TERM</span></p>
+                                <p class="card-text">TermName:<span>NAME-TERM</span></p>
+                            </div>
+                            <div class="card-footer">
+                                <a>
+                                    <button class="btn btn-primary">Details</button>
+                                </a>
+                                <i class="bi bi-trash text-danger ms-2"></i>
+                                <i class="bi bi-dash-square text-primary ms-2"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+    </section>
+</main>
+<footer th:replace="~{main::footer}"></footer>
+</body>
+</html>

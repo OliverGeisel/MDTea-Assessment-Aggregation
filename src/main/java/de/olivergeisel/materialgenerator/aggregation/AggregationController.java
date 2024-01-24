@@ -1,5 +1,10 @@
 package de.olivergeisel.materialgenerator.aggregation;
 
+import de.olivergeisel.materialgenerator.aggregation.extraction.GPT_Manager;
+import de.olivergeisel.materialgenerator.aggregation.extraction.GPT_Request;
+import de.olivergeisel.materialgenerator.aggregation.extraction.ServerNotAvailableException;
+import de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_prompts.TermElementExtractor;
+import de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_prompts.TermPrompt;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +26,13 @@ public class AggregationController {
 			"GPT4All Falcon", "gpt4all-falcon-newbpe-q4_0.gguf",
 			"Hermes", "nous-hermes-llama2-13b.Q4_0.gguf",
 			"Mistral german", "em_german_mistral_v01.Q4_0.gguf");
-	private static final String              ZUFALL        = "ZUFALL";
+	private static final String ZUFALL = "ZUFALL";
 
+	private final GPT_Manager gptManager;
 	private final KnowledgeModelService modelService;
 
-	public AggregationController(KnowledgeModelService modelService) {
+	public AggregationController(GPT_Manager gptManager, KnowledgeModelService modelService) {
+		this.gptManager = gptManager;
 		this.modelService = modelService;
 	}
 
@@ -111,6 +118,20 @@ public class AggregationController {
 					modelListName.size() - 1)));
 		} else {
 			process.setModelName(form.getModelName());
+		}
+		var location = GPT_Request.ModelLocation.valueOf(form.getConnectionType().toUpperCase());
+		process.setModelLocation(location);
+		model.addAttribute("models", getModelNameList());
+		var prompt = new TermPrompt(form.getFragment());
+		try {
+			var answer = gptManager.requestTerms(prompt, form.getUrl(),
+					modelListName.get(process.getModelName()), location,
+					form.getMaxTokens(), form.getTemperature(), form.getTopP(), 0.2, form.getRetries());
+			var termExtractor = new TermElementExtractor();
+			var terms = termExtractor.extractAll(answer, process.getModelLocation());
+			process.add(terms);
+		} catch (ServerNotAvailableException e) {
+			model.addAttribute("error", e.getMessage());
 		}
 		return "redirect:/aggregation/top-level-scan/terms";
 	}
