@@ -1,9 +1,10 @@
-package de.olivergeisel.materialgenerator.finalization.parts;
+package de.olivergeisel.materialgenerator.finalization;
 
 import de.olivergeisel.materialgenerator.core.course.Course;
 import de.olivergeisel.materialgenerator.core.course.Meta;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
-import de.olivergeisel.materialgenerator.finalization.Goal;
+import de.olivergeisel.materialgenerator.finalization.parts.CourseMetadataFinalization;
+import de.olivergeisel.materialgenerator.finalization.parts.CourseOrder;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
 import jakarta.persistence.*;
 

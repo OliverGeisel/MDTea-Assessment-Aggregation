@@ -113,4 +113,10 @@ public class FinalizationController {
 		});
 		return TEMPLATE_SET_FROM_TEMPLATES_FOLDER + templateSet + "/" + materialType;
 	}
+
+	@GetMapping("export")
+	public String exportOverview(Model model) {
+		model.addAttribute("courses", repository.findAll().filter(RawCourse::isValid));
+		return PATH + "export";
+	}
 }

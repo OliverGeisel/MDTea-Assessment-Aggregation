@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Planwahl</title>
-    <th:block th:include="main :: head-tag"></th:block>
+    <th:block th:insert="~{main :: head-tag}"></th:block>
     <style>
         .drop-zone {
             border: 2px dashed #bbb;
@@ -68,7 +68,7 @@
     </script>
 </head>
 <body class="container">
-<nav th:replace="main::navigation"></nav>
+<nav th:replace="~{main::navigation}"></nav>
 <main>
     <section>
         <h2> Gewähltes Template: <span th:text="${templateSetName}"></span></h2>
@@ -104,6 +104,7 @@
         </form>
     </section>
 </main>
+<footer th:replace="~{main::footer}"></footer>
 
 
 </body>

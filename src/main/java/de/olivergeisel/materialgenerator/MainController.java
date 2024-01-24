@@ -12,4 +12,19 @@ public class MainController {
 		return "index";
 	}
 
+	@GetMapping("login")
+	String login() {
+		return "login";
+	}
+
+	@GetMapping("synchronization")
+	String synchronization() {
+		return "synchronization";
+	}
+
+	@GetMapping("info")
+	String info() {
+		return "info";
+	}
+
 }
