@@ -120,6 +120,8 @@ def remote(prompt, model_name, url: str = None, api_key: str = None):
 
     # Print the generated completion
     print(response)
+    with open("last-response.txt", "w") as f:
+        f.write(str(response))
 
 
 if __name__ == '__main__':
