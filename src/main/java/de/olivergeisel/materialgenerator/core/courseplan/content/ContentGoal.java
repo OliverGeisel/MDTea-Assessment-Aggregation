@@ -1,5 +1,6 @@
 package de.olivergeisel.materialgenerator.core.courseplan.content;
 
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.KnowledgeModel;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ import java.util.List;
  * @see ContentTarget
  * @see de.olivergeisel.materialgenerator.core.courseplan.CoursePlan
  * @see KnowledgeModel
- * @see de.olivergeisel.materialgenerator.core.knowledge.metamodel.element.KnowledgeElement
+ * @see KnowledgeElement
  * @since 0.2.0
  */
 public class ContentGoal {

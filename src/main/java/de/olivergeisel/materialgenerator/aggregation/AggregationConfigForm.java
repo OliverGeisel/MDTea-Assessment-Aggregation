@@ -1,15 +1,16 @@
 package de.olivergeisel.materialgenerator.aggregation;
 
 public class AggregationConfigForm {
-	public  String connectionType;
-	public  String modelName;
-	public  String url;
-	public  String apiKey;
-	public  int    retries;
-	public  int    maxTokens;
-	public  double temperature;
-	public  double topP;
+	private String connectionType;
+	private String modelName;
+	private String url;
+	private String apiKey;
+	private int    retries;
+	private int    maxTokens;
+	private double temperature;
+	private double topP;
 	private String fragment;
+
 	public AggregationConfigForm() {
 		this.fragment = "";
 		this.connectionType = "remote";
@@ -23,8 +24,7 @@ public class AggregationConfigForm {
 	}
 
 	public AggregationConfigForm(String connectionType, String modelName, String url, String apiKey, String fragment,
-			int retries,
-			int maxTokens, double temperature, double topP) {
+			int retries, int maxTokens, double temperature, double topP) {
 		this.connectionType = connectionType;
 		this.modelName = modelName;
 		this.url = url;

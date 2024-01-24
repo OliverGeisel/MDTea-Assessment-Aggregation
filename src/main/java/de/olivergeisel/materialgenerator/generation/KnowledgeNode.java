@@ -12,6 +12,15 @@ import java.util.*;
 /**
  * Contains all Knowledge from a KnowledgeModel, that is related to a specific topic in the structure.
  * Each Node has a main KnowledgeElement. It should be a Term
+ *
+ * @see KnowledgeElement
+ * @see KnowledgeObject
+ * @see Relation
+ * @see ContentGoal
+ *
+ * @version 1.1.0
+ * @since 0.2.0
+ * @author Oliver Geisel
  */
 public class KnowledgeNode {
 
@@ -21,7 +30,7 @@ public class KnowledgeNode {
 	// todo remove duplicates in relatedElements
 	@Getter private KnowledgeElement[]    relatedElements;
 	@Getter private Relation[]            relations;
-	@Getter private Optional<ContentGoal> goal   = Optional.empty();
+	@Getter private Optional<ContentGoal> goal = Optional.empty();
 
 	public KnowledgeNode(KnowledgeObject structurePoint, KnowledgeElement mainElement,
 			KnowledgeElement[] relatedElements, Relation[] relations) {
@@ -99,11 +108,6 @@ public class KnowledgeNode {
 
 	@Override
 	public String toString() {
-		return "KnowledgeNode{" +
-			   "structurePoint=" + structurePoint +
-			   ", mainElement=" + mainElement +
-			   ", relatedElements size=" + relatedElements.length +
-			   ", relations size=" + relations.length +
-			   '}';
+		return STR."KnowledgeNode{structurePoint=\{structurePoint}, mainElement=\{mainElement}, relatedElements size=\{relatedElements.length}, relations size=\{relations.length}}";
 	}
 }

@@ -1,6 +1,7 @@
 package de.olivergeisel.materialgenerator.aggregation;
 
 import de.olivergeisel.materialgenerator.aggregation.collect.SourceFragmentCollection;
+import de.olivergeisel.materialgenerator.aggregation.extraction.ElementNegotiator;
 import de.olivergeisel.materialgenerator.aggregation.extraction.GPT_Request;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Definition;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Example;
@@ -24,21 +25,21 @@ import java.util.List;
  */
 public class AggregationProcess {
 
-	private final LocalDateTime             start         = LocalDateTime.now();
-	private       List<MultipartFile>       sources;
-	private       GPT_Request.ModelLocation modelLocation = GPT_Request.ModelLocation.REMOTE;
-	private       SourceFragmentCollection  sourceFragmentCollection;
-	private       String                    currentFragment;
-	private       String                    areaOfKnowledge;
-	private       String                    apiKey;
-	private       String                    url;
-	private       String                    modelName;
-	private       List<Term>                terms         = new LinkedList<>();
-	private       List<Definition>          definitions   = new LinkedList<>();
-	private       List<Example>             examples      = new LinkedList<>();
-	private       List<Relation>            relations     = new LinkedList<>();
-	private       boolean                   complete      = false;
-	private       Step                      step          = Step.INITIAL;
+	private final LocalDateTime                 start         = LocalDateTime.now();
+	private       List<MultipartFile>           sources;
+	private       GPT_Request.ModelLocation     modelLocation = GPT_Request.ModelLocation.REMOTE;
+	private       SourceFragmentCollection      sourceFragmentCollection;
+	private       String                        currentFragment;
+	private       String                        areaOfKnowledge;
+	private       String                        apiKey;
+	private       String                        url;
+	private       String                        modelName;
+	private       ElementNegotiator<Term>       terms         = new ElementNegotiator<>(null);
+	private       ElementNegotiator<Definition> definitions   = new ElementNegotiator<>(null);
+	private       ElementNegotiator<Example>    examples      = new ElementNegotiator<>(null);
+	private       List<Relation>                relations     = new LinkedList<>();
+	private       boolean                       complete      = false;
+	private       Step                          step          = Step.INITIAL;
 
 	public AggregationProcess() {
 		sources = new LinkedList<>();
@@ -49,9 +50,9 @@ public class AggregationProcess {
 	}
 
 	public void reset() {
-		terms.clear();
-		definitions.clear();
-		examples.clear();
+		terms = new ElementNegotiator<>(null);
+		definitions = new ElementNegotiator<>(null);
+		examples = new ElementNegotiator<>(null);
 		relations.clear();
 	}
 
@@ -101,6 +102,37 @@ public class AggregationProcess {
 			case EXAMPLE -> examples.addAll((Collection<Example>) elements);
 			default -> throw new IllegalArgumentException("Unknown type: " + first.getType());
 		}
+	}
+
+	public boolean removeById(String id) {
+		if (id == null || id.isBlank()) {
+			return false;
+		}
+		var removed = terms.removeById(id);
+		removed |= definitions.removeById(id);
+		removed |= examples.removeById(id);
+		return removed;
+
+	}
+
+	public boolean approveById(String id) {
+		if (id == null || id.isBlank()) {
+			return false;
+		}
+		var accepted = terms.approveById(id);
+		accepted |= definitions.approveById(id);
+		accepted |= examples.approveById(id);
+		return accepted;
+	}
+
+	public boolean rejectById(String id) {
+		if (id == null || id.isBlank()) {
+			return false;
+		}
+		var rejected = terms.rejectById(id);
+		rejected |= definitions.rejectById(id);
+		rejected |= examples.rejectById(id);
+		return rejected;
 	}
 
 	//region setter/getter
@@ -169,15 +201,15 @@ public class AggregationProcess {
 		this.modelName = modelName;
 	}
 
-	public List<Term> getTerms() {
+	public ElementNegotiator<Term> getTerms() {
 		return terms;
 	}
 
-	public List<Definition> getDefinitions() {
+	public ElementNegotiator<Definition> getDefinitions() {
 		return definitions;
 	}
 
-	public List<Example> getExamples() {
+	public ElementNegotiator<Example> getExamples() {
 		return examples;
 	}
 

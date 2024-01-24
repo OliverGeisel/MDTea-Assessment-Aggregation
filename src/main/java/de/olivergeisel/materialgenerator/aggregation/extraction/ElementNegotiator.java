@@ -4,6 +4,7 @@ import de.olivergeisel.materialgenerator.aggregation.collect.KnowledgeFragment;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.KnowledgeModel;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -44,6 +45,27 @@ public class ElementNegotiator<T extends KnowledgeElement> implements Negotiator
 	}
 
 	/**
+	 * Move an element from the list of suggested elements to the list of accepted elements.
+	 *
+	 * @param id the id of the element to approve
+	 * @return true if the element was moved, false if the element is not in the list of suggested elements.
+	 */
+	public boolean approveById(String id) {
+		return swapById(id, suggestedElements, acceptedElements);
+	}
+
+	private boolean swapById(String id, List<T> from, List<T> to) {
+		if (id == null || id.isBlank()) {
+			return false;
+		}
+		return from.stream().filter(it -> it.getId().equals(id)).findFirst().map(it -> {
+			from.remove(it);
+			to.add(it);
+			return true;
+		}).orElse(false);
+	}
+
+	/**
 	 * Move an element from the list of accepted elements to the list of suggested elements.
 	 *
 	 * @param element the element to reject
@@ -58,18 +80,43 @@ public class ElementNegotiator<T extends KnowledgeElement> implements Negotiator
 		return false;
 	}
 
+
+	/**
+	 * Move an element from the list of accepted elements to the list of suggested elements.
+	 *
+	 * @param id the id of the element to reject
+	 * @return true if the element was moved, false if the element is not in the list of accepted elements.
+	 */
+	public boolean rejectById(String id) {
+		return swapById(id, acceptedElements, suggestedElements);
+	}
+
 	/**
 	 * Adds an element to the list of accepted elements.
 	 *
 	 * @param element the element to add
 	 * @return true if the element was added, false if the element is already in the list of suggested or accepted elements.
 	 */
-	public boolean add(T element) {
+	public <E extends T> boolean add(E element) {
 		if (!suggestedElements.contains(element) && !acceptedElements.contains(element)) {
 			acceptedElements.add(element);
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Adds a list of elements to the list of accepted elements.
+	 *
+	 * @param elements the elements to add
+	 * @return true if at least one element was added, false if all elements are already in the list of suggested or accepted elements.
+	 */
+	public <E extends T> boolean addAll(Collection<E> elements) {
+		boolean changed = false;
+		for (var element : elements) {
+			changed |= add(element);
+		}
+		return changed;
 	}
 
 	/**
@@ -102,6 +149,14 @@ public class ElementNegotiator<T extends KnowledgeElement> implements Negotiator
 			return true;
 		}
 		return false;
+	}
+
+	public boolean removeById(String id) {
+		if (id == null || id.isBlank()) {
+			return false;
+		}
+		return suggestedElements.removeIf(it -> it.getId().equals(id))
+			   || acceptedElements.removeIf(it -> it.getId().equals(id));
 	}
 
 	@Override

@@ -1,8 +1,10 @@
 upload-dir/
 target/
+neo4j
+
 
 *.gguf
-
+args.txt
 
 .idea/discord.xml
 .idea/workspace.xml

@@ -143,6 +143,19 @@ public class AggregationController {
 		return "aggregation/terms";
 	}
 
+	@PostMapping("top-level-scan/terms/{action}")
+	String topLevelScanTermsPost(@ModelAttribute("process") AggregationProcess process,
+			@PathVariable("action") String action, @RequestParam("id") String id) {
+		switch (action) {
+			case "remove" -> process.removeById(id);
+			case "reject" -> process.rejectById(id);
+			case "accept" -> process.approveById(id);
+			default -> throw new IllegalArgumentException("Unknown action: " + action);
+		}
+
+		return "redirect:/aggregation/top-level-scan/terms";
+	}
+
 	@GetMapping("compile")
 	public String compile() {
 		return "aggregation/compile";
@@ -177,7 +190,7 @@ public class AggregationController {
 
 	private static List<String> getModelNameList() {
 		List<String> list = new LinkedList<>();
-		list.add("ZUFALL");
+		list.add(ZUFALL);
 		list.addAll(modelListName.keySet());
 		return list;
 	}
