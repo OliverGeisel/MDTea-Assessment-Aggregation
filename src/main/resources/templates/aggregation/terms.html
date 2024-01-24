@@ -57,9 +57,16 @@
             <header>
                 <h3>Antwort</h3>
             </header>
+            <span>
+                <form method="post" th:action="@{terms/add}">
+                    <button class="btn btn-primary" th:text="#{aggregation.terms.add}">Add</button>
+                </form>
+            </span>
             <article class="mt-2">
                 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
                     <div class="col-lg-6">
+                        <span th:text="#{aggregation.terms.suggested}">Vorgeschlagen: </span>: <span
+                            th:text="${process.terms.suggestedElements.size}"></span>
                         <div class="row">
                             <div class="card col-md-5 col-lg-5 m-2 text-bg-primary" th:each="term:${suggestedTerms}">
                                 <div class="card-header">
@@ -94,6 +101,8 @@
                     </div>
 
                     <div class="col-lg-6">
+                        <span th:text="#{aggregation.terms.accepted}">Angenommen</span>: <span
+                            th:text="${process.terms.acceptedElements.size}"></span>
                         <div class="row">
                             <div class="card col-md-5 col-lg-5 m-2 text-bg-success" th:each="term:${acceptedTerms}">
                                 <div class="card-header">
@@ -132,7 +141,7 @@
             <hr>
             <article class="row mb-2" id="next-step">
                 <header><h4>Weiter zu den Definitionen</h4></header>
-                <form method="post" th:action="@{definitons}">
+                <form method="post" th:action="@{terms}">
                     <button class="btn btn-primary" th:disabled="${process.terms.isEmpty}">Weiter</button>
                 </form>
             </article>

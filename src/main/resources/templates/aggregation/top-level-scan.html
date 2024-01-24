@@ -22,9 +22,9 @@
                 <div class="form-label">Ort des Modells:</div>
                 <div class="input-group-lg">
                     <label>
-                        Local <input name="connectionType" th:checked="${process.modelLocation.toString()}=='LOCAL'"
+                        <input name="connectionType" th:checked="${process.modelLocation.toString()}=='LOCAL'"
                                      th:text="#{aggregation.modelType.local}" th:value="local" type="radio">
-                        Remote <input name="connectionType" th:checked="${process.modelLocation.toString()}=='REMOTE'"
+                        <input name="connectionType" th:checked="${process.modelLocation.toString()}=='REMOTE'"
                                       th:text="#{aggregation.modelType.remote}" th:value="remote" type="radio">
                     </label>
                 </div>

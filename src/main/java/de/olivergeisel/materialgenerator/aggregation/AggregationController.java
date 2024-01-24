@@ -140,6 +140,9 @@ public class AggregationController {
 
 	@GetMapping("top-level-scan/terms")
 	String topLevelScanTerms(Model model, @ModelAttribute("process") AggregationProcess process) {
+		if (process.getStepNumber() != 1) {
+			return "redirect:/aggregation/top-level-scan";
+		}
 		model.addAttribute("models", getModelNameList());
 		model.addAttribute("acceptedTerms", process.getTerms().getAcceptedElements());
 		model.addAttribute("suggestedTerms", process.getTerms().getSuggestedElements());
