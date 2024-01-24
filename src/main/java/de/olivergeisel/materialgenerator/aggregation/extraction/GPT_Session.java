@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 public class GPT_Session {
 
@@ -24,7 +25,7 @@ public class GPT_Session {
 
 	private static <T extends KnowledgeElement, A extends PromptAnswer<T>> StringBuilder runConnection(
 			GPT_Request<T, A> request)
-			throws ServerNotAvailableException {
+			throws ServerNotAvailableException, TimeoutException {
 		final var workingDir = System.getProperty("user.dir");
 		var parameters = createParameters(request);
 		var prompt = STR."\"\{request.getPrompt().getPrompt()}\""; // " are needed for the python script
@@ -35,8 +36,19 @@ public class GPT_Session {
 		int exitCode = -1;
 		Process process;
 		StringBuilder answer = new StringBuilder();
+		Thread timerThread = null;
 		try {
 			process = pb.start();
+			timerThread = new Thread(() -> {
+				try {
+					Thread.sleep(10 * 60 * 1_000);
+					process.destroy();
+				} catch (InterruptedException e) {
+					// do nothing
+				}
+			});
+			timerThread.start();
+
 			InputStream inputStream = process.getInputStream();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 			String line;
@@ -51,16 +63,24 @@ public class GPT_Session {
 				throw new ServerNotAvailableException(STR."""
 				The server behind "\{url}" is not responding.""");
 			}
-		} catch (IOException | InterruptedException e) {
+			if (timerThread.isInterrupted()) {
+				throw new TimeoutException("The connection timed out.");
+			}
+		} catch (IOException e) {
 			throw new RuntimeException(e);
+		} catch (InterruptedException e) {
+			logger.info("Connection was interrupted.");
 		} finally {
+			if (timerThread != null) {
+				timerThread.interrupt();
+			}
 			logger.info(STR."Connection-(Python) was closed with code: \{exitCode}");
 		}
 		return answer;
 	}
 
 	private <T extends KnowledgeElement, A extends PromptAnswer<T>> String requestLocalModel(
-			GPT_Request<T, A> request) {
+			GPT_Request<T, A> request) throws TimeoutException {
 		logger.info("open connection to a local GPT-Model. Model-Name: {} - Parameters: {}", request.getModelName(),
 				request.getPromptParameters());
 		StringBuilder answer = runConnection(request);
@@ -68,7 +88,7 @@ public class GPT_Session {
 	}
 
 	private <T extends KnowledgeElement, A extends PromptAnswer<T>> String requestRemoteModel(GPT_Request<T, A> request)
-			throws ServerNotAvailableException {
+			throws ServerNotAvailableException, TimeoutException {
 		logger.info("open connection to a GPT/Model-Server. Model-Name: {} - Parameters: {}", request.getModelName(),
 				request.getPromptParameters());
 		StringBuilder answer = runConnection(request);
@@ -83,7 +103,7 @@ public class GPT_Session {
 	 * @return The answer to the request
 	 */
 	public <T extends KnowledgeElement, A extends PromptAnswer<T>> A request(GPT_Request<T, A> request)
-			throws ServerNotAvailableException {
+			throws ServerNotAvailableException, TimeoutException {
 		String response;
 		if (request.getModelLocation() == GPT_Request.ModelLocation.LOCAL) {
 			response = requestLocalModel(request);

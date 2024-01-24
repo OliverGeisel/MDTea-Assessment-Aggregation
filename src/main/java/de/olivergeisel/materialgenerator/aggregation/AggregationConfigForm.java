@@ -18,7 +18,7 @@ public class AggregationConfigForm {
 		this.url = "";
 		this.apiKey = "";
 		this.retries = 1;
-		this.maxTokens = 800;
+		this.maxTokens = 1800;
 		this.temperature = .28;
 		this.topP = .95;
 	}

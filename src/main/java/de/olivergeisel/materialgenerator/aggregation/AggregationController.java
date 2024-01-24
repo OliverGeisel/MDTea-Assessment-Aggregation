@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
+import java.util.concurrent.TimeoutException;
 
 @Controller
 @RequestMapping("/aggregation")
@@ -108,10 +109,6 @@ public class AggregationController {
 		if (process.getSources().isEmpty()) {
 			process.setCurrentFragment(form.getFragment());
 		}
-		model.addAttribute("form", form);
-		if (process.getStepNumber() == 0) {
-			process.nextStep();
-		}
 		process.setApiKey(form.getApiKey());
 		if (form.getModelName().equals(ZUFALL)) {
 			process.setModelName(modelListName.keySet().stream().toList().get(new Random().nextInt(1,
@@ -121,7 +118,6 @@ public class AggregationController {
 		}
 		var location = GPT_Request.ModelLocation.valueOf(form.getConnectionType().toUpperCase());
 		process.setModelLocation(location);
-		model.addAttribute("models", getModelNameList());
 		var prompt = new TermPrompt(form.getFragment());
 		try {
 			var answer = gptManager.requestTerms(prompt, form.getUrl(),
@@ -129,9 +125,15 @@ public class AggregationController {
 					form.getMaxTokens(), form.getTemperature(), form.getTopP(), 0.2, form.getRetries());
 			var termExtractor = new TermElementExtractor();
 			var terms = termExtractor.extractAll(answer, process.getModelLocation());
-			process.add(terms);
-		} catch (ServerNotAvailableException e) {
+			process.suggest(terms);
+		} catch (ServerNotAvailableException | TimeoutException e) {
 			model.addAttribute("error", e.getMessage());
+			model.addAttribute("models", getModelNameList());
+			model.addAttribute("form", form);
+			return "aggregation/top-level-scan";
+		}
+		if (process.getStepNumber() == 0) {
+			process.nextStep();
 		}
 		return "redirect:/aggregation/top-level-scan/terms";
 	}
@@ -139,7 +141,8 @@ public class AggregationController {
 	@GetMapping("top-level-scan/terms")
 	String topLevelScanTerms(Model model, @ModelAttribute("process") AggregationProcess process) {
 		model.addAttribute("models", getModelNameList());
-		model.addAttribute("terms", process.getTerms());
+		model.addAttribute("acceptedTerms", process.getTerms().getAcceptedElements());
+		model.addAttribute("suggestedTerms", process.getTerms().getSuggestedElements());
 		return "aggregation/terms";
 	}
 

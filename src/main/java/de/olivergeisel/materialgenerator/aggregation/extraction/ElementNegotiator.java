@@ -44,6 +44,16 @@ public class ElementNegotiator<T extends KnowledgeElement> implements Negotiator
 		return false;
 	}
 
+	public boolean hasElements() {
+		return !isEmpty();
+	}
+
+	public boolean hasSuggestedElements() {
+		return !suggestedElements.isEmpty();
+	}
+
+	//region setter/getter
+
 	/**
 	 * Move an element from the list of suggested elements to the list of accepted elements.
 	 *
@@ -163,8 +173,9 @@ public class ElementNegotiator<T extends KnowledgeElement> implements Negotiator
 	public List<KnowledgeElement> extract() {
 		return null;
 	}
-
-	//region setter/getter
+	public boolean isEmpty() {
+		return suggestedElements.isEmpty() && acceptedElements.isEmpty();
+	}
 	public KnowledgeFragment getFragment() {
 		return fragment;
 	}

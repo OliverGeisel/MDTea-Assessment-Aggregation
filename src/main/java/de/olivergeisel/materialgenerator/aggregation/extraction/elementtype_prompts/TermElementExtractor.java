@@ -23,7 +23,8 @@ public class TermElementExtractor extends ElementExtractor<Term, TermPromptAnswe
 	}
 
 	@Override
-	public List<Term> extractAll(TermPromptAnswer answers, GPT_Request.ModelLocation modelLocation) {
+	public List<Term> extractAll(TermPromptAnswer answers, GPT_Request.ModelLocation modelLocation)
+			throws RuntimeException {
 		if (answers.getDeliverType() == DeliverType.SINGLE) {
 			throw new WrongExtractionMethodException("Wrong extraction method for single answer. Use extract instead.");
 		}
@@ -38,7 +39,6 @@ public class TermElementExtractor extends ElementExtractor<Term, TermPromptAnswe
 				var jsonObject = parser.parseObject();
 				var choices = (List<Map>) jsonObject.get("choices");
 				text = choices.get(0).get("text").toString();
-
 			} catch (ParseException e) {
 				throw new RuntimeException(e);
 			}

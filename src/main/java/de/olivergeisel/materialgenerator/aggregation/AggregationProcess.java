@@ -104,6 +104,19 @@ public class AggregationProcess {
 		}
 	}
 
+	public <T extends KnowledgeElement> void suggest(List<T> elements) throws IllegalArgumentException {
+		if (elements == null || elements.isEmpty()) {
+			return;
+		}
+		var first = elements.getFirst();
+		switch (first.getType()) {
+			case TERM -> ((Collection<Term>) elements).forEach(terms::suggest);
+			case DEFINITION -> ((Collection<Definition>) elements).forEach(definitions::suggest);
+			case EXAMPLE -> ((Collection<Example>) elements).forEach(examples::suggest);
+			default -> throw new IllegalArgumentException("Unknown type: " + first.getType());
+		}
+	}
+
 	public boolean removeById(String id) {
 		if (id == null || id.isBlank()) {
 			return false;

@@ -4,6 +4,8 @@ import de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_prom
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Definition;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.TimeoutException;
+
 @Service
 public class GPT_Manager {
 
@@ -15,7 +17,7 @@ public class GPT_Manager {
 
 	public TermPromptAnswer requestTerms(TermPrompt prompt, String url, String modelName,
 			GPT_Request.ModelLocation location, int maxTokens, double temperature, double topP, double frequencyPenalty,
-			int retries) throws ServerNotAvailableException {
+			int retries) throws ServerNotAvailableException, TimeoutException {
 		var answer = new TermPromptAnswer(prompt);
 		var newRequest = new GPT_Request<>(prompt, answer, url, modelName, location, maxTokens, temperature, topP,
 				frequencyPenalty, retries);
@@ -24,7 +26,7 @@ public class GPT_Manager {
 
 	public PromptAnswer<Definition> requestDefinitions(DefinitionPrompt prompt, String url, String modelName,
 			GPT_Request.ModelLocation location, int maxTokens, double temperature, double topP, double frequencyPenalty,
-			int retries) throws ServerNotAvailableException {
+			int retries) throws ServerNotAvailableException, TimeoutException {
 		var answer = new DefinitionPromptAnswer(prompt);
 		var newRequest = new GPT_Request<>(prompt, answer, url, modelName, location, maxTokens, temperature, topP,
 				frequencyPenalty, retries);

@@ -50,67 +50,92 @@
     <hr>
     <section class="container-fluid">
         <div class="alert alert-danger" role="alert" th:if="${error}">
+            Error
             <p th:text="${error}"></p>
         </div>
         <div th:unless="${error}">
             <header>
                 <h3>Antwort</h3>
             </header>
-            <article class="row" id="next-step">
-                <header><h4>Weiter zu den Definitionen</h4></header>
-                <form method="post" th:action="@{definitons}" th:disabled="${process.terms.isEmpty()}">
-                    <button class="btn btn-primary">Weiter</button>
-                </form>
-            </article>
-            <hr>
             <article class="mt-2">
                 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
                     <div class="col-lg-6">
                         <div class="row">
-                            <div class="card col-md-5 col-lg-5 m-2 text-bg-primary" th:each="term:${terms}">
+                            <div class="card col-md-5 col-lg-5 m-2 text-bg-primary" th:each="term:${suggestedTerms}">
                                 <div class="card-header">
-                                    <i class="bi bi-pen"></i>
+                                    <span th:text="${term.content}"></span>
                                 </div>
                                 <div class="card-body">
-                                    <p class="card-title">Name:<span th:text="${term.content}"></span></p>
-                                    <p class="card-text">Id:<span th:text="${term.id}"></span></p>
-                                    <p class="card-text">Type:<span th:text="${term.type}"></span></p>
-                                    <p class="card-text">TermName:<span th:text="${term.termName}"></span></p>
+                                    <p class="card-text">Id: <span th:text="${term.id}"></span></p>
+                                    <p class="card-text">Type: <span th:text="${term.type}"></span></p>
+                                    <p class="card-text">TermName: <span th:text="${term.termName}"></span></p>
                                 </div>
                                 <div class="card-footer">
                                     <a th:href="@{/aggregation/term/{id}(id=${term.id})}">
                                         <button class="btn btn-primary">Details</button>
                                     </a>
-                                    <i class="bi bi-trash text-danger"></i>
-                                    <i class="bi bi-plus-square text-success"></i>
+                                    <div class="btn-group btn-group-sm">
+                                        <form method="post" th:action="@{terms/remove}">
+                                            <input name="id" th:value="${term.id}" type="hidden">
+                                            <button class="btn btn-danger"><i class="bi bi-trash ms-2"></i></button>
+                                        </form>
+                                        <form method="post" th:action="@{terms/accept}">
+                                            <input name="id" th:value="${term.id}" type="hidden">
+                                            <button class="btn btn-success"><i class="bi bi-plus-square"></i></button>
+                                        </form>
+                                        <form method="post" th:action="@{terms/edit}">
+                                            <input name="id" th:value="${term.id}" type="hidden">
+                                            <button class="btn btn-info"><i class="bi bi-pen"></i></button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="col-lg-6">
-                        <div class="card mb-2 text-bg-success">
-                            <div class="card-header">
-                                <i class="bi bi-pen"></i>
-                            </div>
-                            <div class="card-body">
-                                <p class="card-title">Name:<span>NAME</span></p>
-                                <p class="card-text">Id:<span>1234564</span></p>
-                                <p class="card-text">Type:<span>TERM</span></p>
-                                <p class="card-text">TermName:<span>NAME-TERM</span></p>
-                            </div>
-                            <div class="card-footer">
-                                <a>
-                                    <button class="btn btn-primary">Details</button>
-                                </a>
-                                <i class="bi bi-trash text-danger ms-2"></i>
-                                <i class="bi bi-dash-square text-primary ms-2"></i>
+                        <div class="row">
+                            <div class="card col-md-5 col-lg-5 m-2 text-bg-success" th:each="term:${acceptedTerms}">
+                                <div class="card-header">
+                                    <span th:text="${term.content}"></span>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">Id: <span th:text="${term.id}"></span></p>
+                                    <p class="card-text">Type: <span th:text="${term.type}"></span></p>
+                                    <p class="card-text">TermName: <span th:text="${term.termName}"></span></p>
+                                </div>
+                                <div class="card-footer">
+                                    <a>
+                                        <button class="btn btn-primary">Details</button>
+                                    </a>
+                                    <div class="btn-group btn-group-sm">
+                                        <form method="post" th:action="@{terms/remove}">
+                                            <input name="id" th:value="${term.id}" type="hidden">
+                                            <button class="btn btn-danger"><i class="bi bi-trash ms-2"></i></button>
+                                        </form>
+                                        <form method="post" th:action="@{terms/reject}">
+                                            <input name="id" th:value="${term.id}" type="hidden">
+                                            <button class="btn btn-warning"><i class="bi bi-dash-square ms-2"></i>
+                                            </button>
+                                        </form>
+                                        <form method="post" th:action="@{terms/edit}">
+                                            <input name="id" th:value="${term.id}" type="hidden">
+                                            <button class="btn btn-info"><i class="bi bi-pen"></i></button>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </article>
-
+            <hr>
+            <article class="row mb-2" id="next-step">
+                <header><h4>Weiter zu den Definitionen</h4></header>
+                <form method="post" th:action="@{definitons}">
+                    <button class="btn btn-primary" th:disabled="${process.terms.isEmpty}">Weiter</button>
+                </form>
+            </article>
         </div>
     </section>
 </main>

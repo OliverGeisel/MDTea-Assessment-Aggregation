@@ -22,15 +22,18 @@ prompts to tests
 			program:
 			- List all terms in the following query.
 			- Terms are subjects in the query.
-			- Terms are single words.
-			- A term is a noun.
+			- Terms are single words in singular.
+			- Terms are a single nouns.
 			- Follow the pattern:+ [Term] | ([Translation])
 			- in example section you can see an example.
+						
 			example:
-			- query: 'A fish is an animal that lives in the water.'
+			- query: 'A fish is an animal that lives in the water. A fish use gills to breathe.'
 			+ fish | Fisch
 			+ animal | Tier
-			+ water | Wasser""";
+			+ water | Wasser
+			+ gill | Kieme
+			""";
 
 	private static final String DEFAULT_FORMAT = "+ [Term] ([Translation])\\n";
 
