@@ -12,14 +12,15 @@ import java.util.UUID;
 /**
  * A material is a part of a course. It can be a text, an example, a proof, a definition and so on. It contains all
  * values for the specific Materialtype and TemplateInfo. It is used to generate the final material. The TemplateInfo
- * has all information for the template. Specific Materials have more Information about the Material.  @see
- * TemplateInfo for more information.
+ * has all information for the template. Specific Materials have more information about the there content. This is
+ * stored in a {@link TemplateInfo}.
  * <p>
- * The MaterialType is a general type of the material. It is only a classification from MDTea.
+ * The {@link MaterialType} is a general type of the material. It is only a classification from MDTea.
  *
  * @author Oliver Geisel
  * @version 1.0
- * @see de.olivergeisel.materialgenerator.core.course.MaterialOrderPart
+ * @see MaterialOrderPart
+ * @see TemplateInfo
  * @since 0.2.0
  */
 @Entity

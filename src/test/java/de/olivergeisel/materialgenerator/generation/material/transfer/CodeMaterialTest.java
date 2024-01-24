@@ -1,6 +1,7 @@
-package de.olivergeisel.materialgenerator.generation.material;
+package de.olivergeisel.materialgenerator.generation.material.transfer;
 
 import de.olivergeisel.materialgenerator.core.knowledge.metamodel.element.Code;
+import de.olivergeisel.materialgenerator.generation.material.transfer.CodeMaterial;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;

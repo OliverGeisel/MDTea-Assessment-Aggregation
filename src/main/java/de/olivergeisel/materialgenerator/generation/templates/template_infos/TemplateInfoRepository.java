@@ -22,6 +22,7 @@ public interface TemplateInfoRepository extends CrudRepository<TemplateInfo, UUI
 		list.add(findByTemplateType(TemplateType.PROOF));
 		list.add(findByTemplateType(TemplateType.EXERCISE));
 		list.add(findByTemplateType(TemplateType.SOLUTION));
+		list.add(findByTemplateType(TemplateType.TASK));
 		return list;
 	}
 }

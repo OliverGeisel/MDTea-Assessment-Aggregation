@@ -2,9 +2,9 @@ package de.olivergeisel.materialgenerator.finalization;
 
 import de.olivergeisel.materialgenerator.StorageFileNotFoundException;
 import de.olivergeisel.materialgenerator.finalization.parts.*;
-import de.olivergeisel.materialgenerator.generation.material.ExampleMaterial;
-import de.olivergeisel.materialgenerator.generation.material.ImageMaterial;
 import de.olivergeisel.materialgenerator.generation.material.Material;
+import de.olivergeisel.materialgenerator.generation.material.transfer.ExampleMaterial;
+import de.olivergeisel.materialgenerator.generation.material.transfer.ImageMaterial;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -153,7 +153,7 @@ public class DownloadManager {
 		for (int i = 0; i < chapters.size(); i++) {
 			var chapter = plan.getCourseOrder().getChapterOrder().get(i);
 			String chapterName = chapter.getName() == null || chapter.getName().isBlank() ?
-					"Kapitel " + (chapters.indexOf(chapter) + 1) : chapter.getName();
+					STR."Kapitel \{chapters.indexOf(chapter) + 1}" : chapter.getName();
 			var nextChapter = i < chapters.size() - 1 ? chapters.get(i + 1) : null;
 			var chapterNavigation = navigation.nextChapter(nextChapter);
 			var subDir = Files.createDirectory(new File(outputDir, chapterName).toPath());
@@ -165,9 +165,7 @@ public class DownloadManager {
 		}
 		context.clearVariables();
 		context.setVariable("course", plan);
-		for (var entry : overallInfos.entrySet()) {
-			context.setVariable(entry.getKey(), entry.getValue());
-		}
+		overallInfos.forEach(context::setVariable);
 		var course = templateEngine.process("COURSE", context);
 		zipService.saveToFile(course, outputDir, "Course.html");
 		saveIncludes(outputDir, templateSet);
@@ -196,7 +194,7 @@ public class DownloadManager {
 					continue;
 				}
 				String groupName = concreteGroup.getName() == null || group.getName().isBlank() ?
-						"Gruppe " + (chapter.getGroupOrder().indexOf(group) + 1) : group.getName();
+						STR."Gruppe \{chapter.getGroupOrder().indexOf(group) + 1}" : group.getName();
 				var subDir = new File(outputDir, groupName);
 				Files.createDirectory(subDir.toPath());
 				exportGroup(concreteGroup, newLevel, navigation, context, subDir, templateEngine);
@@ -249,11 +247,11 @@ public class DownloadManager {
 					continue;
 				}
 				String taskName = concreteTask.getName() == null || concreteTask.getName().isBlank() ?
-						"Task " + (group.getTaskOrder().indexOf(concreteTask) + 1) : concreteTask.getName();
+						STR."Task \{group.getTaskOrder().indexOf(concreteTask) + 1}" : concreteTask.getName();
 				taskName = taskName.replaceAll(CourseNavigation.PATH_REPLACE_REGEX, "_");
 				var subDir = new File(outputDir, taskName);
 				Files.createDirectory(subDir.toPath());
-				exportTask(concreteTask, newTaskLevel, newCourseNavigation, context, subDir, templateEngine);
+				exportMaterial(concreteTask, newTaskLevel, newCourseNavigation, context, subDir, templateEngine);
 			} else {
 				throw new IllegalArgumentException(
 						"Unknown substructure component! Must be either group or task inside a group.");
@@ -264,7 +262,7 @@ public class DownloadManager {
 
 	}
 
-	private void exportTask(TaskOrder task, CourseNavigation.MaterialLevel level, CourseNavigation navigation,
+	private void exportMaterial(TaskOrder task, CourseNavigation.MaterialLevel level, CourseNavigation navigation,
 			Context context, File outputDir, TemplateEngine templateEngine) {
 		final int taskSize = task.getMaterialOrder().size();
 		var materials = task.getMaterialOrder();
@@ -281,10 +279,10 @@ public class DownloadManager {
 						navigation.getCount() + 1, navigation.getSize());
 			} else {
 				next = new MaterialHierarchy(level.getChapter(), level.getGroup(), level.getTask(),
-						"MATERIAL_" + (i + 1), i + 1, materials.size());
+						STR."MATERIAL_\{i + 1}", i + 1, materials.size());
 			}
 			CourseNavigation.MaterialLevel materialLevel = new CourseNavigation.MaterialLevel(level.getChapter(),
-					level.getGroup(), task.getName(), "MATERIAL_" + i);
+					level.getGroup(), task.getName(), STR."MATERIAL_\{i}");
 			CourseNavigation newNavigation = new CourseNavigation(materialLevel,
 					previousNavigation.getCurrentMaterialHierarchy(), next, i, taskSize);
 			exportMaterial(context, outputDir, templateEngine, i, material, materialLevel, newNavigation);
@@ -293,8 +291,7 @@ public class DownloadManager {
 	}
 
 	private void exportMaterial(Context context, File outputDir, TemplateEngine templateEngine, int materialNumber,
-			Material material, CourseNavigation.MaterialLevel materialLevel,
-			CourseNavigation newNavigation) {
+			Material material, CourseNavigation.MaterialLevel materialLevel, CourseNavigation newNavigation) {
 		setOverallInfos(context);
 		context.setVariable("material", material);
 		context.setVariable("navigation", newNavigation);
@@ -303,22 +300,20 @@ public class DownloadManager {
 		String processedHtml = templateEngine.process("MATERIAL", context);
 		zipService.saveToFile(processedHtml, outputDir, String.format("Material_%s.html", materialNumber));
 		if (material instanceof ImageMaterial image) {
-			try {
-				var imageFile = getImage(image.getImageName());
-				Files.copy(imageFile.getInputStream(), new File(outputDir, image.getImageName()).toPath(),
-						StandardCopyOption.REPLACE_EXISTING);
-			} catch (IOException | StorageFileNotFoundException e) {
-				logger.warn(e.toString());
-			}
+			loadImage(image.getImageName(), outputDir);
 		}
 		if (material instanceof ExampleMaterial exampleMaterial && exampleMaterial.isImageExample()) {
-			try {
-				var image = getImage(exampleMaterial.getImageName());
-				Files.copy(image.getInputStream(), new File(outputDir, exampleMaterial.getImageName()).toPath(),
-						StandardCopyOption.REPLACE_EXISTING);
-			} catch (IOException | StorageFileNotFoundException e) {
-				logger.warn(e.toString());
-			}
+			loadImage(exampleMaterial.getImageName(), outputDir);
+		}
+	}
+
+	private void loadImage(String image, File outputDir) {
+		try {
+			var imageFile = getImage(image);
+			Files.copy(imageFile.getInputStream(), new File(outputDir, image).toPath(),
+					StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException | StorageFileNotFoundException e) {
+			logger.warn(e.toString());
 		}
 	}
 

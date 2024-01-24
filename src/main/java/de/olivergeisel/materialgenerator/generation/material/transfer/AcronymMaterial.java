@@ -1,6 +1,7 @@
-package de.olivergeisel.materialgenerator.generation.material;
+package de.olivergeisel.materialgenerator.generation.material.transfer;
 
 import de.olivergeisel.materialgenerator.core.knowledge.metamodel.element.KnowledgeElement;
+import de.olivergeisel.materialgenerator.generation.material.MaterialType;
 import de.olivergeisel.materialgenerator.generation.templates.template_infos.TemplateInfo;
 import jakarta.persistence.Entity;
 

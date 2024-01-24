@@ -9,7 +9,11 @@ import java.util.UUID;
 /**
  * The TemplateInfo class is the base class for all template information classes.
  * It contains the type of the template and the main term id.
- * All classes that extend this class are have a FIELD set, which contains all fields of the class.
+ * All classes that extend this class have a FIELDS-set, which contains all names for the fields of the class.
+ *
+ * @since 1.0.0
+ * @version 1.1.0
+ * @author Oliver Geisel
  */
 @Entity
 public abstract class TemplateInfo {
@@ -76,6 +80,6 @@ public abstract class TemplateInfo {
 
 	@Override
 	public String toString() {
-		return "TemplateInfo{" + "templateType=" + templateType + ", id=" + id + ", mainTermId=" + mainTermId + '}';
+		return STR."TemplateInfo{templateType=\{templateType}, id=\{id}, mainTermId=\{mainTermId}}";
 	}
 }

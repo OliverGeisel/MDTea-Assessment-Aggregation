@@ -1,5 +1,8 @@
-package de.olivergeisel.materialgenerator.generation.material;
+package de.olivergeisel.materialgenerator.generation.material.transfer;
 
+import de.olivergeisel.materialgenerator.generation.material.ComplexMaterial;
+import de.olivergeisel.materialgenerator.generation.material.Material;
+import de.olivergeisel.materialgenerator.generation.material.MaterialType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;

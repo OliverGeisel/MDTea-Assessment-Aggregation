@@ -82,9 +82,6 @@ public class MaterialMappingEntry {
 
 	@Override
 	public String toString() {
-		return "MaterialMappingEntry{" +
-			   "relatedElements=" + relatedElements +
-			   ", material=" + material +
-			   '}';
+		return STR."MaterialMappingEntry{relatedElements=\{relatedElements}, material=\{material}}";
 	}
 }

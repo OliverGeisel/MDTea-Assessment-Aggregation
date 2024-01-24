@@ -1,11 +1,28 @@
 package de.olivergeisel.materialgenerator.generation.generator;
 
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
+import de.olivergeisel.materialgenerator.core.courseplan.content.ContentGoal;
+import de.olivergeisel.materialgenerator.core.courseplan.content.Curriculum;
 import de.olivergeisel.materialgenerator.core.knowledge.metamodel.KnowledgeModel;
+import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateSet;
 
 /**
- * A Generator is a class that generates materials for a given curriculum.
+ * A Generator is a class that generates {@link Material}s for a given {@link Curriculum}.
+ *<p>
+ *     It will process all {@link ContentGoal}s of the given {@link Curriculum} and generate {@link Material}s that
+ *     are described by a {@link TemplateSet}. The information or knowledge for the material is in a
+ *     {@link KnowledgeModel}.
+ *</p>
+ *
+ * @see Material
+ * @see Curriculum
+ * @see TemplateSet
+ * @see KnowledgeModel
+ *
+ * @author Oliver Geisel
+ * @version 1.1.0
+ * @since 0.2.0
  */
 public interface Generator {
 

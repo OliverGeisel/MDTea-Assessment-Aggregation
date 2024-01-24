@@ -1,10 +1,14 @@
-package de.olivergeisel.materialgenerator.generation.material;
+package de.olivergeisel.materialgenerator.generation.material.transfer;
 
 import de.olivergeisel.materialgenerator.core.knowledge.metamodel.element.KnowledgeElement;
+import de.olivergeisel.materialgenerator.generation.material.Material;
+import de.olivergeisel.materialgenerator.generation.material.MaterialType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "code_material")
 public class CodeMaterial extends Material {
 
 	private String language;

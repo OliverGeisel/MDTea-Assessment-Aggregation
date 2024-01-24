@@ -1,6 +1,7 @@
 package de.olivergeisel.materialgenerator.generation.material;
 
 import de.olivergeisel.materialgenerator.core.knowledge.metamodel.element.KnowledgeElement;
+import de.olivergeisel.materialgenerator.generation.material.transfer.ExampleMaterial;
 import de.olivergeisel.materialgenerator.generation.templates.template_infos.TemplateInfo;
 
 import java.util.Arrays;

@@ -1,11 +1,11 @@
-package de.olivergeisel.materialgenerator.generation.generator;
+package de.olivergeisel.materialgenerator.generation;
 
 import de.olivergeisel.materialgenerator.FileSystemStorageService;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlanParser;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlanParserException;
 import de.olivergeisel.materialgenerator.core.knowledge.IncompleteJSONException;
-import de.olivergeisel.materialgenerator.generation.GeneratorService;
+import de.olivergeisel.materialgenerator.generation.generator.WrongFileTypeException;
 import de.olivergeisel.materialgenerator.generation.material.MaterialRepository;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateSetRepository;
 import org.springframework.stereotype.Controller;

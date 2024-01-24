@@ -1,5 +1,7 @@
-package de.olivergeisel.materialgenerator.generation.material;
+package de.olivergeisel.materialgenerator.generation.material.transfer;
 
+import de.olivergeisel.materialgenerator.generation.material.Material;
+import de.olivergeisel.materialgenerator.generation.material.MaterialType;
 import jakarta.persistence.Entity;
 
 import java.util.List;

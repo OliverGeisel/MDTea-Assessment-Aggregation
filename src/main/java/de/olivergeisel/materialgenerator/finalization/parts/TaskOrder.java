@@ -20,7 +20,7 @@ import java.util.*;
  * Is the smallest Collection Structure in a Plan.
  *
  * @author Oliver Geisel
- * @version 1.0.0
+ * @version 1.1.0
  * @see MaterialOrderPart
  * @see MaterialAssigner
  * @see Material
@@ -182,11 +182,7 @@ public class TaskOrder extends MaterialOrderCollection {
 
 	@Override
 	public String toString() {
-		return "TaskOrder{" +
-			   "name='" + getName() +
-			   ", id=" + getId() + '\'' +
-			   ", topic=" + getTopic() +
-			   '}';
+		return STR."TaskOrder{name='\{getName()}, id=\{getId()}\{'\''}, topic=\{getTopic()}}";
 	}
 
 }
