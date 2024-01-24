@@ -1,12 +1,14 @@
 <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="MaterialGeneratorApplication" type="SpringBootApplicationConfigurationType"
-                   factoryName="Spring Boot">
-        <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateResources"/>
-        <module name="MDTea-Assesment-Aggregation"/>
-        <option name="SPRING_BOOT_MAIN_CLASS" value="de.olivergeisel.materialgenerator.MDTea_Aggregation"/>
-        <option name="UPDATE_ACTION_UPDATE_POLICY" value="UpdateClassesAndResources"/>
-        <method v="2">
-            <option name="Make" enabled="true"/>
-        </method>
-    </configuration>
+  <configuration default="false" name="MaterialGeneratorApplication" type="SpringBootApplicationConfigurationType"
+                 factoryName="Spring Boot">
+    <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources"/>
+    <module name="MDTea-Assesment-Aggregation"/>
+    <option name="SPRING_BOOT_MAIN_CLASS" value="de.olivergeisel.materialgenerator.MDTea_Aggregation"/>
+    <option name="UPDATE_ACTION_UPDATE_POLICY" value="UpdateClassesAndResources"/>
+    <method v="2">
+      <option name="Make" enabled="true"/>
+      <option name="RunConfigurationTask" enabled="true"
+              run_configuration_name="docker-compose.yaml: Compose Deployment" run_configuration_type="docker-deploy"/>
+    </method>
+  </configuration>
 </component>

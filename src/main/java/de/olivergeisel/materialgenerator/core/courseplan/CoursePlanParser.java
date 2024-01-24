@@ -1,6 +1,6 @@
 package de.olivergeisel.materialgenerator.core.courseplan;
 
-import de.olivergeisel.materialgenerator.aggregation.model.structure.KnowledgeObject;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeObject;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentGoal;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentGoalExpression;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentTarget;

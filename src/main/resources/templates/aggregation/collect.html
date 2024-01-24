@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Aggregation - Collect</title>
+    <th:block th:replace="~{main::head-tag}"></th:block>
+    <style>
+        .drop-zone {
+            border: 2px dashed #bbb;
+            height: 200px;
+            text-align: center;
+            padding: 40px;
+            cursor: pointer;
+        }
+
+        .drop-zone.highlight {
+            background-color: #f7f7f7;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div th:replace="~{main::navigation}"></div>
+<main class="flex-grow-1">
+    <div class="container">
+        <header><h1>Neues Wissen hinzufügen</h1></header>
+        <section>
+            <h2> Wahl der Quelle(n)!</h2>
+            <form enctype="multipart/form-data" id="uploadForm" method="post" onsubmit="handleFileSelect()"
+                  th:action="@{/aggregation/collect}">
+                <h3> Bitte die Quellen hier einfügen</h3>
+                <div class="row mt-2">
+                    <div class="col-md">
+                        <div class="drop-zone" id="dropZone" ondragover="handleDragOver(event)"
+                             ondrop="handleFileSelect(event)">
+                            <h4>Drag &amp; Drop</h4>
+                            <p>Ziehe deine Datei hierhin, um sie hochzuladen.</p>
+                            <p id="fileName"></p>
+                        </div>
+                        <p class="m-3">oder</p>
+                        <label for="source-input">Datei auswählen:</label>
+                        <input class="form-control-file" id="source-input" multiple
+                               name="sources"
+                               onchange="collectSources(event)" style="display: none;" type="file">
+                        <button class="btn btn-primary ms-2" onclick="sourceInput.click();" type="button">
+                            Öffnen
+                        </button>
+                        <br>
+                        <div class="row">
+                            <span class="align-text-top mt-2">Gewählte Dateien:</span> <span id="source-count"></span>
+                            <textarea class="form-control form-control-lg m-2" cols="30" disabled
+                                      id="fileNames" readonly rows="5"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary m-1" type="submit">Senden</button>
+            </form>
+        </section>
+        <hr>
+        <section class="m-2">
+            <header><h3>Nur ein Fragment einfügen</h3></header>
+            <a th:href="@{/aggregation/only-one-fragment}">
+                <button class="btn btn-warning" title="'Überspringt' Collect">Nur ein Fragment</button>
+            </a>
+        </section>
+    </div>
+</main>
+<footer th:replace="~{main::footer}"></footer>
+<script>
+    const sourceInput = document.getElementById('source-input');
+    const fileNamesTextarea = document.getElementById('fileNames');
+    const form = document.getElementById("uploadForm");
+    const formData = new FormData(form);
+
+    function handleFileSelect(evt) {
+        evt.stopPropagation();
+        evt.preventDefault();
+
+        const files = evt.dataTransfer.files; // Dateien aus dem Drag-and-Drop-Ereignis extrahieren
+
+        if (files.length === 0) {
+            alert("Bitte mindestens eine Datei auswählen.");
+        } else {
+            innerCall(files)
+        }
+    }
+
+    function handleDragOver(evt) {
+        evt.stopPropagation();
+        evt.preventDefault();
+        evt.dataTransfer.dropEffect = 'copy';
+    }
+
+    function innerCall(files) {
+        formData.set("sources", files);
+    }
+
+    function displayNames(files) {
+        let fileNames = [...files].map(file => file.name).join('\n');
+        fileNamesTextarea.value = fileNames;
+        const count = document.getElementById('source-count');
+        count.innerText = fileNames.length === 0 ? "" : files.length + " Dateien";
+    }
+
+    function collectSources(evt) {
+        const files = evt.target.files;
+        if (files.length === 0) {
+            alert("Bitte mindestens eine Datei auswählen.");
+        } else {
+            innerCall(files)
+            displayNames(files);
+        }
+    }
+</script>
+</body>
+</html>

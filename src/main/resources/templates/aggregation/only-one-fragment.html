@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Aggregation - Fragment</title>
+    <th:block th:replace="~{main::head-tag}"></th:block>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div th:replace="~{main::navigation}"></div>
+<main class="flex-grow-1">
+    <div class="container">
+        <header><h1>Neues Wissensfragment hinzufügen</h1></header>
+        <section>
+            <form method="post" th:action="@{only-one-fragment}">
+                <div class="mb-3">
+                    <label class="form-label"> Fragment:
+                        <textarea class="form-control col" cols="100" minlength="3" name="fragment"
+                                  placeholder="Neues Fragment"
+                                  required
+                                  rows="5"></textarea>
+                    </label>
+                </div>
+                <input class="btn btn-primary" type="submit">
+            </form>
+            <div th:if="${error}">
+                <p class="badge bg-danger">
+                    <span>Fehler</span>
+                    <span th:text="${error}"></span>
+                </p>
+            </div>
+        </section>
+    </div>
+</main>
+<footer th:replace="~{main::footer}"></footer>
+</body>
+</html>

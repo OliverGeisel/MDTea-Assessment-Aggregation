@@ -1,6 +1,6 @@
 package de.olivergeisel.materialgenerator.generation.material;
 
-import de.olivergeisel.materialgenerator.core.knowledge.metamodel.element.Code;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Code;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;

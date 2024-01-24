@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Konfiguration</title>
+    <th:block th:replace="~{main::head-tag}"></th:block>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div th:replace="~{main::navigation}"></div>
+<main class="flex-grow-1 container-fluid mb-3">
+    <div th:replace="~{main::aggregationProgress}"></div>
+    <header class="flex-header"><h1>Konfiguration für NLP</h1></header>
+    <section class="container-fluid">
+        <form method="post" th:action="@{top-level-scan}">
+            <div class="input-group-lg">
+                <label>Typ</label>
+                <div>
+                    Local <input name="connectionType" th:checked="${process.modelLocation.toString()}=='LOCAL'" th:text="#{aggregation.modelType.local}"
+                                 th:value="local"
+                                 type="radio">
+                </div>
+                <div>
+                    Remote<input name="connectionType" th:checked="${process.modelLocation.toString()}=='REMOTE'" th:text="#{aggregation.modelType.remote}"
+                                 th:value="remote"
+                                 type="radio">
+                </div>
+            </div>
+            <label class="form-control">
+                Modellname:<select class="form-select" name="modelName">
+                <option th:each="model : ${models}" th:selected="${model}==${process.modelName}" th:text="${model}"
+                        th:value="${model}">Model
+                </option>
+            </select>
+            </label>
+            <label class="form-control">
+                API-Key:
+                <input class="form-text" name="apiKey" th:placeholder="'Nur wenn remote genutzt'" th:value="${process.apiKey}"
+                       title="Nur wenn remote genutzt">
+                Server-Url:
+                <input class="form-text" name="url" placeholder="http://localhost:4891/v1 is default"
+                       th:placeholder="'Nur wenn remote genutzt'" th:value="${form.url}"
+                       title="Nur wenn remote genutzt">
+            </label>
+            Fragment (wenn notwendig):
+            <label>
+            <textarea class="form-control" cols="80" name="fragment" rows="10"
+                      th:if="${process.sources.isEmpty()}" th:text="${process.currentFragment}"></textarea>
+            </label>
+            <input class="btn btn-primary" type="submit" value="Submit">
+        </form>
+    </section>
+
+</main>
+<footer th:replace="~{main::footer}"></footer>
+</body>
+</html>

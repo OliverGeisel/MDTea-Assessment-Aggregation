@@ -1,8 +1,8 @@
 package de.olivergeisel.materialgenerator.generation;
 
-import de.olivergeisel.materialgenerator.aggregation.model.element.KnowledgeElement;
-import de.olivergeisel.materialgenerator.aggregation.model.relation.Relation;
-import de.olivergeisel.materialgenerator.aggregation.model.structure.KnowledgeObject;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.Relation;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeObject;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentGoal;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentGoalExpression;
 import lombok.Getter;
