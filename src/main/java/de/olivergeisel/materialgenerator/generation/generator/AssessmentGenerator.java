@@ -3,12 +3,10 @@ package de.olivergeisel.materialgenerator.generation.generator;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentTarget;
 import de.olivergeisel.materialgenerator.core.knowledge.metamodel.KnowledgeModel;
-import de.olivergeisel.materialgenerator.core.knowledge.metamodel.relation.RelationType;
 import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
 import de.olivergeisel.materialgenerator.generation.generator.task_exctraction.TrueFalseExtractor;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
-import de.olivergeisel.materialgenerator.generation.material.MaterialMappingEntry;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateSet;
 import de.olivergeisel.materialgenerator.generation.templates.template_infos.assessment.AssessmentTemplate;
 import de.olivergeisel.materialgenerator.generation.templates.template_infos.assessment.TrueFalseTemplate;
@@ -86,7 +84,7 @@ public class AssessmentGenerator extends AbstractGenerator {
 			var aliases = target.getAliases();
 			var topic = target.getTopic();
 			try {
-				var topicKnowledge = loadKnowledgeForStructure(aliases);
+				var topicKnowledge = loadKnowledgeForStructure(aliases.complete());
 				if (topicKnowledge.isEmpty()) {
 					logger.info("No knowledge found for Topic {}", target);
 					emptyCount++;
@@ -154,8 +152,8 @@ public class AssessmentGenerator extends AbstractGenerator {
 	 * <br>
 	 * In the blank field the correct answer hast to be filled in.
 	 *
-	 * @param knowledge
-	 * @return
+	 * @param knowledge The knowledge to create the materials for.
+	 * @return A list of materials with the questions.
 	 */
 	public List<MaterialAndMapping> createFillOut(Set<KnowledgeNode> knowledge) {
 		var materials = new LinkedList<MaterialAndMapping>();
@@ -216,7 +214,7 @@ public class AssessmentGenerator extends AbstractGenerator {
 		return materials;
 	}
 
-//region setter/getter
+	//region setter/getter
 	public void setAssessmentTemplateInfo(Set<AssessmentTemplate> assessmentTemplateInfo) {
 		this.taskInfos.clear();
 		this.taskInfos.addAll(assessmentTemplateInfo);

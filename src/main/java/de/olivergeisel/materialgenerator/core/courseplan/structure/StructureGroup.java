@@ -6,6 +6,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * A part of the {@link CourseStructure}. Use the Composite Pattern to build a {@link CourseStructure}.
+ * This class is a composite role of the Composite Pattern.
+ * It should be contained in a {@link StructureChapter} or another {@link StructureGroup}.
+ *
+ * @author Oliver Geisel
+ * @version 1.1.0
+ * @see CourseStructure
+ * @see StructureChapter
+ * @see StructureElementPart
+ * @since 1.0.0
+ */
 public class StructureGroup extends StructureElementPart {
 
 	private final List<StructureElementPart> parts;
@@ -23,6 +35,17 @@ public class StructureGroup extends StructureElementPart {
 	public Relevance updateRelevance() {
 		relevance = parts.stream().map(StructureElement::getRelevance).max(Enum::compareTo).orElseThrow();
 		return relevance;
+	}
+
+	@Override
+	public StructureElement findByAlias(String alias) {
+		var foundThis = super.findByAlias(alias);
+		if (foundThis != null) return foundThis;
+		for (StructureElement element : parts) {
+			var found1 = element.findByAlias(alias);
+			if (found1 != null) return found1;
+		}
+		return null;
 	}
 
 	public boolean add(StructureElementPart element) throws IllegalArgumentException {
@@ -65,10 +88,6 @@ public class StructureGroup extends StructureElementPart {
 
 	@Override
 	public String toString() {
-		return "StructureGroup{" +
-			   "name=" + getName() +
-			   ", parts=" + parts +
-			   ", relevance=" + relevance +
-			   '}';
+		return STR."StructureGroup{name=\{getName()}, parts=\{parts}, relevance=\{relevance}}";
 	}
 }

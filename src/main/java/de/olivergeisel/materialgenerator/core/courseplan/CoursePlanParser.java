@@ -82,6 +82,7 @@ public class CoursePlanParser {
 
 
 	private final List<ContentTarget> targets = new ArrayList<>();
+	// List of all targets that will be used in the course plan
 
 	private final Logger logger = LoggerFactory.getLogger(CoursePlanParser.class);
 
@@ -123,7 +124,7 @@ public class CoursePlanParser {
 	 * @return ordered set of aliases
 	 * @throws IllegalArgumentException if the normal name is null or empty
 	 */
-	private Set<String> crateAlias(String normalName, List<String> alternativesJSON) throws IllegalArgumentException {
+	private List<String> crateAlias(String normalName, List<String> alternativesJSON) throws IllegalArgumentException {
 		var back = new LinkedHashSet<String>();
 		if (normalName == null || normalName.isBlank()) {
 			throw new IllegalArgumentException("Normal name must not be null or blank");
@@ -136,7 +137,7 @@ public class CoursePlanParser {
 				}
 			}
 		}
-		return back;
+		return back.stream().toList();
 	}
 
 	/**
@@ -157,8 +158,9 @@ public class CoursePlanParser {
 		String weight = chapterJSON.get("weight").toString();
 		var alternatives = crateAlias(name, (List<String>) chapterJSON.get(ALTERNATIVES));
 		String topicName = chapterJSON.get(STRUCTURE_TOPIC) != null ? chapterJSON.get(STRUCTURE_TOPIC).toString() : "";
-		var target = findTopic(topicName);
-		var back = new StructureChapter(target, name, Double.parseDouble(weight), alternatives);
+		var topic = findTopic(topicName);
+		var back = new StructureChapter(topic, name, Double.parseDouble(weight), alternatives);
+		topic.getAliases().addAliases(back.getName(), alternatives);
 		for (var group : groups) {
 			try {
 				back.add(createGroup(group));
@@ -182,6 +184,7 @@ public class CoursePlanParser {
 		var topic = findTopic(topicName);
 		var alternatives = crateAlias(name, ((List<String>) groupJSON.get(ALTERNATIVES)));
 		var back = new StructureGroup(topic, Relevance.TO_SET, name, alternatives);
+		topic.getAliases().addAliases(back.getName(), alternatives);
 		List<Map<String, ?>> tasks = (List<Map<String, ?>>) groupJSON.get(STRUCTURE_TASKS);
 		for (var task : tasks) {
 			// Todo decide between group and task!
@@ -206,14 +209,16 @@ public class CoursePlanParser {
 		}
 		String topicName = taskJSON.get(STRUCTURE_TOPIC) != null ? taskJSON.get(STRUCTURE_TOPIC).toString() : "";
 		ContentTarget topic = findTopic(topicName);
-		Set<String> alternatives;
+		List<String> alternatives;
 		try {
-			alternatives = crateAlias(name, (List<String>) taskJSON.get(ALTERNATIVES));
+			alternatives = crateAlias(topic.getTopic(), (List<String>) taskJSON.get(ALTERNATIVES));
 		} catch (IllegalArgumentException e) {
 			logger.error("Could not parse task", e);
 			throw new CoursePlanParserException(String.format("Could not parse task %s", name), e);
 		}
-		return new StructureTask(topic, relevance, name, alternatives);
+		var back = new StructureTask(topic, relevance, name, alternatives);
+		topic.getAliases().addAliases(back.getName(), alternatives);
+		return back;
 	}
 
 	private CourseStructure parseCourseStructure(List<Map<String, ?>> structure) {
