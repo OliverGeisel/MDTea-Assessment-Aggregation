@@ -1,0 +1,68 @@
+{
+  "name": "Default-TestConfiguration",
+  "description": "Default-TestConfiguration for the MDTea-prototype",
+  "version": "1.0.0",
+  "testPer": [
+    "GROUP"
+  ],
+  "defaultTestParameters": {
+    "tries": 1,
+    "pointsPerUnit": 1,
+    "negativeFactor": 0.0
+  },
+  "numberTasks": 5,
+  "markSchema": "NUMBERS",
+  "order": "RANDOM",
+  "marks": [
+    "1.0",
+    "1.3",
+    "1.7",
+    "2.0",
+    "2.3",
+    "2.7",
+    "3.0",
+    "3.3",
+    "3.7",
+    "4.0",
+    "5.0"
+  ],
+  "markMappingPercentage": {
+    "1.0": 95,
+    "1.3": 90,
+    "1.7": 85,
+    "2.0": 80,
+    "2.3": 75,
+    "2.7": 70,
+    "3.0": 65,
+    "3.3": 60,
+    "3.7": 55,
+    "4.0": 50
+  },
+  "tasks": [
+    {
+      "type": "TrueFalse",
+      "testParameters": null
+    },
+    {
+      "type": "FillOutBlanks",
+      "testParameters": null,
+      "numberOfBlanks": 1,
+      "blankType": "RANDOM"
+    },
+    {
+      "type": "SingleChoice",
+      "testParameters": null,
+      "numberOfChoices": 4
+    },
+    {
+      "type": "MultipleChoice",
+      "testParameters": null,
+      "numberOfChoices": 4,
+      "numberOfCorrectChoices": 2
+    },
+    {
+      "type": "Assign",
+      "testParameters": null
+    }
+  ]
+}
