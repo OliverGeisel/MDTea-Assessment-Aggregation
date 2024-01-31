@@ -2,10 +2,17 @@ package de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relat
 
 
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
+import org.springframework.data.neo4j.core.schema.Node;
 
+@Node
 public class CustomRelation extends Relation {
 
-	private final RelationType customType;
+	private RelationType customType;
+
+	protected CustomRelation() {
+		super();
+		customType = RelationType.CUSTOM;
+	}
 
 	public CustomRelation(String name, RelationType type) {
 		super(name, "UNKNOWN", "UNKNOWN", type);

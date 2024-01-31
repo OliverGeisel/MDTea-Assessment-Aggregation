@@ -1,7 +1,7 @@
 package de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element;
 
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.Relation;
-import org.springframework.data.neo4j.core.schema.GeneratedValue;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeObject;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
@@ -11,27 +11,43 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+
+/**
+ * A KnowledgeElement is a part of the KnowledgeGraph. It can be a Term, Definition, Example, Image, Text and so on.
+ * It has a content and a type. The content is the actual content of the element and the type is the type of the element.
+ * Every element can have {@link Relation}s to other elements. And every element is linked to a
+ * {@link KnowledgeObject} by their id.
+ *
+ * @author Oliver Geisel
+ * @version 0.1.0
+ * @see KnowledgeType
+ * @see Relation
+ * @see KnowledgeObject
+ * @since 0.1.0
+ */
 @Node
 public abstract class KnowledgeElement {
 
 	/**
+	 * The id of the structure point this element belongs to.
+	 */
+	protected String        structureId;
+	@Relationship
+	private   Set<Relation> relations = new HashSet<>();
+	/**
 	 * The id of the element in the knowledge base. Can differ from the content field if is Type term.
 	 */
 	@Id
-	@GeneratedValue
-	private final String        id;
-	private final KnowledgeType type;
-	@Relationship
-	private final Set<Relation> relations = new HashSet<>();
-
-	/**
-	 * The id of the structure point this element belongs to.
-	 */
-	protected String structureId;
+	private   String        id;
+	private   KnowledgeType type;
 	/**
 	 * The content of the element. Meaning depends on the type of the element.
 	 */
-	private   String content;
+	private   String        content;
+
+	protected KnowledgeElement() {
+
+	}
 
 	protected KnowledgeElement(String content, String id, String type, Collection<Relation> relations) {
 		this.content = content;
@@ -91,8 +107,17 @@ public abstract class KnowledgeElement {
 		return relations;
 	}
 
+	public void setRelations(Set<Relation> relations) {
+		this.relations.clear();
+		this.relations.addAll(relations);
+	}
+
 	public String getContent() {
 		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
 	}
 
 	public String getId() {
@@ -109,7 +134,7 @@ public abstract class KnowledgeElement {
 		if (this == o) return true;
 		if (!(o instanceof KnowledgeElement that)) return false;
 
-		return !Objects.equals(id, that.id);
+		return Objects.equals(id, that.id);
 	}
 
 	@Override
@@ -119,13 +144,7 @@ public abstract class KnowledgeElement {
 
 	@Override
 	public String toString() {
-		return "KnowledgeElement{" +
-			   "id='" + id + '\'' +
-			   ", type=" + type +
-			   ", relations=" + relations +
-			   ", structureId='" + structureId + '\'' +
-			   ", content='" + content + '\'' +
-			   '}';
+		return STR."KnowledgeElement{id='\{id}', type=\{type}, relations=\{relations}, structureId='\{structureId}', content='\{content}'}";
 	}
 
 }

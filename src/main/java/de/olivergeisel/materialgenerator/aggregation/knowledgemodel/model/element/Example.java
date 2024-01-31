@@ -7,6 +7,11 @@ import java.util.Collection;
 
 @Node
 public class Example extends KnowledgeElement {
+
+	protected Example() {
+		super();
+	}
+
 	public Example(String content, String id, String type, Collection<Relation> relations) {
 		super(content, id, type, relations);
 	}

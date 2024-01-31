@@ -7,6 +7,10 @@ import java.util.Collection;
 
 @Node
 public class Fact extends SimpleElement {
+
+	protected Fact() {
+		super();
+	}
 	public Fact(String content, String id, String type, Collection<Relation> relations) {
 		super(content, id, type, relations);
 	}

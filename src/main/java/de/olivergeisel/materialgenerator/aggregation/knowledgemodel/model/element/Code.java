@@ -14,6 +14,10 @@ public class Code extends SimpleElement {
 	private String caption;
 	private String codeLines;
 
+	protected Code() {
+		super();
+	}
+
 	public Code(String content, String id, String type) {
 		this(content, id, type, null);
 

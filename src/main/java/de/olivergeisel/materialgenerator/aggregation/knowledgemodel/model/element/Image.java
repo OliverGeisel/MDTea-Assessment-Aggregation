@@ -9,9 +9,14 @@ import java.util.HashMap;
 @Node
 public class Image extends KnowledgeElement {
 
+
 	private String imageName;
 	private String imageDescription;
 	private String headline;
+
+	protected Image() {
+		super();
+	}
 
 	protected Image(String content, String id, String type,
 			Collection<Relation> relations) {

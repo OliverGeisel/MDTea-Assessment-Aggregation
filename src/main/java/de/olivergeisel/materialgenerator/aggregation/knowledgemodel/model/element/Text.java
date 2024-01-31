@@ -6,12 +6,17 @@ import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relati
 import java.util.Collection;
 import java.util.HashMap;
 
+@Node
 public class Text extends KnowledgeElement {
 
 	private String text;
 	private String headline;
 
 	public Text(String content, String id, String type,
+	protected Text() {
+		super();
+	}
+
 			Collection<Relation> relations) {
 		super(content, id, type, relations);
 		HashMap<String, String> elements = new HashMap<>();

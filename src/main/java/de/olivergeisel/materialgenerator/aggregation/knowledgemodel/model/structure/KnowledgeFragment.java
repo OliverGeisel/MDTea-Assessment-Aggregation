@@ -16,7 +16,8 @@ public class KnowledgeFragment extends KnowledgeObject {
 	protected KnowledgeFragment() {
 		super();
 	}
-	private       String                name;
+
+	private String name; // Todo fix this in super-class is already a getter fo the id
 
 	public boolean containsSimilar(String structureId) {
 		if (structureId == null) {
@@ -179,6 +180,7 @@ public class KnowledgeFragment extends KnowledgeObject {
 		return Collections.unmodifiableList(children);
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}

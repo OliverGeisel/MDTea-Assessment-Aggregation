@@ -18,6 +18,10 @@ import java.util.Collection;
 @Node
 public class Explanation extends KnowledgeElement {
 
+	protected Explanation() {
+		super();
+	}
+
 
 	public Explanation(String content, String id, String type, Collection<Relation> relations) {
 		super(content, id, type, relations);

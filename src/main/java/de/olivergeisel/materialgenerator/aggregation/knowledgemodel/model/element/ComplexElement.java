@@ -9,6 +9,10 @@ import java.util.Collection;
 @Node
 public abstract class ComplexElement extends KnowledgeElement {
 
+	protected ComplexElement() {
+		super();
+	}
+
 	protected ComplexElement(String content, String id, String type, Collection<Relation> relations) {
 		super(content, id, type, relations);
 	}

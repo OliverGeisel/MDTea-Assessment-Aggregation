@@ -7,6 +7,11 @@ import java.util.Collection;
 
 @Node
 public abstract class SimpleElement extends KnowledgeElement {
+
+	protected SimpleElement() {
+		super();
+	}
+
 	protected SimpleElement(String content, String id, String type, Collection<Relation> relations) {
 		super(content, id, type, relations);
 	}

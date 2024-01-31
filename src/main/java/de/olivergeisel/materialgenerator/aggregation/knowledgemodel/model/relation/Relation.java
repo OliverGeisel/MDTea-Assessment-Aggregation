@@ -25,17 +25,21 @@ public abstract class Relation {
 
 	@Id
 	private UUID id = UUID.randomUUID();
-
-	private final RelationType     type;
-	private final String           name;
-	private       String           fromId;
-	private       String           toId;
-
+	private RelationType     type;
+	private String           name;
+	private String           fromId;
+	private String           toId;
 	@Relationship("FROM")
-	private       KnowledgeElement from;
+	private KnowledgeElement from;
 	@Relationship("TO")
-	private       KnowledgeElement to;
+	private KnowledgeElement to;
 
+	protected Relation() {
+		this.type = RelationType.CUSTOM;
+		this.name = "";
+		this.fromId = "";
+		this.toId = "";
+	}
 	protected Relation(String name, String fromId, String toId, RelationType type) {
 		if (fromId == null || toId == null || type == null || name == null) {
 			throw new IllegalArgumentException("Arguments must not be null");
@@ -114,6 +118,10 @@ public abstract class Relation {
 		return name;
 	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	/**
 	 * Get the target of the relation
 	 *
@@ -145,6 +153,10 @@ public abstract class Relation {
 
 	public RelationType getType() {
 		return type;
+	}
+
+	public void setType(RelationType type) {
+		this.type = type;
 	}
 //endregion
 

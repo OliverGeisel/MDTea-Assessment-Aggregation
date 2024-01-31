@@ -7,6 +7,10 @@ import java.util.Collection;
 
 @Node
 public class Exercise extends ComplexElement {
+
+	protected Exercise() {
+		super();
+	}
 	public Exercise(String content, String id, String type, Collection<Relation> relations) {
 		super(content, id, type, relations);
 	}

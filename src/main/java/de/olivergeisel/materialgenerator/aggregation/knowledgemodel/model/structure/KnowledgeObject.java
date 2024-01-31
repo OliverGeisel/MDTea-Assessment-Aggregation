@@ -13,8 +13,10 @@ import java.util.Set;
 
 @Node
 public abstract class KnowledgeObject {
+
 	@Relationship("LINKED_TO")
 	private Set<KnowledgeElement> linkedElements;
+
 	@Id
 	@GeneratedValue(GeneratedValue.UUIDGenerator.class)
 	private String                id;
