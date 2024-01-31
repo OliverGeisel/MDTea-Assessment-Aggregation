@@ -14,7 +14,7 @@ import java.util.UUID;
  * the {@link de.olivergeisel.materialgenerator.finalization.parts.RawCourse}. Or more specific a {@link de.olivergeisel.materialgenerator.finalization.parts.MaterialOrderCollection}
  *
  * @author Oliver Geisel
- * @version 1.0.0
+ * @version 1.1.0
  * @see Goal
  * @see de.olivergeisel.materialgenerator.finalization.parts.MaterialOrderCollection
  * @see de.olivergeisel.materialgenerator.finalization.parts.RawCourse

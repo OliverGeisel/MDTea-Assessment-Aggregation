@@ -514,7 +514,7 @@ public class KnowledgeModel {
 
 	/**
 	 * Returns all elements that are connected with the given structure object in the model.
-	 * It inclueds similar objects in the structure.
+	 * It includes similar objects in the structure.
 	 *
 	 * @param structureId the id of the structure object
 	 * @return a set of all elements that are connected with the given structure object.

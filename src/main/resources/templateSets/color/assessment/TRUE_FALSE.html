@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport">
+    <th:block th:fragment="head">
+        <link rel="stylesheet" th:href="${rootPath}+'/css/bootstrap.min.css'">
+    </th:block>
+    <title th:text="FRAGE"></title>
+</head>
+<body>
+<main>
+    <div class="container" th:fragment="content">
+        <header>
+            <h1 class="text-center text-light" style="color: var(--bs-red); " th:text="">Ist folgende Frage wahr
+                oder falsch?</h1>
+        </header>
+        <hr>
+        <section>
+            <dl class="text-light">
+                <h2 class="text-light" th:text="${material.question}"></h2>
+                <br>
+                <form onsubmit="checkAnswer()" th:action="">
+                    <input id="true" name="answer" required type="radio" value="true">
+                    <label for="true">Wahr</label><br>
+                    <input id="false" name="answer" required type="radio" value="false">
+                    <label for="false">Falsch</label><br>
+                    <input type="submit" value="Eingabe">
+                </form>
+            </dl>
+        </section>
+        <script th:inline="javascript">
+            function checkAnswer() {
+                let answer = document.querySelector('input[name="answer"]:checked').value;
+                if (answer === /*[[${material.trueStatement}]]*/ true) {
+                    alert("Deine Antwort war korrekt!");
+                } else {
+                    alert("Leider Nicht!\n Grund: " +/*[[${material.reason}]]*/);
+                }
+                return false;
+            }
+        </script>
+    </div>
+
+</main>
+<footer>
+    <div class="container">
+
+    </div>
+</footer>
+</body>
+</html>
