@@ -4,17 +4,19 @@ import de.olivergeisel.materialgenerator.aggregation.AggregationProcess;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.ElementRepository;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeType;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.BasicRelation;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.Relation;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationRepository;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeLeaf;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeObject;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.RootStructureElement;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.StructureRepository;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationType;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.*;
+import org.neo4j.driver.Driver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Service for the knowledge model. Provides methods to access the knowledge model.
@@ -36,11 +38,15 @@ public class KnowledgeModelService {
 
 	private final StructureRepository structureRepository;
 
+	private final Driver neo4jDriver;
+
+
 	public KnowledgeModelService(ElementRepository elementRepository, RelationRepository relationRepository,
-			StructureRepository structureRepository) {
+			StructureRepository structureRepository, Driver neo4jDriver) {
 		this.elementRepository = elementRepository;
 		this.relationRepository = relationRepository;
 		this.structureRepository = structureRepository;
+		this.neo4jDriver = neo4jDriver;
 	}
 
 	public Optional<KnowledgeObject> getKnowledgeObject(String id) {
@@ -124,6 +130,89 @@ public class KnowledgeModelService {
 		}
 	}
 
+	public List<KnowledgeElement> getElementsForStructure(String id) {
+		var structure = structureRepository.findById(id);
+		return structure.map(knowledgeObject -> knowledgeObject.getLinkedElements().stream().toList())
+						.orElseGet(List::of);
+	}
+
+	public Optional<KnowledgeElement> findElementById(String id) {
+		if (id == null || id.isBlank()) {
+			return Optional.empty();
+		}
+		return elementRepository.findById(id);
+	}
+
+	public Optional<Relation> findRelationById(String id) {
+		if (id == null || id.isBlank()) {
+			return Optional.empty();
+		}
+		return relationRepository.findById(UUID.fromString(id));
+	}
+
+	public Optional<KnowledgeObject> findStructureById(String id) {
+		if (id == null || id.isBlank()) {
+			return Optional.empty();
+		}
+		return structureRepository.findById(id);
+	}
+
+	public void deleteElement(String id) {
+		elementRepository.deleteById(id);
+	}
+
+	public void deleteRelation(String id) {
+		relationRepository.deleteById(UUID.fromString(id));
+	}
+
+	public void deleteStructure(String id) {
+		structureRepository.deleteById(id);
+	}
+
+
+	public void leafToNode(String id) {
+		// Todo check if works
+		var leaf = structureRepository.findById(id);
+		if (leaf.isEmpty()) {
+			return;
+		}
+		String parentId;
+		try (var session = neo4jDriver.session()) {
+			var result = session.run(
+					STR."Match (a:KnowledgeObject {id: '\{id}'})<-[:CONTAINS]-(f:KnowledgeObject) return f");
+			parentId = result.next().get("_fields").get(0).get("properties").get("name").asString();
+		}
+		var parent = structureRepository.findById(parentId);
+		leaf.ifPresent(it -> {
+			var links = it.getLinkedElements();
+			var newNode = new KnowledgeFragment(it.getName());
+			for (var link : links) {
+				newNode.linkElement(link);
+				link.setStructureId(newNode.getName());
+				elementRepository.save(link);
+			}
+			parent.ifPresent(it2 -> {
+				var parentFragment = (KnowledgeFragment) it2;
+				parentFragment.addObject(newNode);
+				parentFragment.removeObject(it);
+				structureRepository.save(parentFragment);
+			});
+			structureRepository.save(newNode);
+			structureRepository.delete(it);
+		});
+	}
+
+	public void linkElements(String fromId, RelationType relationType, String toId) {
+		var fromElement = elementRepository.findById(fromId);
+		var toElement = elementRepository.findById(toId);
+		if (fromElement.isEmpty() || toElement.isEmpty()) {
+			return;
+		}
+		var relation = new BasicRelation(relationType, fromElement.get(), toElement.get());
+		relationRepository.save(relation);
+	}
+
+
 	//region setter/getter
 	public List<String> getStructureIds() {
 		return structureRepository.findAll().stream().map(KnowledgeObject::getName).toList();
@@ -131,6 +220,18 @@ public class KnowledgeModelService {
 
 	public RootStructureElement getRoot() {
 		return structureRepository.findRoot();
+	}
+
+	public List<KnowledgeElement> getAllElements() {
+		return elementRepository.findAll();
+	}
+
+	public List<Relation> getAllRelations() {
+		return relationRepository.findAll();
+	}
+
+	public List<KnowledgeObject> getAllStructureElements() {
+		return structureRepository.findAll();
 	}
 //endregion
 }

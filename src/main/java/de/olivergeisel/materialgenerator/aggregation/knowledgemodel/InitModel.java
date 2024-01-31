@@ -7,6 +7,8 @@ import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.struct
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+
 @Component
 public class InitModel implements CommandLineRunner {
 
@@ -17,12 +19,14 @@ public class InitModel implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		var root = new RootStructureElement();
-		var java = new KnowledgeLeaf("Java");
-		var computerScience = new KnowledgeFragment("Computer Science", java);
-		root.addObject(computerScience);
-		structureRepository.save(java);
-		structureRepository.save(computerScience);
-		structureRepository.save(root);
+		if (Arrays.asList(args).contains("--init")) {
+			var root = new RootStructureElement();
+			var java = new KnowledgeLeaf("Java");
+			var computerScience = new KnowledgeFragment("Computer Science", java);
+			root.addObject(computerScience);
+			structureRepository.save(java);
+			structureRepository.save(computerScience);
+			structureRepository.save(root);
+		}
 	}
 }

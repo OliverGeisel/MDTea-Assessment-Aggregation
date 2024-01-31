@@ -18,7 +18,11 @@ public class Neo4J_Clean_On_Start implements CommandLineRunner {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Neo4J_Clean_On_Start.class);
 
-	private Driver neo4jDriver;
+	private final Driver neo4jDriver;
+
+	public Neo4J_Clean_On_Start(Driver neo4jDriver) {
+		this.neo4jDriver = neo4jDriver;
+	}
 
 	@Override
 	public void run(String... args) throws Exception {

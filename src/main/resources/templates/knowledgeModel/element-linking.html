@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Elemente verbinden</title>
+    <th:block th:replace="~{main::head-tag}"></th:block>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div th:replace="~{main::navigation}"></div>
+<main class="flex-grow-1 container">
+    <header><h1>Relationen zwischen Elementen</h1></header>
+    <section>
+        <form method="post">
+            <div class="row m-2">
+                <div class="col-4" id="from-element">
+                    <label> Von:
+                        <input list="elements-list" minlength="3" name="from" required>
+                    </label>
+
+                </div>
+                <div class="col-4" id="relation-type">
+                    <label> Relations Typ:
+                        <select list="relations-list" name="relationType" required>
+                            <option th:each="relation : ${relationTyps}" th:text="${relation}"
+                                    th:value="${relation}"></option>
+                        </select>
+                    </label>
+                </div>
+                <div class="col-4" id="to-element">
+                    <label> Zu:
+                        <input list="elements-list" minlength="3" name="to" required>
+                    </label>
+                </div>
+                <datalist id="elements-list">
+                    <option th:each="element : ${elements}" th:text="${element.id}" th:value="${element.id}"></option>
+                </datalist>
+            </div>
+            <div>
+                <button class="btn btn-primary" type="submit" value="Link">Link</button>
+            </div>
+        </form>
+    </section>
+</main>
+<footer th:replace="~{main::footer}"></footer>
+</body>
+</html>

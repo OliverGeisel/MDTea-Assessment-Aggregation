@@ -9,6 +9,11 @@
 <div class="border border-2 border-primary rounded-1 ps-1" th:fragment="structure-object (structure, depth)">
     <div>
         <p><span th:text="${structure.name}"></span></p>
+        <p>
+            <button class="btn btn-info" onclick="getElements(this)" th:attr="data-id=${structure.name}" th:text="#{model.elements}"
+                    type="button">Elemente
+            </button>
+        </p>
     </div>
     <th:import class="de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeLeaf"/>
     <th:block th:unless="${structure.class.simpleName == 'KnowledgeLeaf'}">
