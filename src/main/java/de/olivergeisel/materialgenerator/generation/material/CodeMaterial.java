@@ -85,10 +85,7 @@ public class CodeMaterial extends Material {
 	@Override
 	public String toString() {
 		var length = Math.min(code.length(), 10);
-		return "CodeMaterial{" +
-			   "title='" + title + '\'' +
-			   ", code='" + code.substring(0, 10) + "...'" +
-			   ", language='" + language + '\'' +
-			   '}';
+		return STR."CodeMaterial{title='\{title}\{'\''}, code='\{code.substring(0,
+				length)}...', language='\{language}'}";
 	}
 }

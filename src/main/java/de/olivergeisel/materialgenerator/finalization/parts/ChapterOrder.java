@@ -181,10 +181,6 @@ public class ChapterOrder extends MaterialOrderCollection {
 
 	@Override
 	public String toString() {
-		return "ChapterOrder{" +
-			   "name='" + getName() + '\'' +
-			   ", id=" + getId() +
-			   ", topic=" + getTopic() +
-			   '}';
+		return STR."ChapterOrder{name='\{getName()}\{'\''}, id=\{getId()}, topic=\{getTopic()}'}";
 	}
 }

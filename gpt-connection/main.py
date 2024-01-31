@@ -8,11 +8,11 @@ from gpt4all import GPT4All
 
 def check_server_is_availability(url) -> bool:
     try:
-        response = requests.post(url)
+        requests.post(url)
     except requests.ConnectionError:
         print(f"Webseite {url} is not available")
         return False
-    except requests.RequestException as e:
+    except requests.RequestException:
         return False
     return True
 
