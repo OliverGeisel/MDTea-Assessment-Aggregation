@@ -8,7 +8,6 @@ import de.olivergeisel.materialgenerator.core.knowledge.metamodel.element.Term;
 import de.olivergeisel.materialgenerator.core.knowledge.metamodel.relation.Relation;
 import de.olivergeisel.materialgenerator.core.knowledge.metamodel.relation.RelationType;
 import de.olivergeisel.materialgenerator.core.knowledge.metamodel.structure.KnowledgeObject;
-import de.olivergeisel.materialgenerator.core.knowledge.metamodel.structure.KnowledgeStructure;
 import lombok.Getter;
 
 import java.util.*;
@@ -25,7 +24,7 @@ import java.util.stream.Collectors;
  *
  * @author Oliver Geisel
  * @version 1.1.0
- * @since 1.0.0
+ * @since 0.2.0
  */
 public class KnowledgeNode {
 

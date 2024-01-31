@@ -16,7 +16,7 @@
       "type": "DEFINITION",
       "id": "DefinitionsBeispiel-DEFINITION",
       "structure": "Bereich1",
-      "content": "Definiert TermBeispie",
+      "content": "Definiert TermBeispiel",
       "relations": [
         {
           "relation_id": "TermBeispiel-TERM",
@@ -42,6 +42,25 @@
       "structure": "Java",
       "content": "Fakten sind immer wahr!",
       "relations": []
+    },
+    {
+      "type": "TERM",
+      "id": "Programmiersprache-TERM",
+      "structure": "Java",
+      "content": "Programmiersprache",
+      "relations": []
+    },
+    {
+      "type": "TERM",
+      "id": "Java-TERM",
+      "structure": "Java",
+      "content": "Java",
+      "relations": [
+        {
+          "relation_id": "Programmiersprache-TERM",
+          "relation_type": "is"
+        }
+      ]
     },
     {
       "type": "TERM",

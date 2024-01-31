@@ -5,10 +5,26 @@ import jakarta.persistence.*;
 
 import java.util.*;
 
+
+/**
+ * A Class holding all ids of {@link KnowledgeElement} to a specific {@link Material} that was created with these
+ * elements.
+ */
 @Entity
 public class MaterialMappingEntry {
+
 	@ElementCollection
-	private final Set<String> relatedElements = new HashSet<>();
+	private Set<String> relatedElements = new HashSet<>();
+
+	//region setter/getter
+	public Set<String> getRelatedElements() {
+		return relatedElements;
+	}
+
+	public void setRelatedElements(Collection<String> relatedElements) {
+		this.relatedElements.clear();
+		this.relatedElements.addAll(relatedElements);
+	}
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	@Column(name = "id", nullable = false)
@@ -53,7 +69,9 @@ public class MaterialMappingEntry {
 		}
 	}
 
-	//region setter/getter
+	public void setMaterial(Material material) {
+		this.material = material;
+	}
 	public UUID getId() {
 		return id;
 	}

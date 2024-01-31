@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport">
+    <th:block th:fragment="head">
+        <link rel="stylesheet" th:href="${rootPath}+'/css/bootstrap.min.css'">
+    </th:block>
+    <title th:text="'Übersicht für '+${material.topic} "></title>
+</head>
+<body>
+<main>
+    <div class="container" th:fragment="content">
+        <header>
+            <h1 class="text-center text-light" style="color: var(--bs-red); ">
+                Zusammenfassung für
+                <th:block th:text="${material.topic}"></th:block>
+            </h1>
+        </header>
+        <hr>
+        <!--/*@thymesVar id="subMaterial" type="de.olivergeisel.materialgenerator.generation.material.Material" */-->
+        <section th:each="subMaterial:${material.parts}">
+            <div th:replace="~{${subMaterial.templateInfo.templateType.type} :: content}"></div>
+        </section>
+    </div>
+</main>
+<footer>
+    <div class="container">
+
+    </div>
+</footer>
+</body>
+</html>

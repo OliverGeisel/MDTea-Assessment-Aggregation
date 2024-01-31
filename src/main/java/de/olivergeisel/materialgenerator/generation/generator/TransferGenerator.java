@@ -6,6 +6,7 @@ import de.olivergeisel.materialgenerator.core.knowledge.metamodel.KnowledgeModel
 import de.olivergeisel.materialgenerator.core.knowledge.metamodel.element.*;
 import de.olivergeisel.materialgenerator.core.knowledge.metamodel.relation.RelationType;
 import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
+import de.olivergeisel.materialgenerator.generation.generator.transfer_assamble.TransferAssembler;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
 import de.olivergeisel.materialgenerator.generation.material.MaterialCreator;
@@ -171,7 +172,11 @@ public class TransferGenerator extends AbstractGenerator {
 
 	protected List<MaterialAndMapping> materialForTranslate(Set<KnowledgeNode> knowledge) {
 		// materials.add(createWikisWithExistingMaterial(knowledge, materials));
-		return materialForKnow(knowledge);
+		var firstLookMaterials = materialForKnow(knowledge);
+		var summary =
+				new TransferAssembler(firstLookMaterials, knowledge.stream().findFirst().orElseThrow()).createSummary();
+		firstLookMaterials.addAll(summary);
+		return firstLookMaterials;
 	}
 
 	@Override
