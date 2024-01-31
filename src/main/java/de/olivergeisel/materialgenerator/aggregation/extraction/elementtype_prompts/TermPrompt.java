@@ -35,7 +35,7 @@ prompts to tests
 			+ gill | Kieme
 			""";
 
-	private static final String DEFAULT_FORMAT = "+ [Term] ([Translation])\\n";
+	private static final String DEFAULT_FORMAT = "+ [Term] | ([Translation])\\n";
 
 	public TermPrompt(String fragment) {
 		this(fragment, DEFAULT_INSTRUCTION, DEFAULT_FORMAT, DeliverType.MULTIPLE);

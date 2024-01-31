@@ -13,37 +13,13 @@
     <section class="container-fluid">
         <form method="post" th:action="@{top-level-scan}">
 
-            <label class="form-control">
-                Modellname:<select class="form-select" name="modelName">
-                <option th:each="model : ${models}" th:selected="${model}==${process.modelName}" th:text="${model}"
-                        th:value="${model}">Model
-                </option>
-            </select>
-                <div class="form-label">Ort des Modells:</div>
-                <div class="input-group-lg">
-                    <label>
-                        <input name="connectionType" th:checked="${process.modelLocation.toString()}=='LOCAL'"
-                                     th:text="#{aggregation.modelType.local}" th:value="local" type="radio">
-                        <input name="connectionType" th:checked="${process.modelLocation.toString()}=='REMOTE'"
-                                      th:text="#{aggregation.modelType.remote}" th:value="remote" type="radio">
-                    </label>
-                </div>
-            </label>
-            <label class="form-control">
-                API-Key:
-                <input class="form-text" name="apiKey" th:placeholder="'Nur wenn remote genutzt'"
-                       th:value="${process.apiKey}"
-                       title="Nur wenn remote genutzt">
-                Server-Url:
-                <input class="form-text" name="url" placeholder="http://localhost:4891/v1 is default"
-                       th:placeholder="'Nur wenn remote genutzt'" th:value="${form.url}"
-                       title="Nur wenn remote genutzt">
-            </label>
+            <th:block th:replace="~{aggregation/fragments :: model-configs}"></th:block>
 
             <label class="form-control">Fragment (wenn notwendig):
                 <textarea class="form-control" cols="80" name="fragment" rows="10"
                           th:if="${process.sources.isEmpty()}" th:text="${process.currentFragment}"></textarea>
             </label>
+            <div th:replace="~{aggregation/fragments :: area-of-knowledge-fragment}"></div>
             <div class="btn-group mt-2">
                 <input class="btn btn-primary" type="submit" value="Submit">
             </div>

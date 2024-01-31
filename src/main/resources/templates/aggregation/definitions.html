@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Definitions</title>
+    <th:block th:replace="~{main::head-tag}"></th:block>
+    <script>
+        function enableTextarea() {
+            document.getElementById("fragment-textarea").disabled = false;
+        }
+    </script>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div th:replace="~{main::navigation}"></div>
+
+<main class="flex-grow-1 container-fluid">
+    <div th:replace="~{main::aggregationProgress}"></div>
+    <header class="flex-header"><h1>Definitionen</h1></header>
+    <section class="container-fluid">
+        <form method="post">
+            <th:block th:replace="~{aggregation/fragments :: model-configs}"></th:block>
+            <label class="form-control">Fragment (wenn notwendig):
+                <textarea class="form-control" cols="80" disabled id="fragment-textarea" name="fragment" rows="10"
+                          th:text="${process.currentFragment}" th:value="${process.currentFragment}"></textarea>
+            </label>
+            <div th:replace="~{aggregation/fragments :: area-of-knowledge-fragment}"></div>
+            <div class="btn-group mt-2">
+                <button class="btn btn-info" onclick="enableTextarea()" type="button">Edit Fragment</button>
+                <button class="btn btn-primary" type="submit">Definitionen Suchen</button>
+            </div>
+        </form>
+    </section>
+    <hr>
+    <section class="container-fluid">
+        <div class="alert alert-danger" role="alert" th:if="${error}">
+            Error
+            <p th:text="${error}"></p>
+        </div>
+        <th:block th:unless="${error}">
+            <header>
+                <h3>Antwort</h3>
+            </header>
+            <span>
+                <form method="post" th:action="@{definitions/add}">
+                    <button class="btn btn-primary" th:text="#{aggregation.definitions.add}">Add</button>
+                </form>
+            </span>
+            <article class="mt-2">
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
+                    <div class="col-lg-6">
+                        <span th:text="#{aggregation.definitions.suggested}">Vorgeschlagen: </span>: <span
+                            th:text="${process.definitions.suggestedElements.size}"></span>
+                        <div class="row">
+                            <div class="card col-12 m-2 text-bg-primary"
+                                 th:each="definition:${suggestedDefinitions}">
+                                <div class="card-header">
+                                    <span th:text="${definition.id.replace('-DEFINITION','')}"></span>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">Id: <span th:text="${definition.id}"></span></p>
+                                    <p class="card-text">Type: <span th:text="${definition.type}"></span></p>
+                                    <p class="card-text">Inhalt: <span th:text="${definition.content}"></span></p>
+                                    <p class="card-text">Structure-Id:
+                                        <span th:text="${definition.structureId}"></span></p>
+                                </div>
+                                <div class="card-footer">
+                                    <a th:href="@{/aggregation/definitions/{id}(id=${definition.id})}">
+                                        <button class="btn btn-primary">Details</button>
+                                    </a>
+                                    <div class="btn-group btn-group-sm">
+                                        <form method="post" th:action="@{definitions/remove}">
+                                            <input name="id" th:value="${definition.id}" type="hidden">
+                                            <button class="btn btn-danger"><i class="bi bi-trash ms-2"></i></button>
+                                        </form>
+                                        <form method="post" th:action="@{definitions/accept}">
+                                            <input name="id" th:value="${definition.id}" type="hidden">
+                                            <button class="btn btn-success"><i class="bi bi-plus-square"></i></button>
+                                        </form>
+                                        <form th:action="@{definitions/edit}">
+                                            <input name="id" th:value="${definition.id}" type="hidden">
+                                            <button class="btn btn-info"><i class="bi bi-pen"></i></button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <span th:text="#{aggregation.definitions.accepted}">Angenommen</span>: <span
+                            th:text="${process.definitions.acceptedElements.size}"></span>
+                        <div class="row">
+                            <div class="card col-12 m-2 text-bg-success"
+                                 th:each="definition:${acceptedDefinitions}">
+                                <div class="card-header">
+                                    <span th:text="${definition.id.replace('-DEFINITION','')}"></span>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">Id: <span th:text="${definition.id}"></span></p>
+                                    <p class="card-text">Type: <span th:text="${definition.type}"></span></p>
+                                    <p class="card-text">Inhalt: <span th:text="${definition.content}"></span></p>
+                                    <p class="card-text">Structure-Id: <span th:text="${definition.structureId}"></span>
+                                    </p>
+                                </div>
+                                <div class="card-footer">
+                                    <a>
+                                        <button class="btn btn-primary">Details</button>
+                                    </a>
+                                    <div class="btn-group btn-group-sm">
+                                        <form method="post" th:action="@{definitions/remove}">
+                                            <input name="id" th:value="${definition.id}" type="hidden">
+                                            <button class="btn btn-danger"><i class="bi bi-trash ms-2"></i></button>
+                                        </form>
+                                        <form method="post" th:action="@{definitions/reject}">
+                                            <input name="id" th:value="${definition.id}" type="hidden">
+                                            <button class="btn btn-warning"><i class="bi bi-dash-square ms-2"></i>
+                                            </button>
+                                        </form>
+                                        <form th:action="@{definitions/edit}">
+                                            <input name="id" th:value="${definition.id}" type="hidden">
+                                            <button class="btn btn-info"><i class="bi bi-pen"></i></button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            <hr>
+            <article class="mt-2">
+                <div>
+                    <span th:text="#{aggregation.terms.accepted}">Angenommen</span>: <span
+                        th:text="${process.terms.acceptedElements.size}"></span>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-5 col-md-3 col-lg-3 card m-2 text-bg-success"
+                         th:each="term:${acceptedTerms}">
+                        <div class="card-header">
+                            <span th:text="${term.id.replace('-TERM','')}"></span>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">Id: <span th:text="${term.id}"></span></p>
+                            <p class="card-text">Type: <span th:text="${term.type}"></span></p>
+                            <p class="card-text">Inhalt: <span th:text="${term.content}"></span></p>
+                            <p class="card-text">Structure-Id: <span th:text="${term.structureId}"></span></p>
+                        </div>
+                        <div class="card-footer">
+                            <a>
+                                <button class="btn btn-primary">Details</button>
+                            </a>
+                            <div class="btn-group btn-group-sm">
+                                <form method="post" th:action="@{terms/remove}">
+                                    <input name="id" th:value="${term.id}" type="hidden">
+                                    <button class="btn btn-danger"><i class="bi bi-trash ms-2"></i></button>
+                                </form>
+                                <form method="post" th:action="@{terms/reject}">
+                                    <input name="id" th:value="${term.id}" type="hidden">
+                                    <button class="btn btn-warning"><i class="bi bi-dash-square ms-2"></i>
+                                    </button>
+                                </form>
+                                <form th:action="@{terms/edit}">
+                                    <input name="id" th:value="${term.id}" type="hidden">
+                                    <button class="btn btn-info"><i class="bi bi-pen"></i></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </th:block>
+    </section>
+    <hr>
+    <section>
+        <article class="row mb-2" id="next-step">
+            <header><h4>Weiter zu den Beispielen</h4></header>
+            <form method="post" th:action="@{examples}">
+                <button class="btn btn-primary">Weiter</button>
+            </form>
+        </article>
+        <article>
+            <th:block th:replace="~{aggregation/fragments :: skip-to-integration-fragment (${process})}"></th:block>
+        </article>
+    </section>
+
+</main>
+<footer th:replace="~{main::footer}"></footer>
+</body>
+</html>

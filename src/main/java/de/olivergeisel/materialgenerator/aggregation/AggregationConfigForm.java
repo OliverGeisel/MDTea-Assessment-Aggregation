@@ -1,6 +1,10 @@
 package de.olivergeisel.materialgenerator.aggregation;
 
+import de.olivergeisel.materialgenerator.aggregation.extraction.ModelParameters;
+
 public class AggregationConfigForm {
+	//region setter/getter
+
 	private String connectionType;
 	private String modelName;
 	private String url;
@@ -35,8 +39,9 @@ public class AggregationConfigForm {
 		this.temperature = temperature;
 		this.topP = topP;
 	}
-
-	//region setter/getter
+	public ModelParameters getModelParameters() {
+		return new ModelParameters(this.maxTokens, this.temperature, this.topP, this.retries);
+	}
 	public String getFragment() {
 		return fragment;
 	}

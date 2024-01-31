@@ -52,6 +52,14 @@ public class ElementNegotiator<T extends KnowledgeElement> implements Negotiator
 		return !suggestedElements.isEmpty();
 	}
 
+	public T findById(String id) {
+		var suggested = suggestedElements.stream().filter(it -> it.getId().equals(id)).findFirst().orElse(null);
+		if (suggested != null) {
+			return suggested;
+		}
+		return acceptedElements.stream().filter(it -> it.getId().equals(id)).findFirst().orElse(null);
+	}
+
 	//region setter/getter
 
 	/**

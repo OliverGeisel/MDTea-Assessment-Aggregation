@@ -2,8 +2,13 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Konfiguration</title>
+    <title>Terms</title>
     <th:block th:replace="~{main::head-tag}"></th:block>
+    <script>
+        function enableTextarea() {
+            document.getElementById("fragment-textarea").disabled = false;
+        }
+    </script>
 </head>
 <body class="d-flex flex-column min-vh-100">
 <div th:replace="~{main::navigation}"></div>
@@ -12,43 +17,20 @@
     <div th:replace="~{main::aggregationProgress}"></div>
     <header class="flex-header"><h1>Konfiguration für NLP</h1></header>
     <section class="container-fluid">
-        <form>
-            <div class="input-group-lg">
-                <label>Typ</label>
-                <div>
-                    <input name="connectionType" th:checked="${process.modelLocation.toString()}=='LOCAL'"
-                           th:text="#{aggregation.modelType.local}"
-                           th:value="local"
-                           type="radio">
-                </div>
-                <div>
-                    <input name="connectionType" th:checked="${process.modelLocation.toString()}=='REMOTE'"
-                           th:text="#{aggregation.modelType.remote}"
-                           th:value="remote"
-                           type="radio">
-                </div>
-            </div>
-            <label class="form-control">
-                Modellname:<select class="form-select" name="modelName">
-                <option th:each="model : ${models}" th:selected="${model}==${process.modelName}" th:text="${model}"
-                        th:value="${model}">Model
-                </option>
-            </select>
+        <form method="post" th:action="@{terms/update-config}">
+            <th:block th:replace="~{aggregation/fragments :: model-configs}"></th:block>
+            <label class="form-control">Fragment (wenn notwendig):<textarea class="form-control" cols="80"
+                                                                            disabled id="fragment-textarea" name="fragment"
+                                                                            rows="10"
+                                                                            th:text="${process.currentFragment}"></textarea>
             </label>
-            <label class="form-control">
-                API-Key:
-                <input class="form-text" name="apiKey" th:placeholder="'Nur wenn remote genutzt'"
-                       th:value="${process.apiKey}"
-                       title="Nur wenn remote genutzt">
-                Server-Url:
-                <input class="form-text" name="url" placeholder="http://localhost:4891/v1 is default"
-                       th:placeholder="'Nur wenn remote genutzt'"
-                       title="Nur wenn remote genutzt">
-            </label>
+            <button class="btn btn-info" onclick="enableTextarea()" type="button">Edit Fragment</button>
+            <div th:replace="~{aggregation/fragments :: area-of-knowledge-fragment}"></div>
+            <button class="btn btn-primary" type="submit">Speichern</button>
         </form>
     </section>
     <hr>
-    <section class="container-fluid">
+    <section class="container-fluid" id="answers">
         <div class="alert alert-danger" role="alert" th:if="${error}">
             Error
             <p th:text="${error}"></p>
@@ -58,7 +40,7 @@
                 <h3>Antwort</h3>
             </header>
             <span>
-                <form method="post" th:action="@{terms/add}">
+                <form th:action="@{terms/add}">
                     <button class="btn btn-primary" th:text="#{aggregation.terms.add}">Add</button>
                 </form>
             </span>
@@ -68,7 +50,8 @@
                         <span th:text="#{aggregation.terms.suggested}">Vorgeschlagen: </span>: <span
                             th:text="${process.terms.suggestedElements.size}"></span>
                         <div class="row">
-                            <div class="card col-md-5 col-lg-5 m-2 text-bg-primary" th:each="term:${suggestedTerms}">
+                            <div class="card col-sm-5 col-md-5 col-lg-5 m-2 text-bg-primary"
+                                 th:each="term:${suggestedTerms}">
                                 <div class="card-header">
                                     <span th:text="${term.content}"></span>
                                 </div>
@@ -76,25 +59,24 @@
                                     <p class="card-text">Id: <span th:text="${term.id}"></span></p>
                                     <p class="card-text">Type: <span th:text="${term.type}"></span></p>
                                     <p class="card-text">TermName: <span th:text="${term.termName}"></span></p>
+                                    <p class="card-text">Structure-Id: <span th:text="${term.structureId}"></span></p>
                                 </div>
                                 <div class="card-footer">
                                     <a th:href="@{/aggregation/term/{id}(id=${term.id})}">
                                         <button class="btn btn-primary">Details</button>
                                     </a>
-                                    <div class="btn-group btn-group-sm">
-                                        <form method="post" th:action="@{terms/remove}">
-                                            <input name="id" th:value="${term.id}" type="hidden">
-                                            <button class="btn btn-danger"><i class="bi bi-trash ms-2"></i></button>
-                                        </form>
-                                        <form method="post" th:action="@{terms/accept}">
-                                            <input name="id" th:value="${term.id}" type="hidden">
-                                            <button class="btn btn-success"><i class="bi bi-plus-square"></i></button>
-                                        </form>
-                                        <form method="post" th:action="@{terms/edit}">
-                                            <input name="id" th:value="${term.id}" type="hidden">
-                                            <button class="btn btn-info"><i class="bi bi-pen"></i></button>
-                                        </form>
+                                    <form method="post">
+                                        <input name="id" th:value="${term.id}" type="hidden">
+                                        <div class="btn-group btn-group-sm col">
+                                            <button class="btn btn-danger" th:formaction="@{terms/remove#answers}"><i
+                                                    class="bi bi-trash ms-2"></i></button>
+                                            <button class="btn btn-success" th:formaction="@{terms/accept#answers}"><i
+                                                    class="bi bi-plus-square"></i></button>
+                                            <button class="btn btn-info" formmethod="get" th:formaction="@{terms/edit}">
+                                                <i
+                                                        class="bi bi-pen"></i></button>
                                     </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -104,7 +86,8 @@
                         <span th:text="#{aggregation.terms.accepted}">Angenommen</span>: <span
                             th:text="${process.terms.acceptedElements.size}"></span>
                         <div class="row">
-                            <div class="card col-md-5 col-lg-5 m-2 text-bg-success" th:each="term:${acceptedTerms}">
+                            <div class="card col-sm-5 col-md-5 col-lg-5 m-2 text-bg-success"
+                                 th:each="term:${acceptedTerms}">
                                 <div class="card-header">
                                     <span th:text="${term.content}"></span>
                                 </div>
@@ -112,22 +95,23 @@
                                     <p class="card-text">Id: <span th:text="${term.id}"></span></p>
                                     <p class="card-text">Type: <span th:text="${term.type}"></span></p>
                                     <p class="card-text">TermName: <span th:text="${term.termName}"></span></p>
+                                    <p class="card-text">Structure-Id: <span th:text="${term.structureId}"></span></p>
                                 </div>
                                 <div class="card-footer">
                                     <a>
                                         <button class="btn btn-primary">Details</button>
                                     </a>
-                                    <div class="btn-group btn-group-sm">
-                                        <form method="post" th:action="@{terms/remove}">
+                                    <div class="btn-group btn-group-sm btn-group-lg">
+                                        <form method="post" th:action="@{terms/remove#answers}">
                                             <input name="id" th:value="${term.id}" type="hidden">
                                             <button class="btn btn-danger"><i class="bi bi-trash ms-2"></i></button>
                                         </form>
-                                        <form method="post" th:action="@{terms/reject}">
+                                        <form method="post" th:action="@{terms/reject#answers}">
                                             <input name="id" th:value="${term.id}" type="hidden">
                                             <button class="btn btn-warning"><i class="bi bi-dash-square ms-2"></i>
                                             </button>
                                         </form>
-                                        <form method="post" th:action="@{terms/edit}">
+                                        <form th:action="@{terms/edit}">
                                             <input name="id" th:value="${term.id}" type="hidden">
                                             <button class="btn btn-info"><i class="bi bi-pen"></i></button>
                                         </form>
@@ -141,9 +125,12 @@
             <hr>
             <article class="row mb-2" id="next-step">
                 <header><h4>Weiter zu den Definitionen</h4></header>
-                <form method="post" th:action="@{terms}">
+                <form method="post" th:action="@{terms/next}">
                     <button class="btn btn-primary" th:disabled="${process.terms.isEmpty}">Weiter</button>
                 </form>
+            </article>
+            <article>
+                <th:block th:replace="~{aggregation/fragments :: skip-to-integration-fragment (${process})}"></th:block>
             </article>
         </div>
     </section>

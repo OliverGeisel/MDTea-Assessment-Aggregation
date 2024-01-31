@@ -31,6 +31,19 @@ public abstract class ElementPrompt<T extends KnowledgeElement> {
 	}
 
 	//region setter/getter
+
+	/**
+	 * Create the Prompt for the GPT-Model. The Prompt is a string with the instruction, the fragment and the wanted format.
+	 * <p>
+	 * The instruction is a description of the task for the user. Its a list of rules to follow. For better
+	 * results, an example can be added (separated by a new line).
+	 * The fragment is the text that should be analyzed.
+	 * The wanted format is the format of the answer.
+	 * </p>
+	 *
+	 * @return the Prompt for the GPT-Model.
+	 * @see ElementPrompt#getWantedFormat
+	 */
 	public abstract String getPrompt();
 
 	public DeliverType getDeliverType() {

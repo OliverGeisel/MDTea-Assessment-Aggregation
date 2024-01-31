@@ -3,17 +3,21 @@ package de.olivergeisel.materialgenerator.aggregation;
 import de.olivergeisel.materialgenerator.aggregation.collect.SourceFragmentCollection;
 import de.olivergeisel.materialgenerator.aggregation.extraction.ElementNegotiator;
 import de.olivergeisel.materialgenerator.aggregation.extraction.GPT_Request;
+import de.olivergeisel.materialgenerator.aggregation.extraction.ModelParameters;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Definition;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Example;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Term;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.BasicRelation;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.Relation;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationType;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Session-Object for the aggregation process.
@@ -25,21 +29,22 @@ import java.util.List;
  */
 public class AggregationProcess {
 
-	private final LocalDateTime                 start         = LocalDateTime.now();
+	private final LocalDateTime                 start           = LocalDateTime.now();
 	private       List<MultipartFile>           sources;
-	private       GPT_Request.ModelLocation     modelLocation = GPT_Request.ModelLocation.REMOTE;
+	private       GPT_Request.ModelLocation     modelLocation   = GPT_Request.ModelLocation.REMOTE;
 	private       SourceFragmentCollection      sourceFragmentCollection;
 	private       String                        currentFragment;
-	private       String                        areaOfKnowledge;
+	private       String                        areaOfKnowledge = "";
 	private       String                        apiKey;
 	private       String                        url;
 	private       String                        modelName;
-	private       ElementNegotiator<Term>       terms         = new ElementNegotiator<>(null);
-	private       ElementNegotiator<Definition> definitions   = new ElementNegotiator<>(null);
-	private       ElementNegotiator<Example>    examples      = new ElementNegotiator<>(null);
-	private       List<Relation>                relations     = new LinkedList<>();
-	private       boolean                       complete      = false;
-	private       Step                          step          = Step.INITIAL;
+	private       ModelParameters               modelParameters = new ModelParameters();
+	private       ElementNegotiator<Term>       terms           = new ElementNegotiator<>(null);
+	private       ElementNegotiator<Definition> definitions     = new ElementNegotiator<>(null);
+	private       ElementNegotiator<Example>    examples        = new ElementNegotiator<>(null);
+	private       List<Relation>                relations       = new LinkedList<>();
+	private       boolean                       complete        = false;
+	private       Step                          step            = Step.INITIAL;
 
 	public AggregationProcess() {
 		sources = new LinkedList<>();
@@ -56,8 +61,8 @@ public class AggregationProcess {
 		relations.clear();
 	}
 
-	public boolean setComplete() {
-		return complete = true;
+	public void setComplete() {
+		complete = true;
 	}
 
 	/**
@@ -66,8 +71,11 @@ public class AggregationProcess {
 	 * @return true if the step was changed, false if the step is already at the end.
 	 */
 	boolean nextStep() {
+		if (step == Step.END) {
+			return false;
+		}
 		step = step.next();
-		return step == Step.END;
+		return true;
 	}
 
 	public boolean addSources(Collection<MultipartFile> files) {
@@ -117,6 +125,21 @@ public class AggregationProcess {
 		}
 	}
 
+	public KnowledgeElement findById(String id) throws IllegalArgumentException {
+		if (id == null) {
+			return null;
+		}
+		var term = terms.findById(id);
+		if (term == null) {
+			var definition = definitions.findById(id);
+			if (definition == null) {
+				return examples.findById(id);
+			}
+			return definition;
+		}
+		return term;
+	}
+
 	public boolean removeById(String id) {
 		if (id == null || id.isBlank()) {
 			return false;
@@ -148,11 +171,86 @@ public class AggregationProcess {
 		return rejected;
 	}
 
+	public List<Relation> getRelationsByFromId(String id) {
+		return relations.stream().filter(it -> it.getFrom().getId().equals(id)).toList();
+	}
+
+	public List<Relation> getRelationsByToId(String id) {
+		return relations.stream().filter(it -> it.getTo().getId().equals(id)).toList();
+	}
+
+	public boolean linkTermsToDefinition(String id, Term mainTerm, List<Term> terms) {
+		try {
+			var definition = definitions.findById(id);
+			var relation = new BasicRelation(RelationType.DEFINED_BY, mainTerm, definition);
+			if (!relations.contains(relation)) {
+				var reverseRelation = new BasicRelation(RelationType.DEFINES, definition, mainTerm);
+				relations.add(relation);
+				relations.add(reverseRelation);
+			}
+			for (var term : terms) {
+				var relation1 = new BasicRelation(RelationType.RELATED, mainTerm, term);
+				if (!relations.contains(relation1)) {
+					var relation2 = new BasicRelation(RelationType.RELATED, term, mainTerm);
+					relations.add(relation1);
+					relations.add(relation2);
+				}
+			}
+			return true;
+		} catch (NoSuchElementException ne) {
+			return false;
+		}
+	}
+
+	public boolean removeAllRelationsWith(String id) {
+		return relations.removeIf(it -> it.getFrom().getId().equals(id) || it.getTo().getId().equals(id));
+	}
+
+	public boolean unlinkTermsFromDefinition(String id, List<Term> terms) {
+		try {
+			var definition = definitions.findById(id);
+			for (var term : terms) {
+				relations.removeIf(it -> it.getFrom().getId().equals(definition.getId())
+										 && it.getTo().getId().equals(term.getId()));
+				relations.removeIf(it -> it.getFrom().getId().equals(term.getId()) && it.getTo().getId().equals(
+						definition.getId()));
+			}
+			return true;
+		} catch (NoSuchElementException ne) {
+			return false;
+		}
+	}
+
+	public boolean hasElements() {
+		return !terms.getAcceptedElements().isEmpty() || !definitions.getAcceptedElements().isEmpty() || !examples
+				.getAcceptedElements().isEmpty();
+	}
+
+	public boolean hasRelations() {
+		return !relations.isEmpty();
+	}
+
+	public boolean hasElementsAndRelations() {
+		return hasElements() && hasRelations();
+	}
+
 	//region setter/getter
+
+	/**
+	 * Number of the Step the process is currently in. Starts with 0.
+	 *
+	 * @return The number of the step.
+	 */
 	public int getStepNumber() {
 		return step.ordinal();
 	}
 
+	/**
+	 * Name of the Step the process is currently in.
+	 *
+	 * @return The name of the step.
+	 * @see Step
+	 */
 	public String getStep() {
 		return step.name();
 	}
@@ -167,6 +265,15 @@ public class AggregationProcess {
 
 	public String getCurrentFragment() {
 		return currentFragment;
+	}
+
+	public ModelParameters getModelParameters() {
+		return modelParameters;
+	}
+
+	public void setModelParameters(
+			ModelParameters modelParameters) {
+		this.modelParameters = modelParameters;
 	}
 
 	public void setCurrentFragment(String currentFragment) {
