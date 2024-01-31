@@ -12,18 +12,18 @@ public class TextMaterial extends Material {
 	@Column(length = 1_000)
 	private String headline;
 	@Column(length = 100_000)
-	private String text;
+	private String textField;
 
-	public TextMaterial(String headline, String text, TextTemplate templateInfo) {
+	public TextMaterial(String headline, String textField, TextTemplate templateInfo) {
 		super(MaterialType.WIKI, templateInfo);
 		this.headline = headline;
-		this.text = text;
+		this.textField = textField;
 	}
 
 	public TextMaterial(Text text, TemplateInfo templateInfo) {
 		super("", text.getId(), text.getStructureId(), MaterialType.WIKI, templateInfo);
 		this.headline = text.getHeadline();
-		this.text = text.getText();
+		this.textField = text.getTextField();
 	}
 
 	protected TextMaterial() {
@@ -39,12 +39,12 @@ public class TextMaterial extends Material {
 		this.headline = headline;
 	}
 
-	public String getText() {
-		return text;
+	public String getTextField() {
+		return textField;
 	}
 
-	public void setText(String text) {
-		this.text = text;
+	public void setTextField(String textField) {
+		this.textField = textField;
 	}
 //endregion
 }

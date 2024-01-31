@@ -2,6 +2,7 @@ package de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.eleme
 
 
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.Relation;
+import org.springframework.data.neo4j.core.schema.Node;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,38 +10,38 @@ import java.util.HashMap;
 @Node
 public class Text extends KnowledgeElement {
 
-	private String text;
+	private String textField;
 	private String headline;
 
-	public Text(String content, String id, String type,
 	protected Text() {
 		super();
 	}
 
+	public Text(String textField, String id, String type,
 			Collection<Relation> relations) {
-		super(content, id, type, relations);
+		super(textField, id, type, relations);
 		HashMap<String, String> elements = new HashMap<>();
-		for (String element : content.split(";")) {
+		for (String element : textField.split(";")) {
 			String[] parts = element.split(":");
 			if (parts.length == 2) {
 				elements.put(parts[0].trim(), parts[1].trim());
 			}
 		}
-		this.text = elements.getOrDefault("text", "");
+		this.textField = elements.getOrDefault("text", "");
 		this.headline = elements.getOrDefault("headline", "");
 	}
 
-	public Text(String content, String id, String type) {
-		super(content, id, type);
+	public Text(String textField, String id, String type) {
+		super(textField, id, type);
 	}
 
 	//region setter/getter
-	public String getText() {
-		return text;
+	public String getTextField() {
+		return textField;
 	}
 
-	public void setText(String text) {
-		this.text = text;
+	public void setTextField(String textField) {
+		this.textField = textField;
 	}
 
 	public String getHeadline() {

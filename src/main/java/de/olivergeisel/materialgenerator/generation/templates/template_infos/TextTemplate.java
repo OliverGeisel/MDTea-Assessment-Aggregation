@@ -15,12 +15,12 @@ public class TextTemplate extends BasicTemplate {
 
 	static {
 		var allFields = new HashSet<>(TemplateInfo.FIELDS);
-		allFields.add("text");
+		allFields.add("textField");
 		allFields.add("headline");
 		FIELDS = Collections.unmodifiableSet(allFields);
 	}
 
-	private String text;
+	private String textField;
 	private String headline;
 
 	public TextTemplate() {
@@ -31,9 +31,9 @@ public class TextTemplate extends BasicTemplate {
 		super(TemplateType.TEXT, mainTermId);
 	}
 
-	public TextTemplate(UUID mainTermId, String text, String headline) {
+	public TextTemplate(UUID mainTermId, String textField, String headline) {
 		super(TemplateType.TEXT, mainTermId);
-		this.text = text;
+		this.textField = textField;
 		this.headline = headline;
 	}
 
@@ -46,12 +46,12 @@ public class TextTemplate extends BasicTemplate {
 		this.headline = headline;
 	}
 
-	public String getText() {
-		return text;
+	public String getTextField() {
+		return textField;
 	}
 
-	public void setText(String text) {
-		this.text = text;
+	public void setTextField(String textField) {
+		this.textField = textField;
 	}
 //endregion
 }
