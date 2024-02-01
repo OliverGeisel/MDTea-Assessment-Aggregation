@@ -103,6 +103,18 @@
       ]
     },
     {
+      "type": "TERM",
+      "id": "Prozess-TERM",
+      "structure": "Algorithmus-Begriff",
+      "content": "Prozess",
+      "relations": [
+        {
+          "relation_id": "Algorithmus-TERM",
+          "relation_type": "is-Synonym-for"
+        }
+      ]
+    },
+    {
       "type": "DEFINITION",
       "id": "Algorithmus-2-DEFINITION",
       "structure": "Algorithmus-Begriff",
