@@ -26,10 +26,9 @@ public class ContentTarget {
 
 	private String                      value;
 	private ContentGoal                 relatedGoal;
-	private TopicStructureAliasMappings topicStructureAliasMappings;
+	private TopicStructureAliasMappings topicStructureAliasMappings = new TopicStructureAliasMappings();
 
 	protected ContentTarget() {
-		this.topicStructureAliasMappings = new TopicStructureAliasMappings();
 	}
 
 	/**

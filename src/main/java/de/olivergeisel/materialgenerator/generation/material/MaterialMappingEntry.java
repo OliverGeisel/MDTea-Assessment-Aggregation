@@ -16,7 +16,9 @@ public class MaterialMappingEntry {
 	@ElementCollection
 	private Set<String> relatedElements = new HashSet<>();
 
-	//region setter/getter
+	public void addAll(Collection<String> elements) {
+		relatedElements.addAll(elements);
+	}
 	public Set<String> getRelatedElements() {
 		return relatedElements;
 	}
@@ -68,6 +70,8 @@ public class MaterialMappingEntry {
 			add(elem);
 		}
 	}
+
+	//region setter/getter
 
 	public void setMaterial(Material material) {
 		this.material = material;

@@ -213,7 +213,6 @@ public class Material extends MaterialOrderPart {
 
 	@Override
 	public String toString() {
-		return "Material{" + "term='" + term + '\'' + ", structureId='" + structureId + '\''
-			   + ", type=" + type + ", template=" + templateInfo + ", values=" + values + '}';
+		return STR."Material{term='\{term}', structureId='\{structureId}', type=\{type}, template=\{templateInfo}, values=\{values}}";
 	}
 }

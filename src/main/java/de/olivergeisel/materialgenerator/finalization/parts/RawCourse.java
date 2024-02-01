@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * It can be edited.
  *
  * @author Oliver Geisel
- * @version 1.0.0
+ * @version 1.1.0
  * @see Course
  * @see CourseOrder
  * @see CourseMetadataFinalization
@@ -32,7 +32,13 @@ public class RawCourse extends Course {
 	@Column(name = "id", nullable = false)
 	private UUID id;
 
+	/**
+	 * The id of the plan that is used to create this course.
+	 */
 	private UUID                       planId;
+	/**
+	 * The name of the templateSet that is used to create this course.
+	 */
 	private String                     templateName;
 	@OneToOne(cascade = CascadeType.ALL)
 	private CourseMetadataFinalization metadata;
@@ -67,8 +73,15 @@ public class RawCourse extends Course {
 	 */
 	public void changePlan(CoursePlan plan) {
 		setPlanId(plan.getId());
+		// Todo change courseOrder
 	}
 
+	/**
+	 * Assign materials to this course.
+	 *
+	 * @param materials The materials to assign
+	 * @return True if all materials are assigned. False otherwise
+	 */
 	public boolean assignMaterial(Collection<MaterialAndMapping> materials) {
 		return courseOrder.assignMaterial(materials.stream().map(MaterialAndMapping::material).collect(
 				Collectors.toSet()));

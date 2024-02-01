@@ -14,6 +14,7 @@ import de.olivergeisel.materialgenerator.generation.material.MaterialMappingEntr
 import de.olivergeisel.materialgenerator.generation.material.transfer.*;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateSet;
 import de.olivergeisel.materialgenerator.generation.templates.template_infos.*;
+import org.slf4j.Logger;
 
 import java.util.*;
 
@@ -35,6 +36,8 @@ import java.util.*;
  * @since 0.2.0
  */
 public class TransferGenerator extends AbstractGenerator {
+
+	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(TransferGenerator.class);
 
 	public TransferGenerator() {
 		super();
@@ -62,6 +65,7 @@ public class TransferGenerator extends AbstractGenerator {
 
 	/**
 	 * {@inheritDoc}
+	 *
 	 * @param targets {@inheritDoc}
 	 * @throws IllegalStateException {@inheritDoc}
 	 */
@@ -173,8 +177,8 @@ public class TransferGenerator extends AbstractGenerator {
 	protected List<MaterialAndMapping> materialForTranslate(Set<KnowledgeNode> knowledge) {
 		// materials.add(createWikisWithExistingMaterial(knowledge, materials));
 		var firstLookMaterials = materialForKnow(knowledge);
-		var summary =
-				new TransferAssembler(firstLookMaterials, knowledge.stream().findFirst().orElseThrow()).createSummary();
+		var summary = new TransferAssembler(firstLookMaterials, knowledge.stream().findFirst().orElseThrow(),
+				basicTemplateInfo).createSummary();
 		firstLookMaterials.addAll(summary);
 		return firstLookMaterials;
 	}
@@ -516,7 +520,7 @@ public class TransferGenerator extends AbstractGenerator {
 									 .findFirst().orElseThrow();
 		List<MaterialAndMapping> back = new ArrayList<>();
 		var mainTerm = mainKnowledge.getMainElement();
-		var relations = mainKnowledge.getWantedRelationsFromRelated( RelationType.PROOFS);
+		var relations = mainKnowledge.getWantedRelationsFromRelated(RelationType.PROOFS);
 		relations.forEach(it -> {
 			var proofId = it.getFromId();
 			try {
@@ -534,7 +538,6 @@ public class TransferGenerator extends AbstractGenerator {
 		});
 		return back;
 	}
-
 
 
 	private Set<KnowledgeNode> loadKnowledgeForStructure(String structureId, Collection<String> extra) {

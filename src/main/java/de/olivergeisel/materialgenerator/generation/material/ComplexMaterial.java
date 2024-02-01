@@ -1,5 +1,6 @@
 package de.olivergeisel.materialgenerator.generation.material;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 
@@ -18,7 +19,7 @@ import java.util.List;
 @Entity
 public abstract class ComplexMaterial extends Material {
 
-	@OneToMany
+	@OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	private final List<Material> parts = new ArrayList<>();
 
 	protected ComplexMaterial() {

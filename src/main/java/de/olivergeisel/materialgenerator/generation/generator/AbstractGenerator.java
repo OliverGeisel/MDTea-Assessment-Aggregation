@@ -27,7 +27,7 @@ import java.util.*;
 public abstract class AbstractGenerator implements Generator {
 	protected static final String UNKNOWN = "Unknown";
 
-	protected static final Logger logger = org.slf4j.LoggerFactory.getLogger(AbstractGenerator.class);
+	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AbstractGenerator.class);
 
 
 	protected final Set<TemplateInfo> basicTemplateInfo = new HashSet<>();

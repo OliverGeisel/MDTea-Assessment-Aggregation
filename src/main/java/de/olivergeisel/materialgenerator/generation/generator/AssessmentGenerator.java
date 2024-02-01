@@ -10,6 +10,7 @@ import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateSet;
 import de.olivergeisel.materialgenerator.generation.templates.template_infos.assessment.AssessmentTemplate;
 import de.olivergeisel.materialgenerator.generation.templates.template_infos.assessment.TrueFalseTemplate;
+import org.slf4j.Logger;
 
 import java.util.*;
 
@@ -41,6 +42,8 @@ import java.util.*;
  * @since 1.1.0
  */
 public class AssessmentGenerator extends AbstractGenerator {
+
+	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AssessmentGenerator.class);
 
 
 	private final Set<AssessmentTemplate> taskInfos = new HashSet<>();

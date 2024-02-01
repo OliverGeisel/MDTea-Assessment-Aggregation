@@ -81,7 +81,7 @@ public abstract class MaterialOrderPart {
 
 	@Override
 	public String toString() {
-		return "MaterialOrderPart{" + "name='" + name + ", id=" + id + '\'' + '}';
+		return STR."MaterialOrderPart{name='\{name}', id=\{id}}";
 	}
 }
 

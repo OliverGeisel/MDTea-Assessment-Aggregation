@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * Is the largest unit in the course plan. Contains a list of {@link GroupOrder}s.
  *
  * @author Oliver Geisel
- * @version 1.0.0
+ * @version 1.1.0
  * @see MaterialOrderPart
  * @since 0.2.0
  */
@@ -81,7 +81,7 @@ public class ChapterOrder extends MaterialOrderCollection {
 	}
 
 	public MaterialOrderPart find(UUID id) {
-		if (this.getId().equals(id)) return this;
+		if (id.equals(this.getId())) return this;
 		return groupOrder.stream().map(g -> g.find(id)).filter(Objects::nonNull).findFirst().orElse(null);
 	}
 
@@ -181,10 +181,6 @@ public class ChapterOrder extends MaterialOrderCollection {
 
 	@Override
 	public String toString() {
-		return "ChapterOrder{" +
-			   "name='" + getName() + '\'' +
-			   ", id=" + getId() +
-			   ", topic=" + getTopic() +
-			   '}';
+		return STR."ChapterOrder{name='\{getName()}', id=\{getId()}, topic=\{getTopic()}}";
 	}
 }
