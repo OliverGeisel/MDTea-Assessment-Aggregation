@@ -18,9 +18,18 @@
             </h1>
         </header>
         <hr>
-        <!--/*@thymesVar id="subMaterial" type="de.olivergeisel.materialgenerator.generation.material.Material" */-->
-        <section th:each="subMaterial:${material.parts}">
-            <div th:replace="~{${subMaterial.templateInfo.templateType.type} :: content}"></div>
+        <!--/*@thymesVar id="material" type="de.olivergeisel.materialgenerator.generation.material.transfer.SummaryMaterial" */-->
+        <section th:each="material:${material.definitions}">
+            Definition:
+            <div th:replace="~{${material.templateInfo.templateType.type} :: content}"></div>
+        </section>
+        <section th:each="material:${material.lists}">
+            Listen:
+            <div th:replace="~{${material.templateInfo.templateType.type} :: content}"></div>
+        </section>
+        <section th:each="material:${material.examples}">
+            Beispiele:
+            <div th:replace="~{${material.templateInfo.templateType.type} :: content}"></div>
         </section>
     </div>
 </main>
