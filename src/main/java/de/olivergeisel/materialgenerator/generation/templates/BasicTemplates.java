@@ -11,23 +11,19 @@ import java.util.UUID;
 public class BasicTemplates {
 
 	public static final Set<String>    TEMPLATES = Set.of("DEFINITION", "TEXT", "EXAMPLE", "ACRONYM", "LIST",
-			"SYNONYM", "PROOF");
+			"SYNONYM", "PROOF", "CODE", "IMAGE", "SUMMARY");
 	@Transient
 	private static      BasicTemplates instance;
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	@Column(name = "id", nullable = false)
 	private UUID id;
-
 	@ManyToOne
 	@JoinColumn(name = "definition_template_id")
 	private DefinitionTemplate definitionTemplate;
-
 	@ManyToOne
 	@JoinColumn(name = "text_template_id")
 	private TextTemplate textTemplate;
-
 	@ManyToOne
 	@JoinColumn(name = "example_template_id")
 	private ExampleTemplate exampleTemplate;
@@ -43,15 +39,15 @@ public class BasicTemplates {
 	@ManyToOne
 	@JoinColumn(name = "synonym_template_id")
 	private SynonymTemplate synonymTemplate;
-
 	@ManyToOne
 	@JoinColumn(name = "code_template_id")
 	private CodeTemplate codeTemplate;
-
 	@ManyToOne
 	@JoinColumn(name = "image_template_id")
 	private ImageTemplate imageTemplate;
-
+	@ManyToOne
+	@JoinColumn(name = "summary_template_id")
+	private             SummaryTemplate summaryTemplate;
 
 	protected BasicTemplates() {
 		this.definitionTemplate = new DefinitionTemplate();
@@ -63,9 +59,36 @@ public class BasicTemplates {
 		this.proofTemplate = new ProofTemplate();
 		this.codeTemplate = new CodeTemplate();
 		this.imageTemplate = new ImageTemplate();
+		this.summaryTemplate = new SummaryTemplate();
 	}
 
 	//region setter/getter
+	public SummaryTemplate getSummaryTemplate() {
+		return summaryTemplate;
+	}
+
+	public void setSummaryTemplate(
+			SummaryTemplate summaryTemplate) {
+		this.summaryTemplate = summaryTemplate;
+	}
+
+	public CodeTemplate getCodeTemplate() {
+		return codeTemplate;
+	}
+
+	public void setCodeTemplate(CodeTemplate codeTemplate) {
+		this.codeTemplate = codeTemplate;
+	}
+
+	public ImageTemplate getImageTemplate() {
+		return imageTemplate;
+	}
+
+	public void setImageTemplate(
+			ImageTemplate imageTemplate) {
+		this.imageTemplate = imageTemplate;
+	}
+
 	public ProofTemplate getProofTemplate() {
 		return proofTemplate;
 	}

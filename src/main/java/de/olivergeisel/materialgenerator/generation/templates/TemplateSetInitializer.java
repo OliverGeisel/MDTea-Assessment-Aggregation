@@ -15,8 +15,7 @@ import java.util.Set;
 public class TemplateSetInitializer implements CommandLineRunner {
 
 	private static final Set<String>            ignoredFiles  = Set.of("exclude", "include", "INCLUDE", "ignore",
-			"help", "COURSE", "MATERIAL", "CHAPTER",
-			"GROUP");
+			"help", "COURSE", "MATERIAL", "CHAPTER", "GROUP");
 	private static final String                 TEMPLATE_PATH = "templateSets";
 	private final        TemplateSetRepository  repository;
 	private final        TemplateInfoRepository templateInfoRepository;
