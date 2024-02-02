@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title th:text="${title}">Title</title>
     <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport">
-    <th:block th:include="~{${material.templateType.type}:: head}"></th:block>
+    <th:block th:replace="~{${material.templateType.type}:: head}"></th:block>
 </head>
 <body>
 <nav id="mainNav">

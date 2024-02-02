@@ -6,7 +6,7 @@
 </head>
 <body>
 <main class="container" th:fragment="content">
-    <th:block th:include="~{'assesment/'+${material.templateType.taskType.type} :: content}"></th:block>
+    <th:block th:replace="~{'assesment/'+${material.templateType.taskType.type} :: content}"></th:block>
 </main>
 
 </body>
