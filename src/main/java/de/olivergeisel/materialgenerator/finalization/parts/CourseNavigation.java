@@ -5,6 +5,19 @@ import lombok.Getter;
 
 import java.nio.file.Paths;
 
+
+/**
+ * A Representation of the Navigation in the Course.
+ * It is used to navigate through the Course and to get the current Material.
+ * The Navigation is immutable. So every time a step is made, a new Navigation is created.
+ *
+ * @author Oliver Geisel
+ * @version 1.1.0
+ * @see MaterialHierarchy
+ * @see Material
+ * @see MaterialLevel
+ * @since 0.2.0
+ */
 @Getter
 public class CourseNavigation {
 	public static final String PATH_REPLACE_REGEX = "[^a-zA-Z0-9äöüÄÖÜß\\s\\-_]";
@@ -202,6 +215,21 @@ public class CourseNavigation {
 	}
 //endregion
 
+	/**
+	 * Information level in the Navigation. It is used to navigate through the Course and to get the current Material.
+	 * The Navigation is immutable. So every time a step is made, a new Navigation is created.
+	 * <p>
+	 * The getRootPath() method returns the path to the root of the Material. This is important for usage of css/js
+	 * and images.
+	 * <p>
+	 * The Level is defined by the MaterialLevel. It can be CHAPTER, GROUP, TASK or MATERIAL. The value define
+	 * what level is set. For example if the chapter is set, then the Navigation is on the chapter level.
+	 *
+	 * @author Oliver Geisel
+	 * @version 1.1.0
+	 * @see CourseNavigation
+	 * @since 0.2.0
+	 */
 	@Getter
 	public static class MaterialLevel {
 		private String chapter;

@@ -18,7 +18,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URL;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,10 +29,11 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * This class is responsible for creating the zip file containing the course. It uses the template engine to create the html files.
+ * This class is responsible for creating the zip file containing the course.
+ * It uses the template engine to create the html files. Only HTML-files supportet at the moment.
  *
  * @author Oliver Geisel
- * @version 1.0.0
+ * @version 1.1.0
  * @see Material
  * @see de.olivergeisel.materialgenerator.core.course.Course
  * @since 0.2.0
@@ -65,6 +66,12 @@ public class DownloadManager {
 	}
 
 
+	/**
+	 * downloads a single html file
+	 *
+	 * @param name     The name of the file
+	 * @param response The response to write the file to
+	 */
 	public void createSingle(String name, HttpServletResponse response) {
 		Context context = new Context(Locale.GERMANY);
 		context.setVariable("wert", "My Value");
@@ -102,7 +109,7 @@ public class DownloadManager {
 
 	private TemplateEngine createTemplateEngine(String templateSet) {
 		var templateResolver = new ClassLoaderTemplateResolver();
-		templateResolver.setPrefix("templateSets/" + templateSet + "/");
+		templateResolver.setPrefix(STR."templateSets/\{templateSet}/");
 		templateResolver.setSuffix(".html");
 		templateResolver.setTemplateMode("HTML");
 		templateResolver.setCharacterEncoding("UTF-8");
@@ -114,12 +121,20 @@ public class DownloadManager {
 		return templateEngine;
 	}
 
-	private void saveIncludes(File outputDir, String templateSet) {
+	/**
+	 * Saves the include-folder of the template set to the output directory.
+	 *
+	 * @param outputDir   The directory to save the includes to.
+	 * @param templateSet Name of the template set.
+	 */
+	private void saveIncludes(File outputDir, String templateSet) throws URISyntaxException {
 		var classloader = this.getClass().getClassLoader();
-		URL folder = classloader.getResource("");
+		var classPathRoot = classloader.getResource("").toURI();
+		var includeURI = classPathRoot.resolve(STR."templateSets/\{templateSet}/include");
 		var outPath = outputDir.toPath();
-		File sourceCopy = new File(folder.getFile(), "templateSets/" + templateSet + "/include");
+		File sourceCopy = new File(includeURI);
 		if (!sourceCopy.exists()) {
+			logger.info(STR."No includes found for template set \{templateSet}");
 			return;
 		}
 		var copyPath = sourceCopy.toPath();
@@ -142,8 +157,15 @@ public class DownloadManager {
 		}
 	}
 
-	private void exportCourse(RawCourse plan, String templateSet, File outputDir)
-			throws IOException {
+	/**
+	 * Exports the course to the output directory.
+	 *
+	 * @param plan        The courseplan for the course to export.
+	 * @param templateSet The template set to use.
+	 * @param outputDir   The directory to save the course to.
+	 * @throws IOException If an error occurs while exporting the course.
+	 */
+	private void exportCourse(RawCourse plan, String templateSet, File outputDir) throws IOException {
 		var templateEngine = createTemplateEngine(templateSet);
 		Context context = new Context(Locale.GERMANY);
 		CourseNavigation.MaterialLevel level = new CourseNavigation.MaterialLevel();
@@ -151,24 +173,28 @@ public class DownloadManager {
 		overallInfos.put("courseName", plan.getMetadata().getName().orElse("Kurs"));
 		var chapters = plan.getCourseOrder().getChapterOrder();
 		for (int i = 0; i < chapters.size(); i++) {
-			var chapter = plan.getCourseOrder().getChapterOrder().get(i);
+			var chapter = chapters.get(i);
+			if (chapter.materialCount() == 0) { // skip chapters without material
+				continue;
+			}
 			String chapterName = chapter.getName() == null || chapter.getName().isBlank() ?
 					STR."Kapitel \{chapters.indexOf(chapter) + 1}" : chapter.getName();
 			var nextChapter = i < chapters.size() - 1 ? chapters.get(i + 1) : null;
 			var chapterNavigation = navigation.nextChapter(nextChapter);
-			var subDir = Files.createDirectory(new File(outputDir, chapterName).toPath());
 			var newLevel = new CourseNavigation.MaterialLevel(chapter.getName(), "", "", "");
-			if (chapter.materialCount() == 0) {
-				continue;
-			}
-			exportChapter(chapter, newLevel, chapterNavigation, context, subDir.toFile(), templateEngine);
+			var chapterDir = Files.createDirectory(new File(outputDir, chapterName).toPath());
+			exportChapter(chapter, newLevel, chapterNavigation, context, chapterDir.toFile(), templateEngine);
 		}
 		context.clearVariables();
 		context.setVariable("course", plan);
 		overallInfos.forEach(context::setVariable);
 		var course = templateEngine.process("COURSE", context);
 		zipService.saveToFile(course, outputDir, "Course.html");
-		saveIncludes(outputDir, templateSet);
+		try {
+			saveIncludes(outputDir, templateSet);
+		} catch (URISyntaxException e) {
+			logger.warn(e.toString());
+		}
 	}
 
 	private void exportChapter(ChapterOrder chapter, CourseNavigation.MaterialLevel level, CourseNavigation navigation,

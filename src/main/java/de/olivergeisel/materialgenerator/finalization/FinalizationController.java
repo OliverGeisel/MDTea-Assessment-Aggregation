@@ -3,8 +3,6 @@ package de.olivergeisel.materialgenerator.finalization;
 
 import de.olivergeisel.materialgenerator.core.courseplan.structure.Relevance;
 import de.olivergeisel.materialgenerator.generation.material.MaterialRepository;
-import de.olivergeisel.materialgenerator.generation.templates.template_infos.DefinitionTemplate;
-import de.olivergeisel.materialgenerator.generation.templates.template_infos.TemplateInfo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
@@ -105,12 +103,7 @@ public class FinalizationController {
 	public String viewOverview(@RequestParam("materialId") UUID materialId,
 			@RequestParam("templateSet") String templateSet, Model model) {
 		AtomicReference<String> materialType = new AtomicReference<>();
-		materialRepository.findById(materialId).ifPresent(material -> {
-			TemplateInfo info = material.getTemplateInfo() == null ? new DefinitionTemplate() :
-					material.getTemplateInfo();
-			materialType.set(info.getTemplateType().getType());
-			model.addAttribute("material", material);
-		});
-		return TEMPLATE_SET_FROM_TEMPLATES_FOLDER + templateSet + "/" + materialType;
+		// TODO not active
+		return STR."\{TEMPLATE_SET_FROM_TEMPLATES_FOLDER}\{templateSet}/\{materialType}";
 	}
 }
