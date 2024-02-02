@@ -17,9 +17,7 @@ import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
 import de.olivergeisel.materialgenerator.generation.material.MaterialMappingEntry;
 import de.olivergeisel.materialgenerator.generation.material.transfer.ListMaterial;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateSet;
-import de.olivergeisel.materialgenerator.generation.templates.template_infos.BasicTemplate;
-import de.olivergeisel.materialgenerator.generation.templates.template_infos.ListTemplate;
-import de.olivergeisel.materialgenerator.generation.templates.template_infos.TemplateInfo;
+import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 import org.slf4j.Logger;
 
 import java.util.*;
@@ -29,8 +27,6 @@ public abstract class AbstractGenerator implements Generator {
 
 	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AbstractGenerator.class);
 
-
-	protected final Set<TemplateInfo> basicTemplateInfo = new HashSet<>();
 	protected       TemplateSet       templateSet;
 	protected       KnowledgeModel    model;
 	protected       CoursePlan        plan;
@@ -67,7 +63,7 @@ public abstract class AbstractGenerator implements Generator {
 	}
 
 	protected static MaterialAndMapping createListMaterialCore(String headline, String materialName,
-			RelationType relationType, ListTemplate templateInfo,
+			RelationType relationType, TemplateType templateInfo,
 			KnowledgeNode mainKnowledge, KnowledgeElement mainTerm) {
 		var partRelations = mainKnowledge.getWantedRelationsFromRelated(relationType);
 		var mainId = mainTerm.getId();
@@ -78,7 +74,7 @@ public abstract class AbstractGenerator implements Generator {
 		}
 		var partListMaterial = new ListMaterial(headline, partNames);
 		partListMaterial.setTerm(mainTerm.getContent());
-		partListMaterial.setTemplateInfo(templateInfo);
+		partListMaterial.setTemplateType(templateInfo);
 		partListMaterial.setTermId(mainTerm.getId());
 		partListMaterial.setName(materialName);
 		partListMaterial.setStructureId(mainTerm.getStructureId());
@@ -281,7 +277,7 @@ public abstract class AbstractGenerator implements Generator {
 		try {
 			processGoals(goals.stream().toList());
 		} catch (NoTemplateInfoException e) {
-			logger.error("No TemplateInfo found for {}", e.getMessage());
+			logger.error("No AbstractTemplateCategory found for {}", e.getMessage());
 		}
 		setUnchanged(true);
 	}
@@ -378,20 +374,6 @@ public abstract class AbstractGenerator implements Generator {
 		output.addAll(materialAndMapping);
 	}
 
-	/**
-	 * Returns the basic templateInfo for the given class.
-	 *
-	 * @param templateInfoClass the class of the templateInfo
-	 * @return the templateInfo
-	 * @throws NoTemplateInfoException if no templateInfo is found
-	 */
-	protected <T extends TemplateInfo> T getBasicTemplateInfo(Class<T> templateInfoClass) throws
-			NoTemplateInfoException {
-		return (T) basicTemplateInfo.stream()
-									.filter(it -> templateInfoClass.equals(it.getClass()))
-									.findFirst().orElseThrow(() -> new NoTemplateInfoException(
-						String.format("No Template %s found", templateInfoClass.getName())));
-	}
 
 //region setter/getter
 
@@ -447,18 +429,6 @@ public abstract class AbstractGenerator implements Generator {
 	 */
 	public void setPlan(CoursePlan plan) {
 		this.plan = plan;
-		changed();
-	}
-
-	/**
-	 * Sets the basic templateInfo.
-	 * Will change the inner state of the generator.
-	 *
-	 * @param basicTemplateInfo the basic templateInfo to set
-	 */
-	public void setBasicTemplateInfo(Set<BasicTemplate> basicTemplateInfo) {
-		this.basicTemplateInfo.clear();
-		this.basicTemplateInfo.addAll(basicTemplateInfo);
 		changed();
 	}
 //endregion

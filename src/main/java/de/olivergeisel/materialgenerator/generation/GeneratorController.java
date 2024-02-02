@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import static de.olivergeisel.materialgenerator.generation.TemplateService.*;
+import static de.olivergeisel.materialgenerator.generation.TemplateSetService.*;
 
 @Controller
 @RequestMapping("/generator")

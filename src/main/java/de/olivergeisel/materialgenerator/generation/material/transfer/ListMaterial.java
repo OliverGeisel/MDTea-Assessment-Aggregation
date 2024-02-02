@@ -3,7 +3,7 @@ package de.olivergeisel.materialgenerator.generation.material.transfer;
 import de.olivergeisel.materialgenerator.core.knowledge.metamodel.element.KnowledgeElement;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.MaterialType;
-import de.olivergeisel.materialgenerator.generation.templates.template_infos.TemplateInfo;
+import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 
@@ -23,15 +23,14 @@ public class ListMaterial extends Material {
 		super(MaterialType.WIKI);
 	}
 
-	protected ListMaterial(MaterialType type, TemplateInfo templateInfo) {
-		super(type);
-		setTemplateInfo(templateInfo);
+	protected ListMaterial(MaterialType type, TemplateType templateType) {
+		super(type, templateType);
 	}
 
-	protected ListMaterial(MaterialType type, TemplateInfo templateInfo, String headline, Collection<String> entries,
+	protected ListMaterial(MaterialType type, TemplateType templateType, String headline, Collection<String> entries,
 			boolean numerated, KnowledgeElement element) {
 		super(type, element);
-		setTemplateInfo(templateInfo);
+		setTemplateType(templateType);
 		this.entries.addAll(entries);
 		this.headline = headline;
 		this.numerated = numerated;

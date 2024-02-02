@@ -4,19 +4,15 @@ import de.olivergeisel.materialgenerator.core.courseplan.structure.StructureGrou
 import de.olivergeisel.materialgenerator.core.knowledge.metamodel.element.Term;
 import de.olivergeisel.materialgenerator.core.knowledge.metamodel.structure.KnowledgeObject;
 import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
-import de.olivergeisel.materialgenerator.generation.generator.NoTemplateInfoException;
 import de.olivergeisel.materialgenerator.generation.material.ComplexMaterial;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
 import de.olivergeisel.materialgenerator.generation.material.MaterialMappingEntry;
 import de.olivergeisel.materialgenerator.generation.material.MaterialType;
 import de.olivergeisel.materialgenerator.generation.material.transfer.SummaryMaterial;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
-import de.olivergeisel.materialgenerator.generation.templates.template_infos.SummaryTemplate;
-import de.olivergeisel.materialgenerator.generation.templates.template_infos.TemplateInfo;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Specific sub-generator for a {@link ComplexMaterial} in the transfer category. <b>PROTOTYPE and PROOF OF CONCEPT
@@ -36,15 +32,11 @@ import java.util.Set;
 public class TransferAssembler {
 
 	private List<MaterialAndMapping> materials;
-	protected final Set<TemplateInfo> basicTemplateInfo; // TODO Not good. find better Solution
-	private         KnowledgeNode     knowledgeNode;
-	// than get from Generator
+	private KnowledgeNode knowledgeNode;
 
-	public TransferAssembler(List<MaterialAndMapping> materials, KnowledgeNode knowledgeNode, Set<TemplateInfo>
-			basicTemplateInfo) {
+	public TransferAssembler(List<MaterialAndMapping> materials, KnowledgeNode knowledgeNode) {
 		this.materials = materials;
 		this.knowledgeNode = knowledgeNode;
-		this.basicTemplateInfo = basicTemplateInfo;
 	}
 
 	/**
@@ -60,18 +52,20 @@ public class TransferAssembler {
 		}
 		// filter for matching materials
 		var definitions =
-				materials.stream().filter(it -> it.material().getTemplateInfo().getTemplateType()
-												  .equals(TemplateType.DEFINITION)).toList();
+				materials.stream().filter(it -> it.material().getTemplateType()
+												  .equals(de.olivergeisel.materialgenerator.generation.templates.TemplateType.DEFINITION))
+						 .toList();
 		var examples = materials.stream().filter(it -> it.material().getType().equals(MaterialType.EXAMPLE)).toList();
 		//var proofs =
 		//		materials.stream().filter(it -> it.material().getTemplateInfo().getTemplateType().equals()).toList();
 		var lists =
 				materials.stream()
-						 .filter(it -> it.material().getTemplateInfo().getTemplateType().equals(TemplateType.LIST))
+						 .filter(it -> it.material().getTemplateType().equals(
+								 de.olivergeisel.materialgenerator.generation.templates.TemplateType.LIST))
 						 .toList();
 		var material = new SummaryMaterial(term);
 		var mapping = new MaterialMappingEntry(material);
-		material.setTemplateInfo(getBasicTemplateInfo(SummaryTemplate.class));
+		material.setTemplateType(TemplateType.SUMMARY);
 		definitions.forEach(it -> {
 			material.append(it.material());
 			mapping.addAll(it.mapping().getRelatedElements());
@@ -103,14 +97,7 @@ public class TransferAssembler {
 		return back;
 	}
 
-	protected <T extends TemplateInfo> T getBasicTemplateInfo(Class<T> templateInfoClass) throws
-			NoTemplateInfoException {
-		return (T) basicTemplateInfo.stream()
-									.filter(it -> templateInfoClass.equals(it.getClass()))
-									.findFirst().orElseThrow(() -> new NoTemplateInfoException(
-						String.format("No Template %s found", templateInfoClass.getName())));
-	}
-
+//region setter/getter
 	/**
 	 * Get the id of the {@link KnowledgeObject} that all materials are related to.
 	 *
@@ -119,7 +106,6 @@ public class TransferAssembler {
 	private String getKnowledgeObjectName() {
 		return knowledgeNode.getStructurePoint().getId();
 	}
-//region setter/getter
 //endregion
 
 }

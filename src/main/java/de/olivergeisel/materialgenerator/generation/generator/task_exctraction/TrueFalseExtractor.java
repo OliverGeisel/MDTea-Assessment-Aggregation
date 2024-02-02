@@ -6,7 +6,7 @@ import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
 import de.olivergeisel.materialgenerator.generation.material.MaterialMappingEntry;
 import de.olivergeisel.materialgenerator.generation.material.assessment.TrueFalseQuestion;
-import de.olivergeisel.materialgenerator.generation.templates.template_infos.TemplateInfo;
+import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -28,7 +28,7 @@ public class TrueFalseExtractor extends Extractor<TrueFalseQuestion> {
 
 	@Override
 	public List<MaterialAndMapping<TrueFalseQuestion>> extract(KnowledgeNode knowledgeNode,
-			final TemplateInfo templateInfo) {
+			final TemplateType templateType) {
 		var mainElement = knowledgeNode.getMainElement();
 		knowledgeNode.getMasterKeyWord();
 		var back = new LinkedList<MaterialAndMapping<TrueFalseQuestion>>();
@@ -46,7 +46,7 @@ public class TrueFalseExtractor extends Extractor<TrueFalseQuestion> {
 			final var statement = STR."Ein(e) \{newStatementParts.subject} ist \{newStatementParts.predicate}.";
 			var reason = createReason(knowledgeNode, RelationType.IS, trueStatement, newStatementParts,
 					new StatementParts(correctSubject.getContent(), correctPredicate.getContent()));
-			var question = new TrueFalseQuestion(statement, trueStatement, reason, templateInfo);
+			var question = new TrueFalseQuestion(statement, trueStatement, reason, templateType);
 			var mappingEntry = new MaterialMappingEntry(question, correctSubject, correctPredicate);
 			var mapping = new MaterialAndMapping<>(question, mappingEntry);
 			back.add(mapping);

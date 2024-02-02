@@ -13,7 +13,7 @@ import de.olivergeisel.materialgenerator.generation.material.MaterialCreator;
 import de.olivergeisel.materialgenerator.generation.material.MaterialMappingEntry;
 import de.olivergeisel.materialgenerator.generation.material.transfer.*;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateSet;
-import de.olivergeisel.materialgenerator.generation.templates.template_infos.*;
+import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 import org.slf4j.Logger;
 
 import java.util.*;
@@ -51,9 +51,8 @@ public class TransferGenerator extends AbstractGenerator {
 		super(templateSet, model, plan);
 	}
 
-	private static MaterialAndMapping createAcronymInternal(List<String> acronyms, AcronymTemplate templateInfo,
-			KnowledgeElement mainTerm) {
-		Material material = new AcronymMaterial(acronyms, false, templateInfo, mainTerm);
+	private static MaterialAndMapping createAcronymInternal(List<String> acronyms, KnowledgeElement mainTerm) {
+		Material material = new AcronymMaterial(acronyms, false, TemplateType.ACRONYM, mainTerm);
 		String name = STR."Akronyme für \{mainTerm.getContent()}";
 		material.setName(name);
 		MaterialMappingEntry mapping = new MaterialMappingEntry(material);
@@ -177,8 +176,8 @@ public class TransferGenerator extends AbstractGenerator {
 	protected List<MaterialAndMapping> materialForTranslate(Set<KnowledgeNode> knowledge) {
 		// materials.add(createWikisWithExistingMaterial(knowledge, materials));
 		var firstLookMaterials = materialForKnow(knowledge);
-		var summary = new TransferAssembler(firstLookMaterials, knowledge.stream().findFirst().orElseThrow(),
-				basicTemplateInfo).createSummary();
+		var summary =
+				new TransferAssembler(firstLookMaterials, knowledge.stream().findFirst().orElseThrow()).createSummary();
 		firstLookMaterials.addAll(summary);
 		return firstLookMaterials;
 	}
@@ -227,7 +226,7 @@ public class TransferGenerator extends AbstractGenerator {
 		if (knowledge.isEmpty()) {
 			throw new IllegalArgumentException("Knowledge is empty");
 		}
-		final var templateInfo = getBasicTemplateInfo(DefinitionTemplate.class);
+		final var templateInfo = TemplateType.DEFINITION;
 		var firstNode = knowledge.stream().findFirst().orElseThrow();
 		var mainKnowledge = getMainKnowledge(knowledge, firstNode);
 		List<MaterialAndMapping> back = new LinkedList<>();
@@ -278,7 +277,7 @@ public class TransferGenerator extends AbstractGenerator {
 	 */
 	private List<MaterialAndMapping> createLists(Set<KnowledgeNode> knowledge) throws NoTemplateInfoException,
 			NoSuchElementException {
-		final ListTemplate templateInfo = getBasicTemplateInfo(ListTemplate.class);
+		final TemplateType templateInfo = TemplateType.LIST;
 		var mainKnowledge = getMainKnowledge(knowledge);
 		var mainTerm = mainKnowledge.getMainElement();
 		var back = new ArrayList<MaterialAndMapping>();
@@ -306,7 +305,7 @@ public class TransferGenerator extends AbstractGenerator {
 	 */
 	private List<MaterialAndMapping> createSynonyms(Set<KnowledgeNode> knowledge) throws NoTemplateInfoException,
 			NoSuchElementException {
-		var templateInfo = getBasicTemplateInfo(SynonymTemplate.class);
+		var templateInfo = TemplateType.SYNONYM;
 		var back = new LinkedList<MaterialAndMapping>();
 		var masterKeyword = knowledge.stream().findFirst().orElseThrow().getMasterKeyWord().orElseThrow();
 		var mainKnowledge = getMainKnowledge(knowledge, masterKeyword);
@@ -347,7 +346,7 @@ public class TransferGenerator extends AbstractGenerator {
 	 */
 	private List<MaterialAndMapping> createAcronyms(Set<KnowledgeNode> knowledge) throws NoTemplateInfoException,
 			NoSuchElementException {
-		var templateInfo = getBasicTemplateInfo(AcronymTemplate.class);
+		var templateInfo = TemplateType.ACRONYM;
 		var back = new LinkedList<MaterialAndMapping>();
 		var first = knowledge.stream().findFirst().orElseThrow();
 		var mainKnowledge = getMainKnowledge(knowledge, first);
@@ -361,9 +360,8 @@ public class TransferGenerator extends AbstractGenerator {
 			acronyms.get(longFormElement).add(acronymElement);
 		}
 		for (var accEntry : acronyms.entrySet()) {
-			var res = createAcronymInternal(accEntry.getValue().stream().map(KnowledgeElement::getContent).toList(),
-					templateInfo,
-					accEntry.getKey());
+			var terms = accEntry.getValue().stream().map(KnowledgeElement::getContent).toList();
+			var res = createAcronymInternal(terms, accEntry.getKey());
 			res.mapping().addAll(accEntry.getValue().toArray(new KnowledgeElement[0]));
 			res.material().setStructureId(mainTerm.getStructureId());
 			back.add(new MaterialAndMapping(res.material(), res.mapping()));
@@ -373,7 +371,7 @@ public class TransferGenerator extends AbstractGenerator {
 
 	private List<MaterialAndMapping> createImages(Set<KnowledgeNode> knowledge) throws NoTemplateInfoException,
 			NoSuchElementException {
-		var templateInfo = getBasicTemplateInfo(ImageTemplate.class);
+		var templateInfo = TemplateType.IMAGE;
 		if (knowledge.isEmpty()) {
 			throw new IllegalArgumentException("Knowledge is empty!");
 		}
@@ -422,7 +420,7 @@ public class TransferGenerator extends AbstractGenerator {
 	 */
 	private List<MaterialAndMapping> createTexts(Set<KnowledgeNode> knowledge) throws NoTemplateInfoException,
 			NoSuchElementException, IllegalArgumentException {
-		var templateInfo = getBasicTemplateInfo(TextTemplate.class);
+		var templateInfo = TemplateType.TEXT;
 		if (knowledge.isEmpty()) {
 			throw new IllegalArgumentException("Knowledge is empty!");
 		}
@@ -444,10 +442,10 @@ public class TransferGenerator extends AbstractGenerator {
 			}
 			try {
 				Text textElement = (Text) text;
-				Material textMaterial = new TextMaterial(textElement, templateInfo);
+				Material textMaterial = new TextMaterial(textElement);
 				textMaterial.setName(textElement.getHeadline());
 				textMaterial.setTerm(term.getContent());
-				textMaterial.setTemplateInfo(templateInfo);
+				textMaterial.setTemplateType(templateInfo);
 				textMaterial.setValues(Map.of("term", term.getContent(), "content", textElement.getContent()));
 				textMaterial.setStructureId(mainTerm.getStructureId());
 				MaterialMappingEntry mapping = new MaterialMappingEntry(textMaterial);
@@ -466,11 +464,11 @@ public class TransferGenerator extends AbstractGenerator {
 	 * @param knowledge The KnowledgeNode to create the Material for
 	 * @return A List of Materials with Code
 	 * @throws NoSuchElementException  If no Code is found
-	 * @throws NoTemplateInfoException If no TemplateInfo for code is found
+	 * @throws NoTemplateInfoException If no AbstractTemplateCategory for code is found
 	 */
 	private List<MaterialAndMapping> createCode(Set<KnowledgeNode> knowledge)
 			throws NoTemplateInfoException, NoSuchElementException {
-		var templateInfo = getBasicTemplateInfo(CodeTemplate.class);
+		var templateInfo = TemplateType.CODE;
 		List<MaterialAndMapping> back = new LinkedList<>();
 		var codeKnowledgeNodes = knowledge.stream()
 										  .filter(it -> it.getMainElement().hasType(KnowledgeType.CODE))
@@ -481,7 +479,7 @@ public class TransferGenerator extends AbstractGenerator {
 		for (var codeElement : codeKnowledgeNodes) {
 			Material codeMaterial = new CodeMaterial(codeElement.getLanguage(), codeElement.getCodeLines(),
 					codeElement.getCaption(), codeElement);
-			codeMaterial.setTemplateInfo(templateInfo);
+			codeMaterial.setTemplateType(templateInfo);
 			MaterialMappingEntry mapping = new MaterialMappingEntry(codeMaterial);
 			mapping.add(codeElement);
 			back.add(new MaterialAndMapping(codeMaterial, mapping));
@@ -491,7 +489,7 @@ public class TransferGenerator extends AbstractGenerator {
 
 	private List<MaterialAndMapping> createExamples(Set<KnowledgeNode> knowledge)
 			throws IllegalArgumentException, NoTemplateInfoException {
-		var templateInfo = getBasicTemplateInfo(ExampleTemplate.class);
+		var templateInfo = TemplateType.EXAMPLE;
 		if (knowledge.isEmpty()) {
 			throw new IllegalArgumentException("knowledge is empty!");
 		}
@@ -514,7 +512,7 @@ public class TransferGenerator extends AbstractGenerator {
 
 	private List<MaterialAndMapping> createProofs(Set<KnowledgeNode> knowledge) {
 		// todo improve proof material
-		var templateInfo = getBasicTemplateInfo(ProofTemplate.class);
+		var templateInfo = TemplateType.PROOF;
 		var mainKnowledge = knowledge.stream()
 									 .filter(it -> it.getMainElement().getType().equals(KnowledgeType.TERM))
 									 .findFirst().orElseThrow();

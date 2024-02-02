@@ -1,9 +1,8 @@
 package de.olivergeisel.materialgenerator.generation.material.assessment;
 
 import de.olivergeisel.materialgenerator.generation.configuration.TaskConfiguration;
-import de.olivergeisel.materialgenerator.generation.configuration.TestConfiguration;
 import de.olivergeisel.materialgenerator.generation.configuration.TrueFalseConfiguration;
-import de.olivergeisel.materialgenerator.generation.templates.template_infos.TemplateInfo;
+import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 import jakarta.persistence.Entity;
 
 @Entity
@@ -30,8 +29,9 @@ public class TrueFalseQuestion extends TaskMaterial {
 	 * @param reason        The reason why the statement is correct or wrong. Can be empty. (Never null)
 	 * @throws IllegalArgumentException If the statement is null or blank.
 	 */
-	public TrueFalseQuestion(String statement, boolean trueStatement, String reason, TemplateInfo templateInfo) throws IllegalArgumentException {
-		super(DEFAULT_CONFIGURATION, "", templateInfo);
+	public TrueFalseQuestion(String statement, boolean trueStatement, String reason, TemplateType templateType)
+			throws IllegalArgumentException {
+		super(DEFAULT_CONFIGURATION, "", templateType);
 		if (statement == null || statement.isBlank())
 			throw new IllegalArgumentException("The statement must not be null or blank.");
 		this.statement = statement;
@@ -46,8 +46,9 @@ public class TrueFalseQuestion extends TaskMaterial {
 	 * @param reason    The reason why the statement is correct. Can be empty. (Never null)
 	 * @throws IllegalArgumentException If the statement is null or blank.
 	 */
-	public TrueFalseQuestion(String statement, String reason, TemplateInfo templateInfo) throws IllegalArgumentException {
-		this(statement, true, reason, templateInfo);
+	public TrueFalseQuestion(String statement, String reason, TemplateType templateType)
+			throws IllegalArgumentException {
+		this(statement, true, reason, templateType);
 	}
 
 	public TrueFalseQuestion(String statement, boolean trueStatement, String reason, TaskConfiguration configuration) throws IllegalArgumentException {

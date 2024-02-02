@@ -14,9 +14,6 @@ import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
 import de.olivergeisel.materialgenerator.generation.material.MaterialRepository;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateSet;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateSetRepository;
-import de.olivergeisel.materialgenerator.generation.templates.template_infos.BasicTemplateRepository;
-import de.olivergeisel.materialgenerator.generation.templates.template_infos.TemplateInfoRepository;
-import de.olivergeisel.materialgenerator.generation.templates.template_infos.assessment.TaskTemplateRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import static de.olivergeisel.materialgenerator.generation.TemplateService.PLAIN;
+import static de.olivergeisel.materialgenerator.generation.TemplateSetService.PLAIN;
 
 @Service
 @Transactional
@@ -35,22 +32,15 @@ public class GeneratorService {
 	private final TemplateSetRepository   templateSetRepository;
 	private final MaterialRepository      materialRepository;
 	private final MappingRepository       mappingRepository;
-	private final TemplateInfoRepository  templateInfoRepository;
-	private final BasicTemplateRepository basicTemplateRepository;
-	private final TaskTemplateRepository  taskTemplateRepository;
 
 	public GeneratorService(KnowledgeManagement knowledgeManagement, FinalizationService finalizationService,
 			TemplateSetRepository templateSetRepository, MaterialRepository materialRepository,
-			MappingRepository mappingRepository, TemplateInfoRepository templateInfoRepository,
-			BasicTemplateRepository basicTemplateRepository, TaskTemplateRepository taskTemplateRepository) {
+			MappingRepository mappingRepository) {
 		this.knowledgeManagement = knowledgeManagement;
 		this.finalizationService = finalizationService;
 		this.templateSetRepository = templateSetRepository;
 		this.materialRepository = materialRepository;
 		this.mappingRepository = mappingRepository;
-		this.templateInfoRepository = templateInfoRepository;
-		this.basicTemplateRepository = basicTemplateRepository;
-		this.taskTemplateRepository = taskTemplateRepository;
 	}
 
 	public Set<KnowledgeElement> getMaterials(String term) {
@@ -78,14 +68,11 @@ public class GeneratorService {
 	private List<MaterialAndMapping> createAssessmentMaterials(CoursePlan coursePlan, TemplateSet templateSet) {
 		var input = new GeneratorInput(templateSet, knowledgeManagement.getKnowledge(), coursePlan);
 		var generator = new AssessmentGenerator(input);
-		generator.setBasicTemplateInfo(basicTemplateRepository.findAll().toSet());
-		generator.setAssessmentTemplateInfo(taskTemplateRepository.findAll().toSet());
 		return runGeneration(generator);
 	}
 
 	private LinkedList<MaterialAndMapping> createTransferMaterials(CoursePlan coursePlan, TemplateSet templateSet) {
 		TransferGenerator generator = new TransferGenerator();
-		generator.setBasicTemplateInfo(basicTemplateRepository.findAll().toSet());
 		generator.input(templateSet, knowledgeManagement.getKnowledge(), coursePlan);
 		return runGeneration(generator);
 	}
@@ -96,15 +83,14 @@ public class GeneratorService {
 		}
 		generator.update();
 		var output = generator.output();
-		var tempmaterials = output.getMaterialAndMapping();
+		var tempMaterials = output.getMaterialAndMapping();
 		var materials = new LinkedList<MaterialAndMapping>();
-		for (var toAdd : tempmaterials) { // Add only if not already in list (prevent duplicates - check by content)
+		for (var toAdd : tempMaterials) { // Add only if not already in list (prevent duplicates - check by content)
 			if (materials.stream().noneMatch(it -> it.material().isIdentical(toAdd.material()))) {
 				materials.add(toAdd);
 			}
 		}
 		// Save all materials and mappings and templateInfos
-		templateInfoRepository.saveAll(materials.stream().map(it -> it.material().getTemplateInfo()).toList());
 		materialRepository.saveAll(materials.stream().map(MaterialAndMapping::material).toList());
 		mappingRepository.saveAll(materials.stream().map(MaterialAndMapping::mapping).toList());
 		return materials;

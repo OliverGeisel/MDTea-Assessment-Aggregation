@@ -2,6 +2,7 @@ package de.olivergeisel.materialgenerator.generation.material.transfer;
 
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.MaterialType;
+import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 import jakarta.persistence.Entity;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class ExampleMaterial extends Material {
 	}
 
 	public ExampleMaterial(String term, String termId, String structureId, String imageName) {
-		super(MaterialType.EXAMPLE, term, termId, structureId);
+		super(MaterialType.EXAMPLE, TemplateType.EXAMPLE, term, termId, structureId);
 		if (imageName == null || imageName.isBlank()) {
 			throw new IllegalArgumentException("imageName must not be null or blank");
 		}
@@ -28,7 +29,7 @@ public class ExampleMaterial extends Material {
 	}
 
 	public ExampleMaterial(String term, String termId, String structureId) {
-		super(MaterialType.EXAMPLE, term, termId, structureId);
+		super(MaterialType.EXAMPLE, TemplateType.EXAMPLE, term, termId, structureId);
 		this.imageExample = false;
 		imageName = "NO_IMAGE";
 	}

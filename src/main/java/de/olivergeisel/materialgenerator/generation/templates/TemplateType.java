@@ -1,9 +1,20 @@
 package de.olivergeisel.materialgenerator.generation.templates;
 
+import de.olivergeisel.materialgenerator.generation.material.Material;
 import jakarta.persistence.Embeddable;
 
+/**
+ * This class represents the type of template. It is used to distinguish between different types of templates.
+ * The type is used to determine which template should be used to generate the final document.
+ *
+ * @author Oliver Geisel
+ * @version 1.1.0
+ * @see Material
+ * @since 1.1.0
+ */
 @Embeddable
 public class TemplateType {
+
 	public static final TemplateType DEFINITION = new TemplateType("DEFINITION");
 	public static final TemplateType EXERCISE   = new TemplateType("EXERCISE");
 	public static final TemplateType SOLUTION   = new TemplateType("SOLUTION");
@@ -20,15 +31,33 @@ public class TemplateType {
 
 	private String type;
 
+	/**
+	 * Constructor. The type will be set to the given String.
+	 *
+	 * @param type The type to set.
+	 */
 	public TemplateType(String type) {
 		this.type = type;
 	}
 
+	/**
+	 * Default constructor. TemplateType will be set to "TEXT".
+	 */
 	public TemplateType() {
 		this("TEXT");
 	}
 
-	public static TemplateType valueOf(String typeString) {
+	/**
+	 * Find the TemplateType for the given String. Will return a new TemplateType if no match is found.
+	 *
+	 * @param typeString The String to find the TemplateType for.
+	 * @return The TemplateType for the given String.
+	 * @throws IllegalArgumentException If the given String is null or blank.
+	 */
+	public static TemplateType valueOf(String typeString) throws IllegalArgumentException {
+		if (typeString == null || typeString.isBlank()) {
+			throw new IllegalArgumentException("The typeString must not be null or blank.");
+		}
 		return switch (typeString) {
 			case "DEFINITION" -> DEFINITION;
 			case "EXERCISE" -> EXERCISE;
@@ -70,6 +99,6 @@ public class TemplateType {
 
 	@Override
 	public String toString() {
-		return "TemplateType{" + "type='" + type + '\'' + '}';
+		return STR."TemplateType{type='\{type}\{'\''}\{'}'}";
 	}
 }

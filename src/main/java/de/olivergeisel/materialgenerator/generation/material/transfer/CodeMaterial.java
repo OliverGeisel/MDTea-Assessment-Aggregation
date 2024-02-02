@@ -3,6 +3,7 @@ package de.olivergeisel.materialgenerator.generation.material.transfer;
 import de.olivergeisel.materialgenerator.core.knowledge.metamodel.element.KnowledgeElement;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.MaterialType;
+import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -39,7 +40,7 @@ public class CodeMaterial extends Material {
 	 */
 	public CodeMaterial(String language, String code, String title, KnowledgeElement element)
 			throws IllegalArgumentException, NullPointerException {
-		super(MaterialType.WIKI, title, element.getId(), element.getStructureId());
+		super(MaterialType.WIKI, TemplateType.CODE, title, element.getId(), element.getStructureId());
 		if (language == null) {
 			throw new IllegalArgumentException("language must not be null!");
 		}

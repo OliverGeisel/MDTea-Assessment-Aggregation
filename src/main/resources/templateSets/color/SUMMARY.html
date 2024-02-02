@@ -6,7 +6,7 @@
     <th:block th:fragment="head">
         <link rel="stylesheet" th:href="${rootPath}+'/css/bootstrap.min.css'">
     </th:block>
-    <title th:text="'Übersicht für '+${material.topic} "></title>
+    <title th:text="'Übersicht für '+${material.name} "></title>
 </head>
 <body>
 <main>
@@ -14,22 +14,22 @@
         <header>
             <h1 class="text-center text-light" style="color: var(--bs-red); ">
                 Zusammenfassung für
-                <th:block th:text="${material.topic}"></th:block>
+                <th:block th:text="${material.name}"></th:block>
             </h1>
         </header>
         <hr>
         <!--/*@thymesVar id="material" type="de.olivergeisel.materialgenerator.generation.material.transfer.SummaryMaterial" */-->
         <section th:each="material:${material.definitions}">
             Definition:
-            <div th:replace="~{${material.templateInfo.templateType.type} :: content}"></div>
+            <div th:replace="~{${material.templateType.type} :: content}"></div>
         </section>
         <section th:each="material:${material.lists}">
             Listen:
-            <div th:replace="~{${material.templateInfo.templateType.type} :: content}"></div>
+            <div th:replace="~{${material.templateType.type} :: content}"></div>
         </section>
         <section th:each="material:${material.examples}">
             Beispiele:
-            <div th:replace="~{${material.templateInfo.templateType.type} :: content}"></div>
+            <div th:replace="~{${material.templateType.type} :: content}"></div>
         </section>
     </div>
 </main>

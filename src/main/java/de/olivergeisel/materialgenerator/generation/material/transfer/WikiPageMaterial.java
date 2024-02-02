@@ -3,6 +3,7 @@ package de.olivergeisel.materialgenerator.generation.material.transfer;
 import de.olivergeisel.materialgenerator.generation.material.ComplexMaterial;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.MaterialType;
+import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
@@ -24,10 +25,10 @@ public class WikiPageMaterial extends ComplexMaterial {
 	private Material       example;
 
 	public WikiPageMaterial(List<Material> parts) {
-		super(MaterialType.WIKI, parts);
+		super(MaterialType.WIKI, new TemplateType("WIKI"), parts);
 	}
 
 	protected WikiPageMaterial() {
-		super(MaterialType.WIKI);
+		super(MaterialType.WIKI, new TemplateType("WIKI"));
 	}
 }

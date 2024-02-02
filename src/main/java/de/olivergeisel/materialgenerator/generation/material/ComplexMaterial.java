@@ -1,5 +1,7 @@
 package de.olivergeisel.materialgenerator.generation.material;
 
+import de.olivergeisel.materialgenerator.core.knowledge.metamodel.element.Term;
+import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
@@ -31,12 +33,16 @@ public abstract class ComplexMaterial extends Material {
 		this.parts.addAll(parts);
 	}
 
-	protected ComplexMaterial(MaterialType type) {
-		super(type);
+	protected ComplexMaterial(MaterialType type, TemplateType templateType, Term term) {
+		super(type, templateType, term.getContent(), term.getId(), term.getStructureId());
 	}
 
-	protected ComplexMaterial(MaterialType type, List<Material> parts) {
-		super(type);
+	protected ComplexMaterial(MaterialType type, TemplateType templateType) {
+		super(type, templateType);
+	}
+
+	protected ComplexMaterial(MaterialType type, TemplateType templateType, List<Material> parts) {
+		super(type, templateType);
 		this.parts.addAll(parts);
 	}
 

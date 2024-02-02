@@ -26,20 +26,16 @@ import java.util.List;
 @Entity
 public class SummaryMaterial extends ComplexMaterial {
 
-	private String topic;
-
 	protected SummaryMaterial() {
-		super(MaterialType.WIKI);
+		super();
 	}
 
-
 	public SummaryMaterial(Term topic) {
-		super(MaterialType.WIKI);
-		this.topic = topic.getContent();
+		super(MaterialType.WIKI, TemplateType.SUMMARY, topic);
 	}
 
 	public boolean addDefinition(Material material) {
-		if (!material.getTemplateInfo().getTemplateType().equals(TemplateType.DEFINITION)) {
+		if (!material.getTemplateType().equals(TemplateType.DEFINITION)) {
 			return false;
 		}
 		return append(material);
@@ -58,7 +54,7 @@ public class SummaryMaterial extends ComplexMaterial {
 	}
 
 	public boolean removeDefinition(Material material) {
-		if (!material.getTemplateInfo().getTemplateType().equals(TemplateType.DEFINITION)) {
+		if (!material.getTemplateType().equals(TemplateType.DEFINITION)) {
 			return false;
 		}
 		return remove(material);
@@ -78,16 +74,8 @@ public class SummaryMaterial extends ComplexMaterial {
 
 	//region setter/getter
 	public List<Material> getDefinitions() {
-		return getParts().stream().filter(it -> it.getTemplateInfo().getTemplateType().equals(TemplateType.DEFINITION))
+		return getParts().stream().filter(it -> it.getTemplateType().equals(TemplateType.DEFINITION))
 						 .toList();
-	}
-
-	public String getTopic() {
-		return topic;
-	}
-
-	public void setTopic(String topic) {
-		this.topic = topic;
 	}
 
 	public List<ExampleMaterial> getExamples() {
@@ -96,12 +84,12 @@ public class SummaryMaterial extends ComplexMaterial {
 	}
 
 	public List<ListMaterial> getLists() {
-		return getParts().stream().filter(it -> it.getTemplateInfo().getTemplateType().equals(TemplateType.LIST))
+		return getParts().stream().filter(it -> it.getTemplateType().equals(TemplateType.LIST))
 						 .map(it -> (ListMaterial) it).toList();
 	}
 
 	public List<TextMaterial> getTexts() {
-		return getParts().stream().filter(it -> it.getTemplateInfo().getTemplateType().equals(TemplateType.TEXT))
+		return getParts().stream().filter(it -> it.getTemplateType().equals(TemplateType.TEXT))
 						 .map(it -> (TextMaterial) it).toList();
 	}
 //endregion

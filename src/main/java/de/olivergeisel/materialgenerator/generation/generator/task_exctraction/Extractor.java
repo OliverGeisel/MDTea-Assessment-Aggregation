@@ -5,7 +5,7 @@ import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
 import de.olivergeisel.materialgenerator.generation.material.assessment.TaskMaterial;
-import de.olivergeisel.materialgenerator.generation.templates.template_infos.TemplateInfo;
+import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 
 import java.util.List;
 
@@ -23,5 +23,5 @@ import java.util.List;
  */
 public abstract class Extractor<T extends Material> {
 
-	public abstract List<MaterialAndMapping<T>> extract(KnowledgeNode knowledgeNode, TemplateInfo templateInfo);
+	public abstract List<MaterialAndMapping<T>> extract(KnowledgeNode knowledgeNode, TemplateType templateType);
 }

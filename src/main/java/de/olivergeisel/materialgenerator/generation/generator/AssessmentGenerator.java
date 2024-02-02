@@ -8,8 +8,7 @@ import de.olivergeisel.materialgenerator.generation.generator.task_exctraction.T
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateSet;
-import de.olivergeisel.materialgenerator.generation.templates.template_infos.assessment.AssessmentTemplate;
-import de.olivergeisel.materialgenerator.generation.templates.template_infos.assessment.TrueFalseTemplate;
+import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 import org.slf4j.Logger;
 
 import java.util.*;
@@ -46,7 +45,7 @@ public class AssessmentGenerator extends AbstractGenerator {
 	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AssessmentGenerator.class);
 
 
-	private final Set<AssessmentTemplate> taskInfos = new HashSet<>();
+	private final Set<TemplateType> taskInfos = new HashSet<>();
 
 	public AssessmentGenerator() {
 		super();
@@ -63,7 +62,7 @@ public class AssessmentGenerator extends AbstractGenerator {
 	 * @return the templateInfo
 	 * @throws NoTemplateInfoException if no templateInfo is found
 	 */
-	private <T extends AssessmentTemplate> T getTaskTemplateInfo(Class<T> templateInfoClass) throws
+	private <T extends TemplateType> T getTaskTemplateInfo(Class<T> templateInfoClass) throws
 			NoTemplateInfoException {
 		return (T) taskInfos.stream()
 							.filter(it -> templateInfoClass.equals(it.getClass()))
@@ -182,7 +181,7 @@ public class AssessmentGenerator extends AbstractGenerator {
 	public List<MaterialAndMapping> createTrueFalse(Set<KnowledgeNode> knowledge) {
 		var materials = new LinkedList<MaterialAndMapping>();
 		var extractor = new TrueFalseExtractor();
-		final var templateInfo = getTaskTemplateInfo(TrueFalseTemplate.class);
+		final var templateInfo = TemplateType.TASK;
 		// todo get Tasks, that are stored in knowledge (added while aggregation)
 		for (var node : knowledge) {
 			var questions = extractor.extract(node, templateInfo);
@@ -216,14 +215,6 @@ public class AssessmentGenerator extends AbstractGenerator {
 		// Todo implement
 		return materials;
 	}
-
-	//region setter/getter
-	public void setAssessmentTemplateInfo(Set<AssessmentTemplate> assessmentTemplateInfo) {
-		this.taskInfos.clear();
-		this.taskInfos.addAll(assessmentTemplateInfo);
-		changed();
-	}
-//endregion
 
 
 }
