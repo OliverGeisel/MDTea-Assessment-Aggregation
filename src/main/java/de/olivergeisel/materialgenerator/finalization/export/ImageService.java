@@ -1,4 +1,4 @@
-package de.olivergeisel.materialgenerator.finalization;
+package de.olivergeisel.materialgenerator.finalization.export;
 
 import de.olivergeisel.materialgenerator.StorageException;
 import de.olivergeisel.materialgenerator.StorageFileNotFoundException;
@@ -18,6 +18,20 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.stream.Stream;
 
+
+/**
+ * Service for storing and retrieving images.
+ * <p>
+ * The images are stored in the directory specified by the property {@code application.images}.
+ * </p>
+ *
+ * @author Oliver Geisel
+ * @version 1.1.0
+ * @see StorageService
+ * @see StorageException
+ * @see StorageFileNotFoundException
+ * @since 0.2.0
+ */
 @Service
 public class ImageService implements StorageService {
 
@@ -42,25 +56,25 @@ public class ImageService implements StorageService {
 	}
 
 	/**
+	 * Store an image.
+	 *
 	 * @param file Image to store
+	 * @throws StorageException if the image could not be stored. This could be due to an empty file or a file that could not be written.
 	 */
 	@Override
-	public void store(MultipartFile file) {
+	public void store(MultipartFile file) throws StorageException {
 		try {
 			if (file.isEmpty()) {
 				throw new StorageException("Failed to store empty file.");
 			}
-			Path destinationFile = getRootLocation().resolve(
-															Paths.get(file.getOriginalFilename()))
-													.normalize().toAbsolutePath();
+			Path destinationFile = getRootLocation()
+					.resolve(Paths.get(file.getOriginalFilename())).normalize().toAbsolutePath();
 			if (!destinationFile.getParent().equals(getRootLocation().toAbsolutePath())) {
 				// This is a security check
-				throw new StorageException(
-						"Cannot store file outside current directory.");
+				throw new StorageException("Cannot store file outside current directory.");
 			}
 			try (InputStream inputStream = file.getInputStream()) {
-				Files.copy(inputStream, destinationFile,
-						StandardCopyOption.REPLACE_EXISTING);
+				Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
 			}
 		} catch (IOException e) {
 			throw new StorageException("Failed to store file.", e);
@@ -68,10 +82,13 @@ public class ImageService implements StorageService {
 	}
 
 	/**
-	 * @return
+	 * Load all images.
+	 *
+	 * @return a Stream of all images
+	 * @throws StorageException if the images could not be read
 	 */
 	@Override
-	public Stream<Path> loadAll() {
+	public Stream<Path> loadAll() throws StorageException {
 		try (var files = Files.walk(getRootLocation(), 1)) {
 			return files
 					.filter(path -> !path.equals(getRootLocation()))
@@ -82,8 +99,10 @@ public class ImageService implements StorageService {
 	}
 
 	/**
-	 * @param filename
-	 * @return
+	 * Get the path to an image.
+	 *
+	 * @param filename Name of Image you want
+	 * @return Path to the Image
 	 */
 	@Override
 	public Path load(String filename) {
@@ -113,6 +132,9 @@ public class ImageService implements StorageService {
 	}
 
 	/**
+	 * Delete all images.
+	 * <p>
+	 *     This method is not implemented.
 	 *
 	 */
 	@Override
@@ -121,6 +143,12 @@ public class ImageService implements StorageService {
 	}
 
 	//region setter/getter
+
+	/**
+	 * Get the root location of the image storage.
+	 *
+	 * @return the root location
+	 */
 	public Path getRootLocation() {
 		return Paths.get(rootLocation);
 	}

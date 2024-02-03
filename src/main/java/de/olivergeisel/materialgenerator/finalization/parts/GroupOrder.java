@@ -5,7 +5,6 @@ import de.olivergeisel.materialgenerator.core.courseplan.structure.Relevance;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.StructureElementPart;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.StructureGroup;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.StructureTask;
-import de.olivergeisel.materialgenerator.finalization.Goal;
 import de.olivergeisel.materialgenerator.finalization.material_assign.MaterialAssigner;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import jakarta.persistence.CascadeType;

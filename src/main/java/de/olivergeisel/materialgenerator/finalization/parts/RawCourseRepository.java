@@ -1,6 +1,5 @@
-package de.olivergeisel.materialgenerator.finalization;
+package de.olivergeisel.materialgenerator.finalization.parts;
 
-import de.olivergeisel.materialgenerator.finalization.parts.RawCourse;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.UUID;

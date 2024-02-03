@@ -1,4 +1,4 @@
-package de.olivergeisel.materialgenerator.finalization;
+package de.olivergeisel.materialgenerator.finalization.parts;
 
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentTarget;
 import jakarta.persistence.*;
@@ -11,13 +11,13 @@ import java.util.UUID;
  * A topic is a part of a {@link Goal}. It is the smallest unit that has to be mastered by the students.
  * <p>
  * Each topic is linked with at least one StructureElement of the Plan. In this case a chapter, group or task of
- * the {@link de.olivergeisel.materialgenerator.finalization.parts.RawCourse}. Or more specific a {@link de.olivergeisel.materialgenerator.finalization.parts.MaterialOrderCollection}
+ * the {@link RawCourse}. Or more specific a {@link MaterialOrderCollection}
  *
  * @author Oliver Geisel
  * @version 1.1.0
  * @see Goal
- * @see de.olivergeisel.materialgenerator.finalization.parts.MaterialOrderCollection
- * @see de.olivergeisel.materialgenerator.finalization.parts.RawCourse
+ * @see MaterialOrderCollection
+ * @see RawCourse
  * @since 0.2.0
  */
 

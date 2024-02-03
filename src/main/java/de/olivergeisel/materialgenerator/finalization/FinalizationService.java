@@ -3,6 +3,7 @@ package de.olivergeisel.materialgenerator.finalization;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentGoal;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.Relevance;
+import de.olivergeisel.materialgenerator.finalization.export.DownloadManager;
 import de.olivergeisel.materialgenerator.finalization.parts.*;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
@@ -106,7 +107,7 @@ public class FinalizationService {
 				var task = order.findTask(parentTaskId);
 				task.moveUp(material);
 			}
-			default -> throw new IllegalStateException("Unexpected value: " + element);
+			default -> throw new IllegalStateException(STR."Unexpected value: \{element}");
 		}
 		rawCourseRepository.save(course);
 	}
@@ -130,18 +131,19 @@ public class FinalizationService {
 				var task = order.findTask(parentTaskId);
 				task.moveDown(material);
 			}
-			default -> throw new IllegalStateException("Unexpected value: " + element);
+			default -> throw new IllegalStateException(STR."Unexpected value: \{element}");
 		}
 		rawCourseRepository.save(course);
 	}
 
-	public void exportCourse(UUID id, HttpServletResponse response) {
-		generateAndDownloadTemplates(rawCourseRepository.findById(id).orElseThrow(), response);
+	public void exportCourse(UUID id, DownloadManager.ExportKind kind, HttpServletResponse response) {
+		generateAndDownloadTemplates(rawCourseRepository.findById(id).orElseThrow(), kind, response);
 	}
 
-	public void generateAndDownloadTemplates(RawCourse plan, HttpServletResponse response) {
+	public void generateAndDownloadTemplates(RawCourse plan, DownloadManager.ExportKind kind,
+			HttpServletResponse response) {
 		var zipName = plan.getMetadata().getName().orElse("course");
-		downloadManager.createDownloadZip(zipName, plan.getTemplateName(), plan, response);
+		downloadManager.createAndDownload(kind, zipName, plan, plan.getTemplateName(), response);
 	}
 
 	public void setRelevance(UUID id, UUID taskId, Relevance relevance)

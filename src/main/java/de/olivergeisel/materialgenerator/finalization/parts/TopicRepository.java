@@ -1,4 +1,4 @@
-package de.olivergeisel.materialgenerator.finalization;
+package de.olivergeisel.materialgenerator.finalization.parts;
 
 import org.springframework.data.repository.CrudRepository;
 

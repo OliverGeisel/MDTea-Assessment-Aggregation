@@ -2,6 +2,8 @@ package de.olivergeisel.materialgenerator.finalization;
 
 
 import de.olivergeisel.materialgenerator.core.courseplan.structure.Relevance;
+import de.olivergeisel.materialgenerator.finalization.export.DownloadManager;
+import de.olivergeisel.materialgenerator.finalization.parts.RawCourseRepository;
 import de.olivergeisel.materialgenerator.generation.material.MaterialRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -71,7 +73,8 @@ public class FinalizationController {
 
 	@PostMapping("edit/{id}/export")
 	public void exportCourse(@PathVariable UUID id, HttpServletResponse response) {
-		service.exportCourse(id, response);
+		// TODO enable different export formats
+		service.exportCourse(id, DownloadManager.ExportKind.HTML, response);
 	}
 
 	@PostMapping("edit/{id}/relevance")
@@ -84,8 +87,9 @@ public class FinalizationController {
 	@PostMapping({"edit/{id}",})
 	public String editCourse(@PathVariable UUID id,
 			@RequestParam(value = "chapter", required = false) UUID parentChapterId,
-			@RequestParam(value = "group", required = false) UUID parentGroupId, @RequestParam(value
-			= "task", required = false) UUID parentTaskId, @RequestParam(value = "up", required = false) UUID idUp,
+			@RequestParam(value = "group", required = false) UUID parentGroupId,
+			@RequestParam(value = "task", required = false) UUID parentTaskId,
+			@RequestParam(value = "up", required = false) UUID idUp,
 			@RequestParam(value = "down", required = false) UUID idDown, Model model) {
 		if (idUp != null) {
 			service.moveUp(id, parentChapterId, parentGroupId, parentTaskId, idUp);

@@ -1,9 +1,9 @@
 package de.olivergeisel.materialgenerator.finalization.material_assign;
 
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentGoal;
-import de.olivergeisel.materialgenerator.finalization.Goal;
-import de.olivergeisel.materialgenerator.finalization.Topic;
+import de.olivergeisel.materialgenerator.finalization.parts.Goal;
 import de.olivergeisel.materialgenerator.finalization.parts.MaterialOrderCollection;
+import de.olivergeisel.materialgenerator.finalization.parts.Topic;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 
 import java.util.LinkedList;
