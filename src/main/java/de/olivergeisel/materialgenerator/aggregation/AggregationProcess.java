@@ -1,6 +1,5 @@
 package de.olivergeisel.materialgenerator.aggregation;
 
-import de.olivergeisel.materialgenerator.aggregation.collect.SourceFragmentCollection;
 import de.olivergeisel.materialgenerator.aggregation.extraction.ElementNegotiator;
 import de.olivergeisel.materialgenerator.aggregation.extraction.GPT_Request;
 import de.olivergeisel.materialgenerator.aggregation.extraction.ModelParameters;
@@ -32,7 +31,6 @@ public class AggregationProcess {
 	private final LocalDateTime                 start           = LocalDateTime.now();
 	private       List<MultipartFile>           sources;
 	private       GPT_Request.ModelLocation     modelLocation   = GPT_Request.ModelLocation.REMOTE;
-	private       SourceFragmentCollection      sourceFragmentCollection;
 	private       String                        currentFragment;
 	private       String                        areaOfKnowledge = "";
 	private       String                        apiKey;
@@ -259,9 +257,6 @@ public class AggregationProcess {
 		return sources;
 	}
 
-	public SourceFragmentCollection getSourceFragmentCollection() {
-		return sourceFragmentCollection;
-	}
 
 	public String getCurrentFragment() {
 		return currentFragment;
