@@ -21,7 +21,21 @@ import java.util.stream.Collectors;
 
 /**
  * A model of knowledge. It contains structure, all elements, relations and sources.
+ *
+ * @deprecated use the new version of the KnowledgeModel
+ * @see KnowledgeElement
+ * @see Relation
+ * @see KnowledgeSource
+ * @see KnowledgeStructure
+ * @see KnowledgeFragment
+ * @see KnowledgeObject
+ * @see RootStructureElement
+ *
+ * @version 1.1.0
+ * @since 0.2.0
+ * @author Oliver Geisel
  */
+@Deprecated(since = "1.1.0")
 public class KnowledgeModel {
 
 	private static final Logger logger = LoggerFactory.getLogger(KnowledgeModel.class);
