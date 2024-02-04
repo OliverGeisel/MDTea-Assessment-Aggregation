@@ -48,11 +48,19 @@ public class DownloadManager {
 	 * @param templateSetName The template set to use
 	 * @param course          The course to export
 	 * @param response        The response to write the zip file to download the course directly
+	 * @param exporter        The exporter to use to create the course
+	 * @throws IllegalArgumentException if the response, course, templateSetName, or exporter is null
 	 */
 	public void createCourseInZip(String name, String templateSetName, RawCourse course, HttpServletResponse response,
-			Exporter exporter) {
+			Exporter exporter) throws IllegalArgumentException {
 		File tempDir = null;
 		File zipFile = null;
+		if (exporter == null) {
+			throw new IllegalArgumentException("Exporter is null");
+		}
+		if (course == null) {
+			throw new IllegalArgumentException("Course is null");
+		}
 		try {
 			tempDir = zipService.createTempDirectory();
 			exporter.export(course, templateSetName, tempDir);
@@ -70,6 +78,14 @@ public class DownloadManager {
 	}
 
 
+	/**
+	 * Final step to write the zip file to the (http-)response
+	 *
+	 * @param name     The name of the zip file
+	 * @param zipFile  The zip file to write
+	 * @param response The response to write the file to
+	 * @throws IOException if an error occurs while writing the file
+	 */
 	private void writeZipFileToResponse(String name, File zipFile, HttpServletResponse response) throws IOException {
 		response.setContentType("application/zip");
 		response.setHeader("Content-Disposition", String.format("attachment; filename=%s.zip", name));
@@ -113,10 +129,14 @@ public class DownloadManager {
 	 * @param templateSetName The template set to use
 	 * @param course          The course to export
 	 * @param response        The response to write the zip file to download the course directly
+	 * @throws IllegalArgumentException if the response, course, templateSetName, or kind is null
 	 * @see ExportKind
 	 */
 	public void createAndDownload(ExportKind kind, String name, RawCourse course, String templateSetName,
-			HttpServletResponse response) {
+			HttpServletResponse response) throws IllegalArgumentException {
+		if (response == null) {
+			throw new IllegalArgumentException("Response is null");
+		}
 		Exporter exporter = switch (kind) {
 			case HTML -> htmlExporter;
 			case OPAL -> opalExporter;
@@ -125,6 +145,9 @@ public class DownloadManager {
 		createCourseInZip(name, templateSetName, course, response, exporter);
 	}
 
+	/**
+	 * The supported export formats for the course. The matching exporter is used to create the zip file.
+	 */
 	public enum ExportKind {
 		PDF,
 		HTML,
