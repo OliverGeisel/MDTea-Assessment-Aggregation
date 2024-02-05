@@ -1,5 +1,6 @@
 package de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element;
 
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.GraphRelation;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.Relation;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeObject;
 import org.springframework.data.neo4j.core.schema.Id;
@@ -31,19 +32,19 @@ public abstract class KnowledgeElement {
 	/**
 	 * The id of the structure point this element belongs to.
 	 */
-	protected String        structureId;
-	@Relationship
-	private   Set<Relation> relations = new HashSet<>();
+	protected String             structureId;
+	@Relationship(direction = Relationship.Direction.OUTGOING, type = "RELATION")
+	private   Set<GraphRelation> relations = new HashSet<>();
 	/**
 	 * The id of the element in the knowledge base.
 	 */
 	@Id
-	private   String        id;
-	private   KnowledgeType type;
+	private   String             id;
+	private   KnowledgeType      type;
 	/**
 	 * The content of the element. Meaning depends on the type of the element.
 	 */
-	private   String        content;
+	private   String             content;
 
 	protected KnowledgeElement() {
 
