@@ -5,11 +5,14 @@ import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relati
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationRepository;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.*;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.KnowledgeManagement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Initialize the knowledge model in this Prototype.
@@ -23,18 +26,22 @@ import java.util.HashSet;
 @Component
 public class InitModel implements CommandLineRunner {
 
+	private static final Logger logger = LoggerFactory.getLogger(InitModel.class);
 
 	private final StructureRepository structureRepository;
 	private final ElementRepository   elementRepository;
 	private final RelationRepository  relationRepository;
 	private final KnowledgeManagement knowledgeManagement;
+	private final KnowledgeModelService knowledgeModelService;
 
 	public InitModel(StructureRepository structureRepository, ElementRepository elementRepository,
-			RelationRepository relationRepository, KnowledgeManagement knowledgeManagement) {
+			RelationRepository relationRepository, KnowledgeManagement knowledgeManagement,
+			KnowledgeModelService knowledgeModelService) {
 		this.structureRepository = structureRepository;
 		this.elementRepository = elementRepository;
 		this.relationRepository = relationRepository;
 		this.knowledgeManagement = knowledgeManagement;
+		this.knowledgeModelService = knowledgeModelService;
 	}
 
 	@Override
@@ -50,6 +57,7 @@ public class InitModel implements CommandLineRunner {
 		}
 		// load the model from the json-file
 		if (Arrays.asList(args).contains("--load")) {
+			logger.info("Loading model from json");
 			var model = knowledgeManagement.getKnowledge();
 			// Elements
 			var elements = model.getElements();
@@ -61,8 +69,34 @@ public class InitModel implements CommandLineRunner {
 			// Relations
 			relationRepository.saveAll(relations);
 			// Structure
-			var rootModel = model.getRoot();
-			saveStructure(rootModel);
+			var rootOfNewModel = model.getRoot();
+			// replace root with a fragment
+			var rootFragment = new KnowledgeFragment(rootOfNewModel.getName());
+			for (var child : rootOfNewModel.getChildren()) {
+				rootFragment.addObject(child);
+			}
+			AtomicReference<KnowledgeObject> rootToSave = new AtomicReference<>(rootFragment);
+			var fragmentInModel = structureRepository.findById(rootFragment.getName());
+			fragmentInModel.ifPresentOrElse(it -> {
+				if (it instanceof RootStructureElement root) {
+					for (var child : rootOfNewModel.getChildren()) {
+						root.addObject(child);
+					}
+				} else if (it instanceof KnowledgeFragment fragment) {
+					for (var child : rootOfNewModel.getChildren()) {
+						fragment.addObject(child);
+					}
+				} else {
+					knowledgeModelService.leafToNode(it.getName());
+				}
+				rootToSave.set(it);
+			}, () -> {
+				var correctRoot = knowledgeModelService.getRoot();
+				correctRoot.addObject(rootFragment);
+				structureRepository.save(correctRoot);
+			});
+			saveStructure(rootToSave.get());
+			logger.info("Model from json loaded");
 		}
 	}
 
