@@ -7,6 +7,14 @@ import org.springframework.data.neo4j.core.schema.Node;
 import java.util.Collection;
 import java.util.Objects;
 
+/**
+ * Represents a peace of source code of a specific programming-language.
+ *
+ * @author Oliver Geisel
+ * @version 1.1.0
+ * @see KnowledgeElement
+ * @since 0.2.0
+ */
 @Node
 public class Code extends SimpleElement {
 
@@ -19,10 +27,27 @@ public class Code extends SimpleElement {
 	}
 
 	public Code(String content, String id, String type) {
-		this(content, id, type, null);
-
+		this(content, id, type, (Collection<Relation>) null);
 	}
 
+	/**
+	 * Creates a new Code element. This is a old version. Please use the new Constructor.
+	 * <p>
+	 * The <b>content</b> parameter is a string with the following structure:
+	 * <ul>
+	 *<li>language</li>
+	 * <li>caption</li>
+	 * <li>code lines</li>
+	 * </ul>
+	 * each part is separated by a newline character.
+	 * </p>
+	 * @param content the content of the element in the following structure: language\n caption\n code lines
+	 * @param id the id of the element
+	 * @param type the type of the element. Normally "CODE"
+	 * @param relations the relations of the element
+	 * @deprecated use the new constructor. Unhandy to use.
+	 */
+	@Deprecated(since = "1.1.0")
 	public Code(String content, String id, String type, Collection<Relation> relations) {
 		super(content, id, type, relations);
 		var elements = content.replace("\\n", "\n").split("\n");
@@ -34,6 +59,20 @@ public class Code extends SimpleElement {
 			builder.append("\n");
 		}
 		codeLines = builder.toString();
+	}
+
+	/**
+	 * Creates a new Code element.
+	 * @param language the language of the code. E.g. Java, Python, C++
+	 * @param caption the caption of the code
+	 * @param codeLines the code lines
+	 * @param id the id of the element
+	 */
+	public Code(String language, String caption, String codeLines, String id) {
+		super(codeLines, id, "CODE");
+		this.language = language;
+		this.caption = caption;
+		this.codeLines = codeLines;
 	}
 
 	//region setter/getter
@@ -68,9 +107,12 @@ public class Code extends SimpleElement {
 		if (!(o instanceof Code code)) return false;
 		if (!super.equals(o)) return false;
 
-		if (!Objects.equals(language, code.language)) return false;
-		if (!Objects.equals(caption, code.caption)) return false;
-		return Objects.equals(codeLines, code.codeLines);
+		if (getId() == null || code.getId() == null) {
+			if (!Objects.equals(language, code.language)) return false;
+			if (!Objects.equals(caption, code.caption)) return false;
+			return Objects.equals(codeLines, code.codeLines);
+		}
+		return getId().equals(code.getId());
 	}
 
 	@Override

@@ -18,6 +18,15 @@ public class Image extends KnowledgeElement {
 		super();
 	}
 
+	/**
+	 * Creates a new Image element. This is a old version. Please use the new Constructor.
+	 *
+	 * @param content   the content of the element in the following structure: imageName: name; imageDescription: description; headline: headline
+	 * @param id        the id of the element
+	 * @param type      the type of the element. Normally "IMAGE"
+	 * @param relations the relations of the element
+	 */
+	@Deprecated(since = "1.1.0")
 	protected Image(String content, String id, String type,
 			Collection<Relation> relations) {
 		super(content, id, type, relations);
@@ -31,6 +40,21 @@ public class Image extends KnowledgeElement {
 		this.imageName = elements.getOrDefault("imageName", "");
 		this.imageDescription = elements.getOrDefault("imageDescription", "");
 		this.headline = elements.getOrDefault("headline", "");
+	}
+
+	/**
+	 * Creates a new Image element.
+	 *
+	 * @param imageName        the name of the image
+	 * @param imageDescription the description of the image
+	 * @param headline         the headline of the image
+	 * @param id               the id of the element
+	 */
+	public Image(String imageName, String imageDescription, String headline, String id) {
+		super(STR."\{imageName}; imageDescription: \{imageDescription}; headline: \{headline}", id, "IMAGE");
+		this.imageName = imageName;
+		this.imageDescription = imageDescription;
+		this.headline = headline;
 	}
 
 	protected Image(String content, String id, String type) {
