@@ -543,7 +543,7 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	private KnowledgeElement[] getRelatedElements(KnowledgeElement element) {
 		var returnList = new LinkedList<KnowledgeElement>();
 		var outgoing = element.getRelations().stream().map(Relation::getTo).toList();
-		var incoming = relationRepository.findByTo(element).map(Relation::getFrom).toList();
+		var incoming = relationRepository.findDistinctByToId(element.getId()).map(Relation::getFrom).toList();
 		returnList.addAll(outgoing);
 		returnList.addAll(incoming);
 		return returnList.toArray(new KnowledgeElement[0]);
@@ -573,7 +573,7 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	 */
 	private Relation[] getAllRelations(KnowledgeElement element) {
 		var ownRelations = element.getRelations();
-		var otherRelations = relationRepository.findByTo(element).toList();
+		var otherRelations = relationRepository.findByToId(element.getId()).toList();
 		var returnList = new ArrayList<>(ownRelations);
 		return returnList.toArray(new Relation[0]);
 	}
