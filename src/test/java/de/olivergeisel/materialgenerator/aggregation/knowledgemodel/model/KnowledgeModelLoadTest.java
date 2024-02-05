@@ -8,7 +8,7 @@ import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relati
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeFragment;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeLeaf;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.RootStructureElement;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.KnowledgeModel;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.KnowledgeModelLoaded;
 import de.olivergeisel.materialgenerator.aggregation.source.KnowledgeSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,13 +23,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Tag("UnitTest")
-class KnowledgeModelTest {
+class KnowledgeModelLoadTest {
 
-	private KnowledgeModel knowledgeModel;
+	private KnowledgeModelLoaded knowledgeModel;
 
 	@BeforeEach
 	void setUp() {
-		knowledgeModel = new KnowledgeModel();
+		knowledgeModel = new KnowledgeModelLoaded();
 	}
 
 	@AfterEach
@@ -38,18 +38,18 @@ class KnowledgeModelTest {
 
 	@Test
 	void createKnowledgeModel() {
-		var knowledgeModel = new KnowledgeModel();
+		var knowledgeModel = new KnowledgeModelLoaded();
 	}
 
 	@Test
 	void createWithParameter() {
 		var root = mock(RootStructureElement.class);
-		var knowledgeModel = new KnowledgeModel(root);
+		var knowledgeModel = new KnowledgeModelLoaded(root);
 	}
 
 	@Test
 	void creteWithRootIsNull() {
-		assertThrows(IllegalArgumentException.class, () -> new KnowledgeModel(null));
+		assertThrows(IllegalArgumentException.class, () -> new KnowledgeModelLoaded(null));
 	}
 
 	@Test
@@ -97,7 +97,7 @@ class KnowledgeModelTest {
 		when(newKnowledge.getRelations()).thenReturn(Set.of(relation));
 		when(relation.getType()).thenReturn(RelationType.RELATED);
 		knowledgeModel.addAndLink(newKnowledge, newKnowledge1, relation);
-		var foundById = knowledgeModel.get("1");
+		var foundById = knowledgeModel.findElementById("1").orElseThrow();
 		assertEquals(2, knowledgeModel.getElements().size());
 		assertEquals(1, foundById.getRelations().size());
 	}
@@ -147,7 +147,7 @@ class KnowledgeModelTest {
 
 	@Test
 	void containsStringThrowsIllegalArgumentExceptionTest() {
-		assertThrows(IllegalArgumentException.class, () -> knowledgeModel.contains((String) null));
+		assertThrows(IllegalArgumentException.class, () -> knowledgeModel.containsElement((String) null));
 	}
 
 	@Test
@@ -155,7 +155,7 @@ class KnowledgeModelTest {
 		var newKnowledge = mock(KnowledgeElement.class);
 		when(newKnowledge.getId()).thenReturn("1");
 		knowledgeModel.addKnowledge(newKnowledge);
-		assertTrue(knowledgeModel.contains("1"));
+		assertTrue(knowledgeModel.containsElement("1"));
 	}
 
 	@Test
@@ -173,12 +173,12 @@ class KnowledgeModelTest {
 
 	@Test
 	void findAllEmptyModelTest() {
-		assertThrows(NoSuchElementException.class, () -> knowledgeModel.findAll("1"));
+		assertThrows(NoSuchElementException.class, () -> knowledgeModel.findRelatedElements("1"));
 	}
 
 	@Test
 	void getInEmptyModelTest() {
-		assertThrows(NoSuchElementException.class, () -> knowledgeModel.get("1"));
+		assertThrows(NoSuchElementException.class, () -> knowledgeModel.findElementById("1").get());
 	}
 
 	@Test
@@ -186,7 +186,7 @@ class KnowledgeModelTest {
 		var newKnowledge = mock(KnowledgeElement.class);
 		when(newKnowledge.getId()).thenReturn("1");
 		knowledgeModel.addKnowledge(newKnowledge);
-		assertThrows(NoSuchElementException.class, () -> knowledgeModel.get("2"));
+		assertThrows(NoSuchElementException.class, () -> knowledgeModel.findElementById("2").get());
 	}
 
 	@Test
@@ -194,7 +194,7 @@ class KnowledgeModelTest {
 		var newKnowledge = mock(KnowledgeElement.class);
 		when(newKnowledge.getId()).thenReturn("1");
 		knowledgeModel.addKnowledge(newKnowledge);
-		var foundById = knowledgeModel.get("1");
+		var foundById = knowledgeModel.findElementById("1").orElseThrow();
 		assertEquals(newKnowledge, foundById);
 	}
 
@@ -239,7 +239,7 @@ class KnowledgeModelTest {
 
 	@Test
 	void getNameSpecificNameTest() {
-		var knowledgeModel = new KnowledgeModel(mock(RootStructureElement.class), "0.0.0", "ModelName");
+		var knowledgeModel = new KnowledgeModelLoaded(mock(RootStructureElement.class), "0.0.0", "ModelName");
 		assertEquals("ModelName", knowledgeModel.getName());
 	}
 
@@ -250,7 +250,7 @@ class KnowledgeModelTest {
 
 	@Test
 	void getVersionSpecificVersionTest() {
-		var knowledgeModel = new KnowledgeModel(mock(RootStructureElement.class), "1.2.3", "name");
+		var knowledgeModel = new KnowledgeModelLoaded(mock(RootStructureElement.class), "1.2.3", "name");
 		assertEquals("1.2.3", knowledgeModel.getVersion());
 	}
 

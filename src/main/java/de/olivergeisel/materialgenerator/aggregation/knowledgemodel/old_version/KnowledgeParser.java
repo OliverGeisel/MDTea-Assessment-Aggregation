@@ -92,12 +92,12 @@ public class KnowledgeParser {
 			}
 			var parsedSource = parseSource(source);
 			var parsedKnowledge = parseKnowledge(knowledge);
-			back = new KnowledgeModel(parsedStructure.getRoot());
+			back = new KnowledgeModelLoaded(parsedStructure.getRoot());
 			back.addSource(parsedSource);
 			back.addKnowledge(parsedKnowledge);
 		} else {
 			logger.warn("No valid knowledge-File ! Create empty KnowledgeModel");
-			back = new KnowledgeModel();
+			back = new KnowledgeModelLoaded();
 		}
 		return back;
 	}

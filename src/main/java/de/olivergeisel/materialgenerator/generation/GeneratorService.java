@@ -1,7 +1,6 @@
 package de.olivergeisel.materialgenerator.generation;
 
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.KnowledgeManagement;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModelService;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
 import de.olivergeisel.materialgenerator.finalization.FinalizationService;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourse;
@@ -18,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import static de.olivergeisel.materialgenerator.generation.TemplateService.PLAIN;
 
@@ -26,29 +24,25 @@ import static de.olivergeisel.materialgenerator.generation.TemplateService.PLAIN
 @Transactional
 public class GeneratorService {
 
-	private final KnowledgeManagement     knowledgeManagement;
-	private final FinalizationService     finalizationService;
+	private final KnowledgeModelService knowledgeModelService;
+	private final FinalizationService   finalizationService;
 	private final TemplateSetRepository   templateSetRepository;
 	private final MaterialRepository      materialRepository;
 	private final MappingRepository       mappingRepository;
 	private final TemplateInfoRepository  templateInfoRepository;
 	private final BasicTemplateRepository basicTemplateRepository;
 
-	public GeneratorService(KnowledgeManagement knowledgeManagement, FinalizationService finalizationService,
+	public GeneratorService(KnowledgeModelService knowledgeModelService, FinalizationService finalizationService,
 			TemplateSetRepository templateSetRepository, MaterialRepository materialRepository,
 			MappingRepository mappingRepository, TemplateInfoRepository templateInfoRepository,
 			BasicTemplateRepository basicTemplateRepository) {
-		this.knowledgeManagement = knowledgeManagement;
+		this.knowledgeModelService = knowledgeModelService;
 		this.finalizationService = finalizationService;
 		this.templateSetRepository = templateSetRepository;
 		this.materialRepository = materialRepository;
 		this.mappingRepository = mappingRepository;
 		this.templateInfoRepository = templateInfoRepository;
 		this.basicTemplateRepository = basicTemplateRepository;
-	}
-
-	public Set<KnowledgeElement> getMaterials(String term) {
-		return knowledgeManagement.findRelatedData(term);
 	}
 
 	public RawCourse generateRawCourse(CoursePlan coursePlan, String template) {
@@ -63,7 +57,7 @@ public class GeneratorService {
 	private List<MaterialAndMapping> createMaterials(CoursePlan coursePlan, TemplateSet templateSet) {
 		TranslateGenerator generator = new TranslateGenerator();
 		generator.setBasicTemplateInfo(basicTemplateRepository.findAll().toSet());
-		generator.input(templateSet, knowledgeManagement.getKnowledge(), coursePlan);
+		generator.input(templateSet, knowledgeModelService, coursePlan);
 		if (generator.isReady()) {
 			generator.update();
 		}
