@@ -1,9 +1,8 @@
 package de.olivergeisel.materialgenerator.aggregation.knowledgemodel;
 
 import de.olivergeisel.materialgenerator.aggregation.AggregationProcess;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.ElementRepository;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeType;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.forms.AddElementForm;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.*;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.BasicRelation;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.Relation;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationRepository;
@@ -20,6 +19,7 @@ import java.util.UUID;
 
 /**
  * Service for the knowledge model. Provides methods to access the knowledge model.
+ * And edit it.
  *
  * @author Oliver Geisel
  * @version 1.1.0
@@ -170,6 +170,13 @@ public class KnowledgeModelService {
 	}
 
 
+	/**
+	 * change a {@link KnowledgeLeaf} to a {@link KnowledgeFragment}. The leaf will be removed from the database and the
+	 * fragment will be added. The linked elements will be moved to the new fragment.
+	 * Will do nothing if the leaf does not exist.
+	 *
+	 * @param id the id of the leaf
+	 */
 	public void leafToNode(String id) {
 		// Todo check if works
 		var leaf = structureRepository.findById(id);
@@ -210,6 +217,48 @@ public class KnowledgeModelService {
 		}
 		var relation = new BasicRelation(relationType, fromElement.get(), toElement.get());
 		relationRepository.save(relation);
+	}
+
+	/**
+	 * Adds a new element to the knowledge model.
+	 * Links the new element to the structure point with the given id, if it exists.
+	 *
+	 * @param form the form with the data for the new element
+	 */
+	public void addElement(AddElementForm form) {
+		var structureId = form.getStructureId();
+		var structureObject = structureRepository.findById(structureId);
+		if (structureObject.isEmpty()) {
+			return;
+		}
+		KnowledgeElement newElement;
+		switch (form.getType()) {
+			case TERM -> newElement = new Term(form.getContent(), createId(STR."\{form.getContent()}-TERM"),
+					form.getType().name());
+			case DEFINITION -> newElement = new Definition(form.getContent(),
+					createId(STR."\{form.getContent()}-DEFINITION"));
+			case EXAMPLE -> newElement = new Example(form.getContent(),
+					createId(STR."\{form.getContent()}-EXAMPLE"), form.getType().name());
+			case CODE -> newElement = new Code(form.getLanguage(), form.getHeadline(), form.getContent(),
+					createId(STR."\{form.getContent()}-CODE"));
+			case IMAGE -> newElement = new Image(form.getContent(), form.getDescription(), form.getHeadline(),
+					(STR."\{form.getContent()}-IMAGE"));
+			case TEXT -> newElement =
+					new Text(form.getHeadline(), form.getContent(), createId(STR."\{form.getContent()}-TEXT"));
+			case FACT -> newElement = new Fact(form.getContent(), createId(STR."\{form.getContent()}-FACT"));
+			default -> throw new IllegalStateException(STR."Unexpected value: \{form.getType()}");
+		}
+		newElement.setStructureId(structureId);
+		structureObject.ifPresent(it -> {
+			it.linkElement(newElement);
+			structureRepository.save(it);
+		});
+		elementRepository.save(newElement);
+	}
+
+	private String createId(String name) {
+		var exists = elementRepository.existsById(name);
+		return exists ? createId(name + UUID.randomUUID().toString()) : name;
 	}
 
 

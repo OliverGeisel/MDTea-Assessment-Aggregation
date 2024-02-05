@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{knowledgemodel.element.title}">Elemente</title>
+    <th:block th:replace="~{main::head-tag}"></th:block>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div th:replace="~{main::navigation}"></div>
+<main class="flex-grow-1 container">
+    <header class="flex-header">
+        <h1 th:text="#{knowledgemodel.element.title}">Elements</h1>
+    </header>
+    <section class="mt-2">
+        <article class="m-2">
+            <header><h2>Neu</h2></header>
+            <a th:href="@{elements/add}">
+                <button class="btn btn-primary" data-bs-target="#element-add-modal" data-bs-toggle="modal"
+                        type="button">
+                    <i class="bi bi-plus-circle"></i>
+                    <span th:text="#{knowledgemodel.element.add}">Add</span>
+                </button>
+            </a>
+        </article>
+        <article class="m-2">
+            <header><h2>Edit</h2></header>
+            <form th:action="@{elements/edit}">
+                <input list="element-list" name="id" required>
+                <datalist id="element-list">
+                    <option th:each="element : ${elements}" th:text="${element.id}" th:value="${element.id}">Element
+                    </option>
+                </datalist>
+                <button class="btn btn-primary" type="submit">
+                    <i class="bi bi-pencil-fill"></i>
+                    <span th:text="#{knowledgemodel.element.edit}">Edit</span>
+                </button>
+            </form>
+        </article>
+    </section>
+</main>
+<footer th:replace="~{main::footer}"></footer>
+</body>
+</html>

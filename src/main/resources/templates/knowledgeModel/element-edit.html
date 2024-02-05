@@ -2,13 +2,13 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Seitentitel</title>
+    <title th:text="#{knowledgemodel.element.edit.title}">Edit Element</title>
     <th:block th:replace="~{main::head-tag}"></th:block>
 </head>
 <body class="d-flex flex-column min-vh-100">
 <div th:replace="~{main::navigation}"></div>
 <main class="flex-grow-1">
-    <header><h1>Titel</h1></header>
+    <header><h1 th:text="${element.id}"></h1></header>
     <section>
 
     </section>

@@ -29,7 +29,13 @@
                 <h3>Struktur</h3>
                 Struktur Objekte: <span th:text="${structureCount}"></span><br>
                 <hr>
-                <h3>Wissen</h3>
+                <h3>Wissen</h3> <a th:href="@{/knowledge-model/elements}">
+                <button class="btn btn-success" th:text="#{knowledgemodel.elements}">Element</button>
+            </a>
+                <a th:href="@{/knowledge-model/relations}">
+                    <button class="btn btn-warning" th:text="#{knowledgemodel.relations}">Relation</button>
+                </a>
+                <br>
                 Elemente: <span th:text="${aggregation.elements}"></span><br>
                 Relationen: <span th:text="${aggregation.relations}"></span>
                 <hr>
