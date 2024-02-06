@@ -6,6 +6,7 @@ import de.olivergeisel.materialgenerator.finalization.parts.GroupOrder;
 import de.olivergeisel.materialgenerator.finalization.parts.MaterialOrderCollection;
 import de.olivergeisel.materialgenerator.finalization.parts.TaskOrder;
 import de.olivergeisel.materialgenerator.generation.material.Material;
+import de.olivergeisel.materialgenerator.generation.material.transfer.OverviewMaterial;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -63,7 +64,6 @@ public class BasicMaterialAssigner extends MaterialAssigner {
 			logger.warn("TaskOrder of {} is empty", groupOrder);
 			return false;
 		}
-
 		var firstTask = groupOrder.getTaskOrder().get(0);
 		boolean result = false;
 		if (groupOrder.getTaskOrder().stream().anyMatch(it -> it.getTopic() == null
@@ -93,7 +93,7 @@ public class BasicMaterialAssigner extends MaterialAssigner {
 				++i;
 			}
 			if (!matching) {
-				materialsPerTask.get(0).material.add(material);
+				materialsPerTask.getFirst().material.add(material);
 			}
 		}
 		for (var entry : materialsPerTask) {
@@ -114,7 +114,19 @@ public class BasicMaterialAssigner extends MaterialAssigner {
 	public boolean assign(Material material, MaterialOrderCollection part) {
 		return switch (part) {
 			case ChapterOrder ignored1 -> false;
-			case GroupOrder ignored -> false;
+			case GroupOrder group -> {
+				// assign Overviews to the group
+				if (!(material instanceof OverviewMaterial)) { // Todo assign Tests to groups as well (config)
+					yield false;
+				}
+				if (selector.satisfies(material, group)) {
+					var res = group.assign(material);
+					setAssigned(material);
+					yield res;
+				}
+				yield false;
+			}
+
 			default -> {
 				var topic = part.getTopic();
 				if (topic == null) {
@@ -125,9 +137,8 @@ public class BasicMaterialAssigner extends MaterialAssigner {
 					var res = part.assign(material);
 					setAssigned(material);
 					yield res;
-				} else {
-					yield false;
 				}
+				yield false;
 			}
 		};
 	}

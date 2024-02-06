@@ -19,7 +19,7 @@ import java.util.*;
  * Every MaterialOrderCollection has a {@link Topic}. There is a list of aliases for the topic.
  *
  * @author Oliver Geisel
- * @version 1.0.0
+ * @version 1.1.0
  * @see MaterialOrderPart
  * @since 0.2.0
  */

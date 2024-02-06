@@ -16,7 +16,7 @@ import de.olivergeisel.materialgenerator.generation.material.Material;
  * material based on a topic, a goal or a target.
  *
  * @author Oliver Geisel
- * @version 1.0.0
+ * @version 1.1.0
  * @see ContentTarget
  * @see ContentGoal
  * @see Material

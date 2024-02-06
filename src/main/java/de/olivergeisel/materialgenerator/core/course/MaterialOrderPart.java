@@ -1,6 +1,7 @@
 package de.olivergeisel.materialgenerator.core.course;
 
 import de.olivergeisel.materialgenerator.finalization.parts.CourseNavigation;
+import de.olivergeisel.materialgenerator.generation.material.Material;
 import jakarta.persistence.*;
 
 import java.util.UUID;
@@ -11,8 +12,8 @@ import java.util.UUID;
  * It can be a Collection, of other {@link MaterialOrderPart}s or a {@link de.olivergeisel.materialgenerator.generation.material.Material}.
  *
  * @author Oliver Geisel
- * @version 1.0.0
- * @see de.olivergeisel.materialgenerator.generation.material.Material
+ * @version 1.1.0
+ * @see Material
  * @since 0.2.0
  */
 @Entity
