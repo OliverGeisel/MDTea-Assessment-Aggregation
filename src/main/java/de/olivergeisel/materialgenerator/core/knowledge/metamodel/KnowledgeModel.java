@@ -296,7 +296,7 @@ public class KnowledgeModel {
 	 */
 	public KnowledgeElement get(String id) throws NoSuchElementException {
 		return graph.vertexSet().stream().filter(it -> it.getId().equals(id)).findFirst()
-					.orElseThrow(() -> new NoSuchElementException("No element with id " + id + " found"));
+					.orElseThrow(() -> new NoSuchElementException(STR."No element with id \{id} found"));
 	}
 
 	private Relation[] getAllRelations(KnowledgeElement element) {
@@ -459,12 +459,14 @@ public class KnowledgeModel {
 	}
 
 	/**
-	 * Returns all elements that are connected with the given structure object in the model.
+	 * Returns a {@link KnowledgeNode} for each {@link KnowledgeElement}, that is linked with the {@link KnowledgeObject}
+	 * in the model.
 	 *
-	 * @param structureId    the id of the structure object
-	 * @param includeSimilar if true, also search for elements that contain the given structureId in their own
-	 *                       structureId
-	 * @return a set of all elements that are connected with the given structure object
+	 * @param structureId      the id of the structure object
+	 * @param includeSimilar   if true, also search for elements that contain the given structureId in their own
+	 *                         structureId
+	 * @param similarWhenFound if true, also search for similar objects if the structure object is found
+	 * @return a set {@link KnowledgeNode}s of all elements that are connected with the given structure object
 	 */
 	private Set<KnowledgeNode> getKnowledgeNodesFor(String structureId, boolean includeSimilar,
 			boolean similarWhenFound) {
@@ -473,8 +475,8 @@ public class KnowledgeModel {
 		if (hasStructureObject) {
 			var structureObject = structure.getObjectById(structureId);
 			var elements = structureObject.getLinkedElements();
-			for (var element : elements) {
-				back.add(getKnowledgeNode(element.getId()));
+			for (var element : elements) { // Todo create for each Element a own Node... not so good
+				back.add(getKnowledgeNode(element, structureObject));
 			}
 		} else {
 			logger.warn("No structure object with id: '{}' found.", structureId);
@@ -526,46 +528,59 @@ public class KnowledgeModel {
 	private Set<KnowledgeNode> getKnowledgeNodesForSimilar(String structureId) throws NoSuchElementException {
 		Set<KnowledgeNode> back = new HashSet<>();
 		if (!hasStructureSimilar(structureId)) {
-			throw new NoSuchElementException("No structure object with id " + structureId + "or similar found");
+			throw new NoSuchElementException(STR."No structure object with id \{structureId} or similar found");
 		} else {
 			var similarObject = structure.getSimilarObjectById(structureId);
 			var elements = similarObject.getLinkedElements();
 			for (var element : elements) {
-				back.add(getKnowledgeNode(element.getId()));
+				back.add(getKnowledgeNode(element, similarObject));
 			}
 		}
 		return back;
 	}
 
 	/**
-	 * Returns all elements that are connected with the given element in the model.
+	 * Creates a {@link KnowledgeNode} where the Element is the main element.
 	 *
 	 * @param elementId the element id of the element
 	 * @return a set of all elements and relations that are connected with the given element
 	 */
 	public KnowledgeNode getKnowledgeNode(String elementId) throws NoSuchElementException {
 		if (!contains(elementId)) {
-			throw new NoSuchElementException("No element with id " + elementId + " found");
+			throw new NoSuchElementException(STR."No element with id \{elementId} found");
 		}
 		var element = get(elementId);
-		return getKnowledgeNode(element);
+		return getKnowledgeNode(element, null);
 	}
 
 	/**
 	 * create a KnowledgeNode for a given KnowledgeElement
 	 *
 	 * @param element element you want
+	 * @param structureObject structureObject you want. Can be null. Then the structure object will be got from the
+	 *                           element
 	 * @return a Collection of all elements and relations that are connected with the given element
 	 * @throws NoSuchElementException if the element is not in the Model.
 	 */
-	public KnowledgeNode getKnowledgeNode(KnowledgeElement element) throws NoSuchElementException {
+	public KnowledgeNode getKnowledgeNode(KnowledgeElement element, KnowledgeObject structureObject)
+			throws NoSuchElementException {
 		if (!contains(element)) {
-			throw new NoSuchElementException("No element: \"" + element + "\" found");
+			throw new NoSuchElementException(STR."No element: \"\{element}\" found");
 		}
-		var structureObject = structure.getObjectById(element.getStructureId());
-		var relatedElements = getRelatedElements(element);
-		var relations = getAllRelations(element);
-		return new KnowledgeNode(structureObject, element, relatedElements, relations);
+		if (structureObject == null) {
+			structureObject = this.structure.getObjectById(element.getStructureId());
+		}
+		var linkedElements = structureObject.getLinkedElements();
+		var relatedElements = new LinkedList<>();
+		var relations = new HashSet<>();
+		for (var linked : linkedElements) {
+			var tempList = getRelatedElements(linked);
+			Arrays.stream(tempList).filter(it -> !linkedElements.contains(it)).forEach(relatedElements::add);
+			var tempRelations = getAllRelations(linked);
+			relations.addAll(Arrays.asList(tempRelations));
+		}
+		return new KnowledgeNode(structureObject, element, linkedElements.toArray(new KnowledgeElement[0]),
+				relatedElements.toArray(new KnowledgeElement[0]), relations.toArray(new Relation[0]));
 	}
 
 	private boolean hasStructureSimilar(String structureId) {

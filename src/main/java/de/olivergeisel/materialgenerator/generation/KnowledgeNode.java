@@ -15,8 +15,9 @@ import java.util.stream.Collectors;
 
 /**
  * Contains all Knowledge from a {@link KnowledgeModel}, that is related to a specific topic in the structure. This
- * is the {@link KnowledgeObject} where the {@link KnowledgeElement} is linked to.
+ * is the {@link KnowledgeObject} where the {@link KnowledgeElement}s are linked to.
  * Each Node has a main {@link KnowledgeElement}. It should be a {@link Term}.
+ * Furthermore it contains a list of related {@link KnowledgeElement}s and the {@link Relation}s between them.
  *
  * @see KnowledgeModel
  * @see KnowledgeElement
@@ -28,18 +29,21 @@ import java.util.stream.Collectors;
  */
 public class KnowledgeNode {
 
-	private final   List<String>          topics = new ArrayList<>();
+	private final   List<String>       topics = new ArrayList<>();
+			// list of topics from a goal that is related to this node
 	@Getter private KnowledgeObject       structurePoint;
 	@Getter private KnowledgeElement      mainElement;
+	@Getter private KnowledgeElement[] linkedElements;
 	// todo remove duplicates in relatedElements
 	@Getter private KnowledgeElement[]    relatedElements;
 	@Getter private Relation[]            relations;
 	@Getter private Optional<ContentGoal> goal   = Optional.empty();
 
 	public KnowledgeNode(KnowledgeObject structurePoint, KnowledgeElement mainElement,
-			KnowledgeElement[] relatedElements, Relation[] relations) {
+			KnowledgeElement[] linkedElements, KnowledgeElement[] relatedElements, Relation[] relations) {
 		this.structurePoint = structurePoint;
 		this.mainElement = mainElement;
+		this.linkedElements = linkedElements;
 		this.relatedElements = relatedElements;
 		this.relations = relations;
 	}

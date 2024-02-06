@@ -14,24 +14,33 @@ import de.olivergeisel.materialgenerator.core.knowledge.metamodel.relation.Relat
 import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
-import de.olivergeisel.materialgenerator.generation.material.MaterialMappingEntry;
-import de.olivergeisel.materialgenerator.generation.material.transfer.ListMaterial;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateSet;
-import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 import org.slf4j.Logger;
 
 import java.util.*;
 
+/**
+ * Partial implementation of the {@link Generator} interface. This class contains the basic methods for the generation.
+ *
+ * @author Oliver Geisel
+ * @version 1.1.0
+ * @see Generator
+ * @see GeneratorInput
+ * @see GeneratorOutput
+ * @see TemplateSet
+ * @see KnowledgeModel
+ * @since 1.1.0
+ */
 public abstract class AbstractGenerator implements Generator {
 	protected static final String UNKNOWN = "Unknown";
 
 	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AbstractGenerator.class);
 
-	protected       TemplateSet       templateSet;
-	protected       KnowledgeModel    model;
-	protected       CoursePlan        plan;
-	protected       boolean           unchanged         = false;
-	protected       GeneratorOutput   output;
+	protected TemplateSet     templateSet;
+	protected KnowledgeModel  model;
+	protected CoursePlan      plan;
+	protected boolean         unchanged = false;
+	protected GeneratorOutput output;
 
 
 	protected AbstractGenerator() {
@@ -60,30 +69,6 @@ public abstract class AbstractGenerator implements Generator {
 			name = alternativeName;
 		}
 		return name;
-	}
-
-	protected static MaterialAndMapping createListMaterialCore(String headline, String materialName,
-			RelationType relationType, TemplateType templateInfo,
-			KnowledgeNode mainKnowledge, KnowledgeElement mainTerm) {
-		var partRelations = mainKnowledge.getWantedRelationsFromRelated(relationType);
-		var mainId = mainTerm.getId();
-		var partNames = partRelations.stream().filter(it -> it.getToId().equals(mainId))
-									 .map(it -> it.getFrom().getContent()).toList();
-		if (partNames.isEmpty()) {
-			return null;
-		}
-		var partListMaterial = new ListMaterial(headline, partNames);
-		partListMaterial.setTerm(mainTerm.getContent());
-		partListMaterial.setTemplateType(templateInfo);
-		partListMaterial.setTermId(mainTerm.getId());
-		partListMaterial.setName(materialName);
-		partListMaterial.setStructureId(mainTerm.getStructureId());
-		partListMaterial.setValues(Map.of("term", mainTerm.getContent()));
-		var mapping = new MaterialMappingEntry(partListMaterial);
-		mapping.add(mainTerm);
-		mapping.addAll(partRelations.stream().filter(it -> it.getToId().equals(mainId)).map(Relation::getFrom)
-									.toArray(KnowledgeElement[]::new));
-		return new MaterialAndMapping(partListMaterial, mapping);
 	}
 
 	/**
@@ -126,8 +111,7 @@ public abstract class AbstractGenerator implements Generator {
 	 * @throws NoSuchElementException if no KnowledgeNode fits the masterKeyword or one of the topics
 	 */
 	protected static KnowledgeNode getMainKnowledge(Set<KnowledgeNode> knowledge, KnowledgeNode node,
-			KnowledgeType type)
-			throws NoSuchElementException {
+			KnowledgeType type) throws NoSuchElementException {
 		return getMainKnowledge(knowledge, node.getMasterKeyWord().orElseThrow(), node.getTopics(), type);
 	}
 
@@ -177,8 +161,8 @@ public abstract class AbstractGenerator implements Generator {
 	 * Get a {@link KnowledgeNode} that fits the mainKeyword. The node is a {@link Term}.
 	 *
 	 * @param knowledge Set of KnowledgeNodes to search in
-	 * @return KnowledgeNode that is the first TERM element
-	 * @throws NoSuchElementException if no KnowledgeNode is a Term
+	 * @return {@link KnowledgeNode} that is the first TERM element
+	 * @throws NoSuchElementException if no KnowledgeNode is a {@link Term}
 	 */
 	protected static KnowledgeNode getMainKnowledge(Set<KnowledgeNode> knowledge) {
 		return knowledge.stream().filter(it -> it.getMainElement().hasType(KnowledgeType.TERM))
@@ -238,6 +222,12 @@ public abstract class AbstractGenerator implements Generator {
 		this.plan = input.getPlan();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @return {@inheritDoc}
+	 */
+	@Override
 	public boolean update() {
 		if (!isReady()) {
 			logger.error("Generator is not ready to start the generation process.");
@@ -245,7 +235,6 @@ public abstract class AbstractGenerator implements Generator {
 		}
 		process();
 		return true;
-
 	}
 
 	/**
@@ -330,9 +319,8 @@ public abstract class AbstractGenerator implements Generator {
 	/**
 	 * Create the materials for a given list of {@link ContentTarget}s.
 	 * <p>
-	 * Every topic has a mapping to the related
-	 * {@link StructureElement}s in the {@link CoursePlan}. Every Target must look if the generated
-	 * {@link Material} match to the structure.
+	 * Every topic has a mapping to the related {@link StructureElement}s in the {@link CoursePlan}.
+	 * Every Target must look if the generated {@link Material} match to the structure.
 	 * </p>
 	 *
 	 * @param targets List of {@link ContentTarget}s to create {@link Material} for

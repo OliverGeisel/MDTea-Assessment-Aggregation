@@ -8,11 +8,11 @@ import de.olivergeisel.materialgenerator.generation.material.ComplexMaterial;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
 import de.olivergeisel.materialgenerator.generation.material.MaterialMappingEntry;
 import de.olivergeisel.materialgenerator.generation.material.MaterialType;
+import de.olivergeisel.materialgenerator.generation.material.transfer.OverviewMaterial;
 import de.olivergeisel.materialgenerator.generation.material.transfer.SummaryMaterial;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Specific sub-generator for a {@link ComplexMaterial} in the transfer category. <b>PROTOTYPE and PROOF OF CONCEPT
@@ -39,6 +39,27 @@ public class TransferAssembler {
 		this.knowledgeNode = knowledgeNode;
 	}
 
+
+	public List<MaterialAndMapping> createOverview(Collection<MaterialAndMapping> summaryMaterials) {
+		var StructureMapping = new HashMap<String, List<SummaryMaterial>>();
+		var summaries = summaryMaterials.stream().map(it -> (SummaryMaterial) it.material()).toList();
+		for (var m : summaries) {
+			var key = m.getStructureId();
+			if (StructureMapping.containsKey(key)) {
+				StructureMapping.get(key).add(m);
+			} else {
+				StructureMapping.put(key, new LinkedList<>(List.of(m)));
+			}
+		}
+		var back = new ArrayList<MaterialAndMapping>();
+		for (var entry : StructureMapping.entrySet()) {
+			var material = new OverviewMaterial(entry.getKey(), "");
+			entry.getValue().forEach(material::append);
+			back.add(new MaterialAndMapping<>(material, createMappingEntry(material, summaryMaterials)));
+		}
+		return back;
+	}
+
 	/**
 	 * Creates {@link SummaryMaterial}s for the {@link Term}s that is related to the {@link KnowledgeObject} that is the
 	 * {@link KnowledgeNode}.
@@ -52,17 +73,12 @@ public class TransferAssembler {
 		}
 		// filter for matching materials
 		var definitions =
-				materials.stream().filter(it -> it.material().getTemplateType()
-												  .equals(de.olivergeisel.materialgenerator.generation.templates.TemplateType.DEFINITION))
+				materials.stream().filter(it -> it.material().getTemplateType().equals(TemplateType.DEFINITION))
 						 .toList();
 		var examples = materials.stream().filter(it -> it.material().getType().equals(MaterialType.EXAMPLE)).toList();
-		//var proofs =
-		//		materials.stream().filter(it -> it.material().getTemplateInfo().getTemplateType().equals()).toList();
-		var lists =
-				materials.stream()
-						 .filter(it -> it.material().getTemplateType().equals(
-								 de.olivergeisel.materialgenerator.generation.templates.TemplateType.LIST))
-						 .toList();
+		var lists = materials.stream()
+							 .filter(it -> it.material().getTemplateType().equals(TemplateType.LIST))
+							 .toList();
 		var material = new SummaryMaterial(term);
 		var mapping = new MaterialMappingEntry(material);
 		material.setTemplateType(TemplateType.SUMMARY);
@@ -78,13 +94,19 @@ public class TransferAssembler {
 			material.append(it.material());
 			mapping.addAll(it.mapping().getRelatedElements());
 		});
-		back.add(new MaterialAndMapping<>(material, mapping));
+		if (!material.getParts().isEmpty()) {
+			back.add(new MaterialAndMapping<>(material, mapping));
+		}
 		return back;
 	}
 
-	private MaterialMappingEntry createMappingEntry(SummaryMaterial summaryMaterial) {
+	private MaterialMappingEntry createMappingEntry(ComplexMaterial complexMaterial,
+			Collection<MaterialAndMapping> materials) {
+		if (materials == null) {
+			materials = this.materials;
+		}
 		var collect = new LinkedList<MaterialMappingEntry>();
-		for (var m : summaryMaterial.getParts()) {
+		for (var m : complexMaterial.getParts()) {
 			for (var ma : materials) {
 				if (ma.material().equals(m)) { // Equals cant be used
 					collect.add(ma.mapping());
@@ -92,12 +114,13 @@ public class TransferAssembler {
 			}
 		}
 		var allElements = collect.stream().flatMap(it -> it.getRelatedElements().stream()).toList();
-		var back = new MaterialMappingEntry(summaryMaterial);
+		var back = new MaterialMappingEntry(complexMaterial);
 		back.setRelatedElements(allElements);
 		return back;
 	}
 
 //region setter/getter
+
 	/**
 	 * Get the id of the {@link KnowledgeObject} that all materials are related to.
 	 *

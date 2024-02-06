@@ -4,6 +4,7 @@ import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentTarget;
 import de.olivergeisel.materialgenerator.core.knowledge.metamodel.KnowledgeModel;
 import de.olivergeisel.materialgenerator.core.knowledge.metamodel.element.*;
+import de.olivergeisel.materialgenerator.core.knowledge.metamodel.relation.Relation;
 import de.olivergeisel.materialgenerator.core.knowledge.metamodel.relation.RelationType;
 import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
 import de.olivergeisel.materialgenerator.generation.generator.transfer_assamble.TransferAssembler;
@@ -62,47 +63,28 @@ public class TransferGenerator extends AbstractGenerator {
 		return back;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @param targets {@inheritDoc}
-	 * @throws IllegalStateException {@inheritDoc}
-	 */
-	@Override
-	protected void processTargets(List<ContentTarget> targets) throws IllegalStateException {
-
-		if (targets.isEmpty()) {
-			logger.warn("No targets found. This should not happen.");
-			return;
+	protected static MaterialAndMapping createListMaterialCore(String headline, String materialName,
+			RelationType relationType, TemplateType templateInfo, KnowledgeNode mainKnowledge,
+			KnowledgeElement mainTerm) {
+		var partRelations = mainKnowledge.getWantedRelationsFromRelated(relationType);
+		var mainId = mainTerm.getId();
+		var partNames = partRelations.stream().filter(it -> it.getToId().equals(mainId))
+									 .map(it -> it.getFrom().getContent()).toList();
+		if (partNames.isEmpty()) {
+			return null;
 		}
-		var goal = targets.stream().findFirst().orElseThrow().getRelatedGoal();
-		if (goal == null || targets.stream().anyMatch(it -> !it.getRelatedGoal().equals(goal)))
-			throw new IllegalStateException("Targets with different goals found. This should not happen. Ignoring all"
-											+ " targets.");
-		int emptyCount = 0;
-		for (var target : targets) {
-			var expression = goal.getExpression();
-			var topic = target.getTopic();
-			var aliases = target.getAliases().complete();
-			try {
-				var topicKnowledge = loadKnowledgeForStructure(aliases);
-				if (topicKnowledge.isEmpty()) {
-					logger.info("No knowledge found for Topic {}", target);
-					emptyCount++;
-					continue;
-				}
-				topicKnowledge.forEach(it -> {
-					it.setGoal(goal);
-					it.addTopic(topic);
-				});
-				createMaterialFor(expression, topicKnowledge);
-			} catch (NoSuchElementException e) {
-				logger.info("No knowledge found for Target {}", target);
-			}
-		}
-		if (emptyCount == targets.size()) {
-			logger.warn("No knowledge found for any target. Goal: {} has no materials", goal);
-		}
+		var partListMaterial = new ListMaterial(headline, partNames);
+		partListMaterial.setTerm(mainTerm.getContent());
+		partListMaterial.setTemplateType(templateInfo);
+		partListMaterial.setTermId(mainTerm.getId());
+		partListMaterial.setName(materialName);
+		partListMaterial.setStructureId(mainTerm.getStructureId());
+		partListMaterial.setValues(Map.of("term", mainTerm.getContent()));
+		var mapping = new MaterialMappingEntry(partListMaterial);
+		mapping.add(mainTerm);
+		mapping.addAll(partRelations.stream().filter(it -> it.getToId().equals(mainId)).map(Relation::getFrom)
+									.toArray(KnowledgeElement[]::new));
+		return new MaterialAndMapping(partListMaterial, mapping);
 	}
 
 	@Override
@@ -173,13 +155,46 @@ public class TransferGenerator extends AbstractGenerator {
 		return materialForTranslate(knowledge);
 	}
 
-	protected List<MaterialAndMapping> materialForTranslate(Set<KnowledgeNode> knowledge) {
-		// materials.add(createWikisWithExistingMaterial(knowledge, materials));
-		var firstLookMaterials = materialForKnow(knowledge);
-		var summary =
-				new TransferAssembler(firstLookMaterials, knowledge.stream().findFirst().orElseThrow()).createSummary();
-		firstLookMaterials.addAll(summary);
-		return firstLookMaterials;
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @param targets {@inheritDoc}
+	 * @throws IllegalStateException {@inheritDoc}
+	 */
+	@Override
+	protected void processTargets(List<ContentTarget> targets) throws IllegalStateException {
+		if (targets.isEmpty()) {
+			logger.warn("No targets found. This should not happen.");
+			return;
+		}
+		var goal = targets.stream().findFirst().orElseThrow().getRelatedGoal();
+		if (goal == null || targets.stream().anyMatch(it -> !it.getRelatedGoal().equals(goal)))
+			throw new IllegalStateException("Targets with different goals found. This should not happen. Ignoring all"
+											+ " targets.");
+		int emptyTargetCount = 0;
+		for (var target : targets) {
+			var expression = goal.getExpression();
+			var topic = target.getTopic();
+			var aliases = target.getAliases().complete();
+			try {
+				var topicKnowledge = loadKnowledgeForStructure(aliases);
+				if (topicKnowledge.isEmpty()) {
+					logger.info("No knowledge found for Topic {}", target);
+					emptyTargetCount++;
+					continue;
+				}
+				topicKnowledge.forEach(it -> {
+					it.setGoal(goal);
+					it.addTopic(topic);
+				});
+				createMaterialFor(expression, topicKnowledge);
+			} catch (NoSuchElementException e) {
+				logger.info("No knowledge found for Target {}", target);
+			}
+		}
+		if (emptyTargetCount == targets.size()) {
+			logger.warn("No knowledge found for any target. Goal: {} has no materials", goal);
+		}
 	}
 
 	@Override
@@ -293,6 +308,18 @@ public class TransferGenerator extends AbstractGenerator {
 			back.add(newList);
 		}
 		return back;
+	}
+
+	protected List<MaterialAndMapping> materialForTranslate(Set<KnowledgeNode> knowledge) {
+		// materials.add(createWikisWithExistingMaterial(knowledge, materials));
+		var firstLookMaterials = materialForKnow(knowledge);
+		for (var node : knowledge) {
+			var assembler = new TransferAssembler(firstLookMaterials, node);
+			var summary = assembler.createSummary();
+			var overview = assembler.createOverview(summary);
+			firstLookMaterials.addAll(summary);
+		}
+		return firstLookMaterials;
 	}
 
 	/**

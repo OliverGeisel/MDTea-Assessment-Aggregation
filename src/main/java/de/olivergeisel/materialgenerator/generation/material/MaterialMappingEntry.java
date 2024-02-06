@@ -9,30 +9,32 @@ import java.util.*;
 /**
  * A Class holding all ids of {@link KnowledgeElement} to a specific {@link Material} that was created with these
  * elements.
+ *
+ * @version 1.1.0
+ * @see Material
+ * @see KnowledgeElement
+ * @since 0.2.0
+ * @author Oliver Geisel
  */
 @Entity
 public class MaterialMappingEntry {
 
 	@ElementCollection
 	private Set<String> relatedElements = new HashSet<>();
-
-	public void addAll(Collection<String> elements) {
-		relatedElements.addAll(elements);
-	}
-	public Set<String> getRelatedElements() {
-		return relatedElements;
-	}
-
-	public void setRelatedElements(Collection<String> relatedElements) {
-		this.relatedElements.clear();
-		this.relatedElements.addAll(relatedElements);
-	}
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	@Column(name = "id", nullable = false)
-	private       UUID        id              = UUID.randomUUID();
+	private UUID     id = UUID.randomUUID();
 	@OneToOne(cascade = CascadeType.ALL)
-	private       Material    material;
+	private Material material;
+
+	protected MaterialMappingEntry() {
+
+	}
+
+	public MaterialMappingEntry(Material material) {
+		this.material = material;
+	}
 
 	public MaterialMappingEntry(Material material, KnowledgeElement... elements) {
 		this.material = material;
@@ -42,14 +44,6 @@ public class MaterialMappingEntry {
 	public MaterialMappingEntry(Material material, Collection<KnowledgeElement> elements) {
 		this.material = material;
 		add(elements.toArray(new KnowledgeElement[0]));
-	}
-
-	public MaterialMappingEntry() {
-
-	}
-
-	public MaterialMappingEntry(Material material) {
-		this.material = material;
 	}
 
 	public boolean add(KnowledgeElement... elements) {
@@ -71,11 +65,20 @@ public class MaterialMappingEntry {
 		}
 	}
 
-	//region setter/getter
-
-	public void setMaterial(Material material) {
-		this.material = material;
+	public void addAll(Collection<String> elements) {
+		relatedElements.addAll(elements);
 	}
+
+	//region setter/getter
+	public Set<String> getRelatedElements() {
+		return relatedElements;
+	}
+
+	public void setRelatedElements(Collection<String> relatedElements) {
+		this.relatedElements.clear();
+		this.relatedElements.addAll(relatedElements);
+	}
+
 	public UUID getId() {
 		return id;
 	}
@@ -86,6 +89,10 @@ public class MaterialMappingEntry {
 
 	public Material getMaterial() {
 		return material;
+	}
+
+	public void setMaterial(Material material) {
+		this.material = material;
 	}
 //endregion
 

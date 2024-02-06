@@ -10,8 +10,12 @@ import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateSet;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 
 /**
@@ -42,10 +46,7 @@ import java.util.*;
  */
 public class AssessmentGenerator extends AbstractGenerator {
 
-	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AssessmentGenerator.class);
-
-
-	private final Set<TemplateType> taskInfos = new HashSet<>();
+	private static final Logger logger = LoggerFactory.getLogger(AssessmentGenerator.class);
 
 	public AssessmentGenerator() {
 		super();
@@ -55,20 +56,6 @@ public class AssessmentGenerator extends AbstractGenerator {
 		super(input);
 	}
 
-	/**
-	 * Returns the assessmentTemplateInfo for the given class.
-	 *
-	 * @param templateInfoClass the class of the templateInfo
-	 * @return the templateInfo
-	 * @throws NoTemplateInfoException if no templateInfo is found
-	 */
-	private <T extends TemplateType> T getTaskTemplateInfo(Class<T> templateInfoClass) throws
-			NoTemplateInfoException {
-		return (T) taskInfos.stream()
-							.filter(it -> templateInfoClass.equals(it.getClass()))
-							.findFirst().orElseThrow(() -> new NoTemplateInfoException(
-						String.format("No Template %s found", templateInfoClass.getName())));
-	}
 
 	@Override
 	protected void processTargets(List<ContentTarget> targets) throws IllegalStateException {

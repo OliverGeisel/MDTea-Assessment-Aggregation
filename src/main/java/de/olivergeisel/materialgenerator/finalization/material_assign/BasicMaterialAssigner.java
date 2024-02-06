@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * Assign material to a MaterialOrderCollection. This is the basic implementation of the {@link MaterialAssigner}.
  * All this Assigner does is to call the assignMaterial method of the {@link MaterialOrderCollection}.
- * So the MaterialOrderCollection itself decides how to assign the material. Only exception is when the mataerial was
+ * So the MaterialOrderCollection itself decides how to assign the material. Only exception is when the material was
  * already assigned. In this case the material is not assigned to a new part.
  *
  * @author Oliver Geisel
