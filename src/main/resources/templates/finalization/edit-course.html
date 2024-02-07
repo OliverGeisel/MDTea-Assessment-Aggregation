@@ -229,8 +229,9 @@
         </header>
         <article>
             <form method="post" th:action="${course.id}+'/export'">
-                <button class="btn btn-primary" disabled name="export" value="pdf">PDF</button>
-                <button class="btn btn-primary" name="export" th:disabled="${!course.valid}" value="html">HTML</button>
+                <button class="btn btn-danger" disabled name="kind" value="pdf">PDF</button>
+                <button class="btn btn-primary" name="kind" th:disabled="${!course.valid}" value="HTML">HTML</button>
+                <button class="btn btn-success" name="kind" th:disabled="${!course.valid}" value="OPAL">OPAL</button>
             </form>
         </article>
     </section>

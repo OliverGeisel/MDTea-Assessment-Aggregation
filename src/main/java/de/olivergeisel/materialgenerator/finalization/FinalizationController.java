@@ -72,9 +72,10 @@ public class FinalizationController {
 	}
 
 	@PostMapping("edit/{id}/export")
-	public void exportCourse(@PathVariable UUID id, HttpServletResponse response) {
-		// TODO enable different export formats
-		service.exportCourse(id, DownloadManager.ExportKind.HTML, response);
+	public void exportCourse(@PathVariable UUID id,
+			@RequestParam(value = "kind", defaultValue = "HTML") DownloadManager.ExportKind kind,
+			HttpServletResponse response) {
+		service.exportCourse(id, kind, response);
 	}
 
 	@PostMapping("edit/{id}/relevance")
