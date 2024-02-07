@@ -13,7 +13,8 @@ import java.util.List;
  * This class is responsible for exporting the course to the desired format.
  * It is the base class for all exporters.
  * <p>
- * The {@link #export} method is abstract and must be implemented by the subclasses.
+ * The {@link #export} method is abstract and must be implemented by the subclasses. It needs a directory to save all
+ * necessary files in this directory, which is given by the parameters.
  * The method is called by the {@link DownloadManager}
  * and is responsible for creating the final course.
  * The {@link DownloadManager} then creates a zip file or similar formats to enable the user to download the course.
