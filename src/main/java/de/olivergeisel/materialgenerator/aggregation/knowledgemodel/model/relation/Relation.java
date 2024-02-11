@@ -66,7 +66,21 @@ public abstract class Relation {
 		return this.type.equals(type);
 	}
 
-	//region setter/getter
+	/**
+	 * Check if this relation is the same as another relation.
+	 * Ignores the id of the relation.
+	 *
+	 * @param relation the relation to compare
+	 * @return true if the relations are the same
+	 */
+	public boolean isSameAs(Relation relation) {
+		if (this == relation) return true;
+		if (relation == null) return false;
+		if (!type.equals(relation.type)) return false;
+		if (!name.equals(relation.name)) return false;
+		if (!toId.equals(relation.toId)) return false;
+		return fromId.equals(relation.fromId);
+	}
 	public String getFromId() {
 		return fromId;
 	}
@@ -158,7 +172,7 @@ public abstract class Relation {
 	public void setType(RelationType type) {
 		this.type = type;
 	}
-//endregion
+	//region setter/getter
 
 	@Override
 	public boolean equals(Object o) {
@@ -169,6 +183,7 @@ public abstract class Relation {
 		if (!fromId.equals(relation.fromId)) return false;
 		return toId.equals(relation.toId);
 	}
+//endregion
 
 	@Override
 	public int hashCode() {
