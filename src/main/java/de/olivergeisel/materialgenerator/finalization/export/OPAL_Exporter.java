@@ -2,13 +2,13 @@ package de.olivergeisel.materialgenerator.finalization.export;
 
 import de.olivergeisel.materialgenerator.finalization.export.opal.CourseOrganizerOPAL;
 import de.olivergeisel.materialgenerator.finalization.export.opal.DefaultXMLWriter;
+import de.olivergeisel.materialgenerator.finalization.export.opal.RootOPAL;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -22,6 +22,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Random;
 
+import static de.olivergeisel.materialgenerator.finalization.export.opal.BasicElementsOPAL.*;
+
 
 /**
  * Exports the course to the OPAL format.
@@ -29,6 +31,15 @@ import java.util.Random;
  * The OPAL format is a format used by the OPAL learning platform.
  * OPAL is used at TU Dresden for example.
  * See <a href="https://bildungsportal.sachsen.de/opal/shiblogin">here</a> for more information.
+ * </p>
+ * <p>
+ * The OPAL course has at least 3 directories:
+ *     <ul>
+ *         <li>coursefolder - materials for every node (images, html, ...)</li>
+ *         <li>export - 3 files for export. 2 are always the same 3rt (repo.xml) has metadata</li>
+ *         <li>layout - mostly empty</li>
+ *     </ul>
+ *     in the root files two files are important. "editortreemodel.xml" and "runstructure.xml".
  * </p>
  *
  * @author Oliver Geisel
@@ -42,7 +53,6 @@ import java.util.Random;
 public class OPAL_Exporter extends Exporter {
 
 	private static final Logger logger = LoggerFactory.getLogger(OPAL_Exporter.class);
-	private static final String CLASS  = "class";
 
 	private CourseOrganizerOPAL organizer;
 
@@ -73,7 +83,7 @@ public class OPAL_Exporter extends Exporter {
 		writeBasicDirectories(targetDirectory);
 		// config
 		writeCourseConfig(targetDirectory);
-		var id = new Random().nextInt(100000); // Todo check if this is okay or works
+		var id = new Random().nextLong(100_000_000); // Todo check if this is okay or works
 		writeEditorTreeModel(targetDirectory, rawCourse, id);
 		writeRunStructure(targetDirectory, rawCourse, id);
 		// export directory
@@ -81,7 +91,91 @@ public class OPAL_Exporter extends Exporter {
 		createExportFile(exportDirectory, "learninggroupexport");
 		createExportFile(exportDirectory, "rightgroupexport");
 		createRepoFile(exportDirectory, rawCourse);
+	}
 
+	private void writeBasicDirectories(File directory) {
+		File courseDir = new File(directory, "coursefolder");
+		courseDir.mkdir();
+		File exportDir = new File(directory, "export");
+		exportDir.mkdir();
+		File layoutDir = new File(directory, "layout");
+		layoutDir.mkdir();
+		// default files
+		backUpContext(directory);
+		emptyCourseRulesXML(directory);
+	}
+
+	private void writeCourseConfig(File targetDirectory) {
+		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder docBuilder;
+		try {
+			docBuilder = docFactory.newDocumentBuilder();
+		} catch (ParserConfigurationException e) {
+			throw new RuntimeException(e);
+		}
+		Document doc = docBuilder.newDocument();
+		// root element
+		var rootElement = doc.createElement("org.olat.course.config.CourseConfig");
+		doc.appendChild(rootElement);
+		// children
+		var version = doc.createElement("version");
+		version.appendChild(doc.createTextNode("12"));
+		rootElement.appendChild(version);
+		var configuration = doc.createElement("configuration");
+		configuration.setAttribute("class", "hashtable");
+		rootElement.appendChild(configuration);
+		// default entries
+		for (var entry : getDefaultConfigEntries(doc)) {
+			configuration.appendChild(entry);
+		}
+		// write to file
+		DefaultXMLWriter.write(doc, STR."\{targetDirectory.getAbsolutePath()}/CourseConfig.xml");
+	}
+
+	private void writeEditorTreeModel(File directory, RawCourse course, long id) {
+		Document doc = newDocument();
+		// root element
+		var root = doc.createElement("org.olat.course.tree.CourseEditorTreeModel");
+		doc.appendChild(root);
+		var rootNode = new RootOPAL().createRootOPAL(course, FileCreationType.TREE, id)
+									 .getDocumentElement();
+		root.appendChild(rootNode);
+		root.appendChild(elementWithText(doc, "latestPublishTimestamp", -1));
+		root.appendChild(elementWithText(doc, "highestNodeId", 0));
+		root.appendChild(elementWithText(doc, "version", 7));
+		// write to file
+		DefaultXMLWriter.write(doc, STR."\{directory.getAbsolutePath()}/editortreemodel.xml");
+	}
+
+	private void writeRunStructure(File targetDirectory, RawCourse course, long id) {
+		Document doc = newDocument();
+		// root element
+		var rootElement = doc.createElement("org.olat.course.Structure");
+		doc.appendChild(rootElement);
+		var rootNode = new RootOPAL().createRootOPAL(course, FileCreationType.RUN, id)
+									 .getDocumentElement();
+		rootElement.appendChild(rootNode);
+		rootElement.appendChild(elementWithText(doc, "latestPublishTimestamp", -1));
+		rootElement.appendChild(elementWithText(doc, "version", 7));
+
+		// write to file
+		DefaultXMLWriter.write(doc, STR."\{targetDirectory.getAbsolutePath()}/runstructure.xml");
+	}
+
+	private void createExportFile(File exportDirectory, String fileName) {
+		var file = new File(exportDirectory, STR."\{fileName}.xml");
+		try (var writer = new FileWriter(file)) {
+			writer.write("""
+					<?xml version="1.0" encoding="UTF-8"?>
+					     
+					<OLATGroupExport>
+					  <AreaCollection/>
+					  <GroupCollection/>
+					</OLATGroupExport>
+					""");
+		} catch (IOException e) {
+			logger.error(STR."Error while writing \{fileName}");
+		}
 	}
 
 	private void createRepoFile(File exportDirectory, RawCourse rawCourse) {
@@ -180,213 +274,6 @@ public class OPAL_Exporter extends Exporter {
 		DefaultXMLWriter.write(doc, STR."\{exportDirectory.getAbsolutePath()}/repo.xml");
 	}
 
-	private void createExportFile(File exportDirectory, String fileName) {
-		var file = new File(exportDirectory, STR."\{fileName}.xml");
-		try (var writer = new FileWriter(file)) {
-			writer.write("""
-					<?xml version="1.0" encoding="UTF-8"?>
-					     
-					<OLATGroupExport>
-					  <AreaCollection/>
-					  <GroupCollection/>
-					</OLATGroupExport>
-					""");
-		} catch (IOException e) {
-			logger.error(STR."Error while writing \{fileName}");
-		}
-	}
-
-	private void writeRunStructure(File targetDirectory, RawCourse rawCourse, int id) {
-		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder docBuilder;
-		try {
-			docBuilder = docFactory.newDocumentBuilder();
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		}
-		Document doc = docBuilder.newDocument();
-		// root element
-		var rootElement = doc.createElement("org.olat.course.Structure");
-		doc.appendChild(rootElement);
-		rootElement.appendChild(
-				createRootNode(doc, "rootNode", id, rawCourse.getMetadata().getName().orElse("new course")));
-		rootElement.appendChild(elementWithText(doc, "latestPublishTimestamp", -1));
-		rootElement.appendChild(elementWithText(doc, "version", 7));
-
-		// write to file
-		DefaultXMLWriter.write(doc, STR."\{targetDirectory.getAbsolutePath()}/runstructure.xml");
-	}
-
-	private Element elementWithText(Document doc, String name, String text) {
-		var element = doc.createElement(name);
-		element.appendChild(doc.createTextNode(text));
-		return element;
-	}
-
-	private Element elementWithText(Document doc, String name, long value) {
-		return elementWithText(doc, name, Long.toString(value));
-	}
-
-	private Element emptyElement(Document doc, String name) {
-		return doc.createElement(name);
-	}
-
-	private void writeEditorTreeModel(File directory, RawCourse course, long id) {
-		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder docBuilder;
-		try {
-			docBuilder = docFactory.newDocumentBuilder();
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		}
-		Document doc = docBuilder.newDocument();
-		// root element
-		var rootElement = doc.createElement("org.olat.course.tree.CourseEditorTreeModel");
-		doc.appendChild(rootElement);
-		var rootNode = doc.createElement("rootNode");
-		rootNode.setAttribute(CLASS, "org.olat.course.tree.CourseEditorTreeNode");
-		rootElement.appendChild(rootNode);
-		rootNode.appendChild(elementWithText(doc, "ident", id));
-		rootNode.appendChild(elementWithText(doc, "accessible", true));
-		rootNode.appendChild(elementWithText(doc, "selected", false));
-		rootNode.appendChild(elementWithText(doc, "hrefPreferred", false));
-		rootNode.appendChild(elementWithText(doc, "invisible", false)); // Todo maybe true for protection
-		// cn object
-		var cn = createRootNode(doc, "cn", id, course.getMetadata().getName().orElse("new course"));
-		rootNode.appendChild(cn);
-		var dirtry = elementWithText(doc, "dirty", false);
-		var deleted = elementWithText(doc, "deleted", false);
-		var newElement = elementWithText(doc, "newnode", false);
-		rootNode.appendChild(dirtry);
-		rootNode.appendChild(deleted);
-		rootNode.appendChild(newElement);
-		var latestPublishTimestamp = elementWithText(doc, "latestPublishTimestamp", -1);
-		var highestNodeId = elementWithText(doc, "highestNodeId", 0);
-		var version = elementWithText(doc, "version", 7);
-		rootElement.appendChild(latestPublishTimestamp);
-		rootElement.appendChild(highestNodeId);
-		rootElement.appendChild(version);
-
-		// write to file
-		DefaultXMLWriter.write(doc, STR."\{directory.getAbsolutePath()}/editortreemodel.xml");
-	}
-
-	private Element createRootNode(Document doc, String tagType, long id, String title) {
-		var node = doc.createElement(tagType);
-		node.setAttribute(CLASS, "org.olat.course.nodes.RootCourseNode");
-		node.appendChild(elementWithText(doc, "ident", id));
-		node.appendChild(elementWithText(doc, "type", "root"));
-		node.appendChild(elementWithText(doc, "shortTitle", title));
-		node.appendChild(elementWithText(doc, "longTitle", title));
-		node.appendChild(elementWithText(doc, "learningObjectives", ""));
-		var moduleConfiguration = doc.createElement("moduleConfiguration");
-		node.appendChild(moduleConfiguration);
-		var config = doc.createElement("config");
-		moduleConfiguration.appendChild(config);
-		config.appendChild(createEntry(doc, "courseEnrolmentEnabled", false));
-		config.appendChild(createEntry(doc, "columns", 1));
-		config.appendChild(createEntry(doc, "courseEnrolmentMailSubject", ""));
-		config.appendChild(createEntry(doc, "display", "peekview"));
-		config.appendChild(createEntry(doc, "courseEnrolmentGroupId", 0));
-		config.appendChild(createEntry(doc, "courseEnrolmentMailEnabled", false));
-		config.appendChild(createEntry(doc, "courseEnrolmentMailBody", ""));
-		config.appendChild(createEntry(doc, "configversion", 3));
-		var additionalConditions = doc.createElement("additionalConditions");
-		node.appendChild(additionalConditions);
-		additionalConditions.appendChild(emptyElement(doc, "org.olat.course.condition.additionalconditions"
-														   + ".PasswordCondition"));
-		node.appendChild(elementWithText(doc, "evaluateAsSubcourse", false));
-		return node;
-	}
-
-	private Node elementWithText(Document doc, String nodeName, boolean booleanValue) {
-		return elementWithText(doc, nodeName, booleanValue ? "true" : "false");
-	}
-
-	private void writeCourseConfig(File targetDirectory) {
-		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder docBuilder;
-		try {
-			docBuilder = docFactory.newDocumentBuilder();
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		}
-		Document doc = docBuilder.newDocument();
-		// root element
-		var rootElement = doc.createElement("org.olat.course.config.CourseConfig");
-		doc.appendChild(rootElement);
-		// children
-		var version = doc.createElement("version");
-		version.appendChild(doc.createTextNode("12"));
-		rootElement.appendChild(version);
-		var configuration = doc.createElement("configuration");
-		configuration.setAttribute(CLASS, "hashtable");
-		rootElement.appendChild(configuration);
-		// default entries
-		for (var entry : getDefaultConfigEntries(doc)) {
-			configuration.appendChild(entry);
-		}
-		// write to file
-		DefaultXMLWriter.write(doc, STR."\{targetDirectory.getAbsolutePath()}/CourseConfig.xml");
-	}
-
-	private List<Element> getDefaultConfigEntries(Document doc) {
-		return List.of(
-				createEntry(doc, "KEY_CALENDAR_ENABLED", false),
-				createEntry(doc, "SHAREDFOLDER_SOFTKEY", "sf.notconfigured"),
-				createEntry(doc, "FORBID_EXTENSIONS", ""),
-				createEntry(doc, "KEY_DOWNLOAD_CERTIFICATE_ENABLED", false),
-				createEntry(doc, "KEY_CERTIFICATE_ENABLED", false),
-				createEntry(doc, "CSS_FILEREF", "form.layout.setsystemcss"),
-				createEntry(doc, "KEY_EFFICENCY_RULES_ENABLED", true),
-				createEntry(doc, "KEY_EFFICENCY_ENABLED", true));
-	}
-
-	private Element createEntry(Document doc, String name, boolean booleanValue) {
-		var entry = doc.createElement("entry");
-		var wordform = doc.createElement("wordform");
-		var booleanNode = doc.createElement("boolean");
-		wordform.appendChild(doc.createTextNode(name));
-		booleanNode.appendChild(doc.createTextNode(booleanValue ? "true" : "false"));
-		entry.appendChild(wordform);
-		entry.appendChild(booleanNode);
-		return entry;
-	}
-
-	private Element createEntry(Document doc, String firstValue, String secondValue) {
-		var entry = doc.createElement("entry");
-		var wordform = doc.createElement("wordform");
-		var secondWord = doc.createElement("wordform");
-		wordform.appendChild(doc.createTextNode(firstValue));
-		secondWord.appendChild(doc.createTextNode(secondValue));
-		entry.appendChild(wordform);
-		entry.appendChild(secondWord);
-		return entry;
-	}
-
-	private Element createEntry(Document doc, String firstValue, int intVal) {
-		var entry = doc.createElement("entry");
-		var wordform = doc.createElement("wordform");
-		var intNode = doc.createElement("int");
-		wordform.appendChild(doc.createTextNode(firstValue));
-		intNode.appendChild(doc.createTextNode(Integer.toString(intVal)));
-		entry.appendChild(wordform);
-		entry.appendChild(intNode);
-		return entry;
-	}
-
-	private void writeBasicDirectories(File directory) {
-		File courseDir = new File(directory, "coursefolder");
-		courseDir.mkdir();
-		File exportDir = new File(directory, "export");
-		exportDir.mkdir();
-		File layoutDir = new File(directory, "layout");
-		layoutDir.mkdir();
-		// default files
-		backUpContext(directory);
-		emptyCourseRulesXML(directory);
-	}
-
 	private void backUpContext(File directory) {
 		var file = new File(directory, "__backup_context__.json");
 		try (var writer = new FileWriter(file)) {
@@ -398,7 +285,6 @@ public class OPAL_Exporter extends Exporter {
 			logger.error("Error while writing __backup_context__.json");
 		}
 	}
-
 
 	/**
 	 * Default empty course_rules.xml
@@ -412,5 +298,18 @@ public class OPAL_Exporter extends Exporter {
 		} catch (IOException e) {
 			logger.error("Error while writing course_rules.xml");
 		}
+	}
+
+
+	private List<Element> getDefaultConfigEntries(Document doc) {
+		return List.of(
+				createEntry(doc, "KEY_CALENDAR_ENABLED", false),
+				createEntry(doc, "SHAREDFOLDER_SOFTKEY", "sf.notconfigured"),
+				createEntry(doc, "FORBID_EXTENSIONS", ""),
+				createEntry(doc, "KEY_DOWNLOAD_CERTIFICATE_ENABLED", false),
+				createEntry(doc, "KEY_CERTIFICATE_ENABLED", false),
+				createEntry(doc, "CSS_FILEREF", "form.layout.setsystemcss"),
+				createEntry(doc, "KEY_EFFICENCY_RULES_ENABLED", true),
+				createEntry(doc, "KEY_EFFICENCY_ENABLED", true));
 	}
 }
