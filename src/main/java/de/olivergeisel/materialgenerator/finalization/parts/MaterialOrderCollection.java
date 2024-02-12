@@ -23,7 +23,7 @@ import java.util.*;
  * @since 0.2.0
  */
 @Entity
-public abstract class MaterialOrderCollection extends MaterialOrderPart {
+public abstract class MaterialOrderCollection extends MaterialOrderPart implements Iterable<MaterialOrderPart> {
 
 	@ElementCollection
 	private final List<String> alias = new ArrayList<>(); // KnowledgeObject (Structure) ids
