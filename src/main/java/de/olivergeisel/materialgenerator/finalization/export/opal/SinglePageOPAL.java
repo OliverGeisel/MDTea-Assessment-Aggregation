@@ -7,7 +7,8 @@ import java.util.Random;
 
 import static de.olivergeisel.materialgenerator.finalization.export.opal.BasicElementsOPAL.FileCreationType.RUN;
 import static de.olivergeisel.materialgenerator.finalization.export.opal.BasicElementsOPAL.FileCreationType.TREE;
-import static de.olivergeisel.materialgenerator.finalization.export.opal.BasicElementsOPAL.*;
+import static de.olivergeisel.materialgenerator.finalization.export.opal.BasicElementsOPAL.createEntry;
+import static de.olivergeisel.materialgenerator.finalization.export.opal.BasicElementsOPAL.elementWithText;
 
 
 /**
@@ -24,9 +25,9 @@ public class SinglePageOPAL {
 	private static final String CLASS        = "class";
 
 
-	public Document createRunStructureOPAL(String parentType, String file) {
-		var id = new Random().nextInt(100_000_000);
-		return createSinglePageOPAL(parentType, file, RUN, id);
+	public Element createRunStructureOPAL(String parentType, String file, Document doc) {
+		var id = new Random().nextLong(100_000_000);
+		return createSinglePageOPAL(parentType, file, RUN, id, doc);
 	}
 
 	/**
@@ -36,11 +37,9 @@ public class SinglePageOPAL {
 	 * @param file       file to link (html to display in the page)
 	 * @return the document with the tree structure
 	 */
-	public Document createTreeStructureOPAL(String parentType, String file) {
-		var doc = newDocument();
+	public Element createTreeStructureOPAL(String parentType, String file, Document doc) {
 		var root = doc.createElement(TREE_ELEMENT);
-		doc.appendChild(root);
-		var id = new Random().nextInt(100_000_000);
+		var id = new Random().nextLong(100_000_000);
 		var ident = doc.createElement("ident");
 		ident.setTextContent(Long.toString(id));
 		root.appendChild(ident);
@@ -55,12 +54,12 @@ public class SinglePageOPAL {
 		root.appendChild(elementWithText(doc, "selected", false));
 		root.appendChild(elementWithText(doc, "hrefPreferred", false));
 		root.appendChild(elementWithText(doc, "invisible", false));
-		var cn = createSinglePageOPAL(parentType, file, BasicElementsOPAL.FileCreationType.TREE, id);
-		children.appendChild(cn.getDocumentElement());
+		var cn = createSinglePageOPAL(parentType, file, BasicElementsOPAL.FileCreationType.TREE, id, doc);
+		children.appendChild(cn);
 		root.appendChild(elementWithText(doc, "dirty", false));
 		root.appendChild(elementWithText(doc, "deleted", false));
 		root.appendChild(elementWithText(doc, "newnode", false));
-		return doc;
+		return root;
 	}
 
 	/**
@@ -71,14 +70,12 @@ public class SinglePageOPAL {
 	 * @param file       file to link (html to display in the page)
 	 * @return the document with the single page
 	 */
-	protected Document createSinglePageOPAL(String parentType, String file, BasicElementsOPAL.FileCreationType type,
-			long id) {
-		Document doc = newDocument();
+	protected Element createSinglePageOPAL(String parentType, String file, BasicElementsOPAL.FileCreationType type,
+			long id, Document doc) {
 		var root = doc.createElement(type == RUN ? RUN_TYPE : TREE_TYPE);
 		if (type == TREE) {
 			root.setAttribute(CLASS, TREE_CLASS);
 		}
-		doc.appendChild(root);
 		var ident = doc.createElement("ident");
 		ident.setTextContent(Long.toString(id));
 		root.appendChild(ident);
@@ -98,7 +95,7 @@ public class SinglePageOPAL {
 		root.appendChild(title);
 		root.appendChild(createModuleConfiguration(doc, file));
 		// TODO Skip preconditions at moment. can be added later maybe
-		return doc;
+		return root;
 	}
 
 
@@ -109,7 +106,6 @@ public class SinglePageOPAL {
 		config.appendChild(createEntry(doc, "startpage", false));
 		config.appendChild(createEntry(doc, "file", file));
 		config.appendChild(createEntry(doc, "configversion", 3));
-
 		return moduleConfig;
 	}
 }

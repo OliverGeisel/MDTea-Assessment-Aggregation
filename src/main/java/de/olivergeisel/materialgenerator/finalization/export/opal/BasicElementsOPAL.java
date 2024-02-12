@@ -95,6 +95,10 @@ public class BasicElementsOPAL {
 		return moduleConfig;
 	}
 
+	public static String escapeTags(String text) {
+		return text.replace("<", "&lt;").replace(">", "&gt;");
+	}
+
 	public enum FileCreationType {
 		RUN, // if its for "runstructure.xml"
 		TREE, // if its for "editorTreeModel.xml"

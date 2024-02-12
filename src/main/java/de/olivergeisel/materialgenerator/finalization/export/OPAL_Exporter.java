@@ -137,8 +137,7 @@ public class OPAL_Exporter extends Exporter {
 		// root element
 		var root = doc.createElement("org.olat.course.tree.CourseEditorTreeModel");
 		doc.appendChild(root);
-		var rootNode = new RootOPAL().createRootOPAL(course, FileCreationType.TREE, id)
-									 .getDocumentElement();
+		var rootNode = new RootOPAL().createRootOPAL(course, FileCreationType.TREE, id, doc);
 		root.appendChild(rootNode);
 		root.appendChild(elementWithText(doc, "latestPublishTimestamp", -1));
 		root.appendChild(elementWithText(doc, "highestNodeId", 0));
@@ -152,8 +151,7 @@ public class OPAL_Exporter extends Exporter {
 		// root element
 		var rootElement = doc.createElement("org.olat.course.Structure");
 		doc.appendChild(rootElement);
-		var rootNode = new RootOPAL().createRootOPAL(course, FileCreationType.RUN, id)
-									 .getDocumentElement();
+		var rootNode = new RootOPAL().createRootOPAL(course, FileCreationType.RUN, id, doc);
 		rootElement.appendChild(rootNode);
 		rootElement.appendChild(elementWithText(doc, "latestPublishTimestamp", -1));
 		rootElement.appendChild(elementWithText(doc, "version", 7));
@@ -197,9 +195,9 @@ public class OPAL_Exporter extends Exporter {
 		rootElement.appendChild(elementWithText(doc, "DisplayName",
 				rawCourse.getMetadata().getName().orElse("new course")));
 		var description = rawCourse.getMetadata().getDescription().orElse("");
-		var encodedDescription = doc.createCDATASection(description);
+		var encodedDescription = escapeTags(description);
 		var descriptionElement = doc.createElement("Description");
-		descriptionElement.appendChild(encodedDescription);
+		descriptionElement.appendChild(doc.createTextNode(encodedDescription));
 		rootElement.appendChild(descriptionElement);
 		rootElement.appendChild(elementWithText(doc, "InitialAuthor", "MDTea-System")); // Todo Use a metadata field
 		// metadata
@@ -267,8 +265,9 @@ public class OPAL_Exporter extends Exporter {
 				        <repoKey>0</repoKey>
 				    </org.olat.repository.MetaDataElement>
 				</list>""";
-		var encoded = doc.createCDATASection(content);
-		metadata.appendChild(encoded);
+		var encoded = content.replace("<", "&lt;").replace(">", "&gt;");
+		var textNode = doc.createTextNode(encoded);
+		metadata.appendChild(textNode);
 		rootElement.appendChild(metadata);
 		// write to file
 		DefaultXMLWriter.write(doc, STR."\{exportDirectory.getAbsolutePath()}/repo.xml");

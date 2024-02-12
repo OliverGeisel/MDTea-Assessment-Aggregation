@@ -23,15 +23,13 @@ public class RootOPAL {
 	 * @param id       The id of the node
 	 * @return The document with the root node
 	 */
-	public Document createRootOPAL(RawCourse course, FileCreationType nodeType, long id) {
-		var document = newDocument();
+	public Element createRootOPAL(RawCourse course, FileCreationType nodeType, long id, Document document) {
+		Element back;
 		if (nodeType == RUN) {
-			var node = innerRoot(ROOT_TYPE, nodeType, id, course);
-			document.appendChild(node.getDocumentElement());
+			back = innerRoot(ROOT_TYPE, nodeType, id, course, document);
 		} else {
 			var root = document.createElement(ROOT_TYPE);
 			root.setAttribute(CLASS, TREE_ROOT_CLASS);
-			document.appendChild(root);
 			var ident = document.createElement("ident");
 			ident.setTextContent(Long.toString(id));
 			root.appendChild(ident);
@@ -39,28 +37,35 @@ public class RootOPAL {
 			children.setAttribute(CLASS, "linked-list");
 			for (var part : course.getCourseOrder().getChapterOrder()) {
 				var opalChild = new StructureOPAL();
-				Document child = opalChild.createTreeStructureOPAL(part, TREE_PARENT);
-				children.appendChild(child.getDocumentElement());
+				var child = opalChild.createTreeStructureOPAL(part, TREE_PARENT, document);
+				children.appendChild(child);
 			}
 			root.appendChild(children);
 			root.appendChild(elementWithText(document, "accessible", true));
 			root.appendChild(elementWithText(document, "selected", false));
 			root.appendChild(elementWithText(document, "hrefPreferred", false));
 			root.appendChild(elementWithText(document, "invisible", false)); // Todo maybe true for protection
-			root.appendChild(innerRoot("cn", nodeType, id, course).getDocumentElement());
-			var dirtry = elementWithText(document, "dirty", false);
-			var deleted = elementWithText(document, "deleted", false);
-			var newElement = elementWithText(document, "newnode", false);
-			root.appendChild(dirtry);
-			root.appendChild(deleted);
-			root.appendChild(newElement);
+			root.appendChild(innerRoot("cn", nodeType, id, course, document));
+			root.appendChild(elementWithText(document, "dirty", false));
+			root.appendChild(elementWithText(document, "deleted", false));
+			root.appendChild(elementWithText(document, "newnode", false));
+			back = root;
 		}
-		return document;
+		return back;
 	}
 
 
-	private Document innerRoot(String tagType, FileCreationType fileType, long id, RawCourse course) {
-		Document doc = newDocument();
+	/**
+	 * Internal call to create the root node in the document.
+	 *
+	 * @param tagType  The type of the tag (rootNode or cn)
+	 * @param fileType The type of the file (RUN or TREE)
+	 * @param id       The id of the node
+	 * @param course   The course to create the root for
+	 * @param doc      The document to create the node in
+	 * @return The new root node
+	 */
+	private Element innerRoot(String tagType, FileCreationType fileType, long id, RawCourse course, Document doc) {
 		var node = doc.createElement(tagType);
 		node.setAttribute(CLASS, INNER_ROOT_CLASS);
 		var ident = doc.createElement("ident");
@@ -69,14 +74,15 @@ public class RootOPAL {
 		if (fileType == RUN) {
 			var children = doc.createElement("children");
 			children.setAttribute(CLASS, "linked-list");
+			node.appendChild(children);
 			for (var part : course.getCourseOrder().getChapterOrder()) {
 				var opalChild = new StructureOPAL();
-				Document child = opalChild.createRunStructureOPAL(part, INNER_ROOT_CLASS);
-				children.appendChild(child.getDocumentElement());
+				var child = opalChild.createRunStructureOPAL(part, INNER_ROOT_CLASS, doc);
+				children.appendChild(child);
 			}
 		}
 		appendRest(doc, node, course.getMeta().getName().orElse("New Course"));
-		return doc;
+		return node;
 	}
 
 	private void appendRest(Document doc, Element root, String title) {

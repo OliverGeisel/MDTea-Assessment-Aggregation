@@ -3,6 +3,7 @@ package de.olivergeisel.materialgenerator.finalization.export.opal;
 import de.olivergeisel.materialgenerator.finalization.parts.MaterialOrderCollection;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import java.util.Random;
 
@@ -26,16 +27,14 @@ public class StructureOPAL {
 	 * @param parentType parent type of the page (e.g. "org.olat.course.nodes.STCourseNode")
 	 * @return the document with the run structure
 	 */
-	public Document createRunStructureOPAL(MaterialOrderCollection collection, String parentType) {
+	public Element createRunStructureOPAL(MaterialOrderCollection collection, String parentType, Document doc) {
 		var id = new Random().nextLong(100_000_000);
-		return createStructureOPAL(collection, parentType, RUN, id);
+		return createStructureOPAL(collection, parentType, RUN, id, doc);
 	}
 
-	public Document createTreeStructureOPAL(MaterialOrderCollection collection, String parentType) {
-		var doc = newDocument();
+	public Element createTreeStructureOPAL(MaterialOrderCollection collection, String parentType, Document doc) {
 		var root = doc.createElement(TREE_PARENT);
-		doc.appendChild(root);
-		var id = new Random().nextInt(100_000_000);
+		var id = new Random().nextLong(100_000_000);
 		var ident = doc.createElement("ident");
 		ident.setTextContent(Long.toString(id));
 		root.appendChild(ident);
@@ -46,18 +45,15 @@ public class StructureOPAL {
 		var children = doc.createElement("children");
 		children.setAttribute(CLASS, "linked-list");
 		for (var part : collection) {
-			var childId = new Random().nextLong(100_000_000);
 			if (part instanceof MaterialOrderCollection materialOrderCollection) {
 				var xmlGroup =
-						new StructureOPAL().createStructureOPAL(materialOrderCollection, TREE_TYPE, TREE, childId);
+						new StructureOPAL().createTreeStructureOPAL(materialOrderCollection, TREE_TYPE, doc);
 				children.appendChild(xmlGroup);
 			} else if (part instanceof Material task) {
 				var page = new SinglePageOPAL();
-				Document xmlTask;
-				var typeToCreate = TREE;
-				xmlTask = page.createTreeStructureOPAL(TREE_TYPE, task.toString()); //
+				Element xmlTask = page.createTreeStructureOPAL(TREE_TYPE, task.toString(), doc); //
 				// Todo change to a file that is linked with the task
-				children.appendChild(xmlTask.getDocumentElement());
+				children.appendChild(xmlTask);
 			}
 		}
 		root.appendChild(children);
@@ -65,12 +61,12 @@ public class StructureOPAL {
 		root.appendChild(elementWithText(doc, "selected", false));
 		root.appendChild(elementWithText(doc, "hrefPreferred", false));
 		root.appendChild(elementWithText(doc, "invisible", false));
-		var cn = createStructureOPAL(collection, parentType, BasicElementsOPAL.FileCreationType.TREE, id);
-		children.appendChild(cn.getDocumentElement());
+		var cn = createStructureOPAL(collection, parentType, BasicElementsOPAL.FileCreationType.TREE, id, doc);
+		root.appendChild(cn);
 		root.appendChild(elementWithText(doc, "dirty", false));
 		root.appendChild(elementWithText(doc, "deleted", false));
 		root.appendChild(elementWithText(doc, "newnode", false));
-		return doc;
+		return root;
 	}
 
 
@@ -83,14 +79,12 @@ public class StructureOPAL {
 	 * @param id         id of this structure
 	 * @return the document with the structure
 	 */
-	protected Document createStructureOPAL(MaterialOrderCollection collection, String parentType,
-			FileCreationType type, long id) {
-		Document doc = newDocument();
+	protected Element createStructureOPAL(MaterialOrderCollection collection, String parentType,
+			FileCreationType type, long id, Document doc) {
 		var root = doc.createElement(type == RUN ? RUN_TYPE : TREE_TYPE);
 		if (type == TREE) {
 			root.setAttribute(CLASS, TREE_CLASS);
 		}
-		doc.appendChild(root);
 		var ident = doc.createElement("ident");
 		ident.setTextContent(Long.toString(id));
 		root.appendChild(ident);
@@ -107,13 +101,14 @@ public class StructureOPAL {
 				var childId = new Random().nextLong(100_000_000);
 				if (part instanceof MaterialOrderCollection materialOrderCollection) {
 					var xmlGroup =
-							new StructureOPAL().createStructureOPAL(materialOrderCollection, RUN_TYPE, type, childId);
+							new StructureOPAL().createStructureOPAL(materialOrderCollection, RUN_TYPE, type, childId,
+									doc);
 					children.appendChild(xmlGroup);
 				} else if (part instanceof Material task) {
 					var page = new SinglePageOPAL();
-					Document xmlTask = page.createRunStructureOPAL(RUN_TYPE, task.toString());
+					var xmlTask = page.createRunStructureOPAL(RUN_TYPE, task.toString(), doc);
 					// Todo change to a file that is linked with the task
-					children.appendChild(xmlTask.getDocumentElement());
+					children.appendChild(xmlTask);
 				}
 			}
 		}
@@ -136,7 +131,7 @@ public class StructureOPAL {
 		scoreCalc.appendChild(elementWithText(doc, "expertMode", false));
 		scoreCalc.appendChild(elementWithText(doc, "passedCutValue", 0));
 		root.appendChild(elementWithText(doc, "evaluateAsSubcourse", false));
-		return doc;
+		return root;
 	}
 
 
