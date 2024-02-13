@@ -14,6 +14,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @Tag("Unit")
 class SinglePageOPALTest {
@@ -43,9 +45,11 @@ class SinglePageOPALTest {
 	@Test
 	void createRunStructureOPAL_Normal() {
 		var parent = "org.olat.course.nodes.STCourseNode";
+		var organizer = mock(CourseOrganizerOPAL.class);
+		when(organizer.getNextId()).thenReturn(12345678L);
 		var realMaterial =
 				new Material(MaterialType.WIKI, TemplateType.DEFINITION, "Test-Term", "TEST_ID", "STRUCTURE_ID");
-		var material = new OPALMaterialInfo("Test", 1, realMaterial, null);
+		var material = new OPALMaterialInfo("Test", realMaterial, organizer);
 
 		var result = singlePageOPAL.createRunStructureOPAL(material, parent, document);
 
@@ -54,7 +58,7 @@ class SinglePageOPALTest {
 		// ident
 		var ident = result.getChildNodes().item(0);
 		assertEquals("ident", ident.getNodeName(), "NodeName is wrong");
-		assertEquals("1", ident.getTextContent(), "Id is wrong");
+		assertEquals("12345678", ident.getTextContent(), "Id is wrong");
 		// parent
 		var parentElement = (Element) result.getChildNodes().item(1);
 		assertEquals("parent", parentElement.getNodeName(), "NodeName is wrong");
@@ -82,9 +86,11 @@ class SinglePageOPALTest {
 	@Test
 	void createTreeStructureOPAL_Normal() {
 		var parent = "org.olat.course.tree.CourseEditorTreeNode";
+		var organizer = mock(CourseOrganizerOPAL.class);
+		when(organizer.getNextId()).thenReturn(12345678L);
 		var realMaterial =
 				new Material(MaterialType.WIKI, TemplateType.DEFINITION, "Test-Term", "TEST_ID", "STRUCTURE_ID");
-		var material = new OPALMaterialInfo("Test", 1, realMaterial, null);
+		var material = new OPALMaterialInfo("Test", realMaterial, organizer);
 		var result = singlePageOPAL.createTreeStructureOPAL(material, parent, document);
 
 		assertEquals("org.olat.course.tree.CourseEditorTreeNode", result.getTagName(), "Tagname is wrong");
@@ -92,7 +98,7 @@ class SinglePageOPALTest {
 		// ident
 		var ident = result.getChildNodes().item(0);
 		assertEquals("ident", ident.getNodeName(), "NodeName is wrong");
-		assertEquals("1", ident.getTextContent(), "Id is wrong");
+		assertEquals("12345678", ident.getTextContent(), "Id is wrong");
 		// parent
 		var parentElement = (Element) result.getChildNodes().item(1);
 		assertEquals("parent", parentElement.getNodeName(), "NodeName is wrong");
@@ -127,7 +133,7 @@ class SinglePageOPALTest {
 
 		var cnIdent = cn.getChildNodes().item(0);
 		assertEquals("ident", cnIdent.getNodeName(), "NodeName is wrong");
-		assertEquals("1", cnIdent.getTextContent(), "Text is wrong");
+		assertEquals("12345678", cnIdent.getTextContent(), "Text is wrong");
 		var cnType = cn.getChildNodes().item(1);
 		assertEquals("type", cnType.getNodeName(), "NodeName is wrong");
 		assertEquals("sp", cnType.getTextContent(), "Text is wrong");

@@ -42,6 +42,11 @@ class OPALChapterInfo extends ChapterOrder implements MaterialCollectionOPAL<Cha
 
 	//region setter/getter
 	@Override
+	public String getName() {
+		return chapterName;
+	}
+
+	@Override
 	public List<OPALGroupInfo> getMaterialOrder() {
 		return Collections.unmodifiableList(groups);
 	}

@@ -48,6 +48,12 @@ class OPALGroupInfo extends GroupOrder
 	}
 
 	@Override
+	public String getName() {
+		return groupName;
+	}
+
+
+	@Override
 	public GroupOrder getOriginalCollection() {
 		return originalGroup;
 	}

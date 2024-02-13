@@ -101,9 +101,9 @@ public class SinglePageOPAL {
 		typeElement.setTextContent("sp");
 		root.appendChild(typeElement);
 		var title = doc.createElement("shortTitle");
-		title.setTextContent(material.getMaterialName());
+		title.setTextContent(material.getName());
 		root.appendChild(title);
-		root.appendChild(createModuleConfiguration(doc, material.fileName()));
+		root.appendChild(createModuleConfiguration(doc, material.completeFileName()));
 		// TODO Skip preconditions at moment. can be added later maybe
 		return root;
 	}
@@ -114,7 +114,7 @@ public class SinglePageOPAL {
 		var config = doc.createElement("config");
 		moduleConfig.appendChild(config);
 		config.appendChild(createEntry(doc, "startpage", false));
-		config.appendChild(createEntry(doc, "file", file));
+		config.appendChild(createEntry(doc, "file", STR."/\{file}"));
 		config.appendChild(createEntry(doc, "configversion", 3));
 		return moduleConfig;
 	}

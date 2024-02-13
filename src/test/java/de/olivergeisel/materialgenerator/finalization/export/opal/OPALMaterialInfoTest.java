@@ -33,7 +33,8 @@ class OPALMaterialInfoTest {
 
 	@BeforeEach
 	void setUp() {
-		opalMaterialInfo = new OPALMaterialInfo("fileName", 12345678L, material, organizer);
+		when(organizer.getNextId()).thenReturn(12345678L);
+		opalMaterialInfo = new OPALMaterialInfo("fileName", material, organizer);
 	}
 
 	@AfterEach
@@ -94,7 +95,7 @@ class OPALMaterialInfoTest {
 
 	@Test
 	void getMaterialName() {
-		assertEquals("fileName", opalMaterialInfo.getMaterialName());
+		assertEquals("fileName", opalMaterialInfo.getRelatedTaskName());
 	}
 
 	@Test
