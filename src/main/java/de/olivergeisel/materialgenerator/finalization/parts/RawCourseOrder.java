@@ -1,5 +1,6 @@
 package de.olivergeisel.materialgenerator.finalization.parts;
 
+import de.olivergeisel.materialgenerator.core.course.CourseOrder;
 import de.olivergeisel.materialgenerator.core.course.MaterialOrderPart;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
 import de.olivergeisel.materialgenerator.finalization.material_assign.BasicMaterialAssigner;
@@ -14,7 +15,7 @@ import java.util.*;
  * This is the final order of the course. It is used to generate the final course. It's editable by the user.
  */
 @Entity
-public class CourseOrder extends de.olivergeisel.materialgenerator.core.course.CourseOrder {
+public class RawCourseOrder extends CourseOrder {
 	@OneToMany(cascade = CascadeType.ALL)
 	private final List<ChapterOrder> chapterOrder = new LinkedList<>();
 	@Id
@@ -22,10 +23,10 @@ public class CourseOrder extends de.olivergeisel.materialgenerator.core.course.C
 	@Column(name = "id", nullable = false)
 	private       UUID               id;
 
-	protected CourseOrder() {
+	protected RawCourseOrder() {
 	}
 
-	public CourseOrder(CoursePlan plan, Set<Goal> goals) {
+	public RawCourseOrder(CoursePlan plan, Set<Goal> goals) {
 		for (var chapter : plan.getStructure().getOrder()) {
 			chapterOrder.add(new ChapterOrder(chapter, goals));
 		}
@@ -130,7 +131,7 @@ public class CourseOrder extends de.olivergeisel.materialgenerator.core.course.C
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (!(o instanceof CourseOrder that)) return false;
+		if (!(o instanceof RawCourseOrder that)) return false;
 
 		return id.equals(that.id);
 	}

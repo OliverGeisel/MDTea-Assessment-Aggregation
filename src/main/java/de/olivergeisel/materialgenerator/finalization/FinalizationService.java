@@ -47,7 +47,7 @@ public class FinalizationService {
 		var rawCourse = new RawCourse(coursePlan, template, goals);
 		rawCourse.assignMaterial(materials);
 		saveMetadata(rawCourse.getMetadata());
-		saveMaterialOrder(rawCourse.getCourseOrder());
+		saveMaterialOrder(rawCourse.getOrder());
 		return rawCourseRepository.save(rawCourse);
 	}
 
@@ -61,9 +61,9 @@ public class FinalizationService {
 		return back;
 	}
 
-	private void saveMaterialOrder(CourseOrder courseOrder) {
-		saveChapterOrder(courseOrder.getChapterOrder());
-		courseOrderRepository.save(courseOrder);
+	private void saveMaterialOrder(RawCourseOrder rawCourseOrder) {
+		saveChapterOrder(rawCourseOrder.getChapterOrder());
+		courseOrderRepository.save(rawCourseOrder);
 	}
 
 	private void saveMetadata(CourseMetadataFinalization metadata) {
@@ -91,7 +91,7 @@ public class FinalizationService {
 	public void moveUp(UUID id, UUID parentChapterId, UUID parentGroupId, UUID parentTaskId, UUID idUp)
 			throws NoSuchElementException, IllegalStateException {
 		var course = rawCourseRepository.findById(id).orElseThrow();
-		var order = course.getCourseOrder();
+		var order = course.getOrder();
 		var element = order.find(idUp);
 		switch (element) {
 			case ChapterOrder chapter -> order.moveUp(chapter);
@@ -115,7 +115,7 @@ public class FinalizationService {
 	public void moveDown(UUID id, UUID parentChapterId, UUID parentGroupId, UUID parentTaskId, UUID idDown)
 			throws NoSuchElementException, IllegalStateException {
 		var course = rawCourseRepository.findById(id).orElseThrow();
-		var order = course.getCourseOrder();
+		var order = course.getOrder();
 		var element = order.find(idDown);
 		switch (element) {
 			case ChapterOrder chapter -> order.moveDown(chapter);
@@ -149,7 +149,7 @@ public class FinalizationService {
 	public void setRelevance(UUID id, UUID taskId, Relevance relevance)
 			throws IllegalArgumentException, NoSuchElementException {
 		var course = rawCourseRepository.findById(id).orElseThrow();
-		var order = course.getCourseOrder();
+		var order = course.getOrder();
 		var taskOrder = order.findTask(taskId);
 		if (taskOrder != null) {
 			taskOrder.setRelevance(relevance);

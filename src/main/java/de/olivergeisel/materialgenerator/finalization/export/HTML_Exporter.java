@@ -63,7 +63,7 @@ public class HTML_Exporter extends Exporter {
 		CourseNavigation.MaterialLevel level = new CourseNavigation.MaterialLevel();
 		var navigation = new CourseNavigation(level);
 		overallInfos.put("courseName", plan.getMetadata().getName().orElse("Kurs"));
-		var chapters = plan.getCourseOrder().getChapterOrder();
+		var chapters = plan.getOrder().getChapterOrder();
 		for (int i = 0; i < chapters.size(); i++) {
 			var chapter = chapters.get(i);
 			if (chapter.materialCount() == 0) { // skip chapters without material
@@ -261,25 +261,6 @@ public class HTML_Exporter extends Exporter {
 		}
 	}
 
-	/**
-	 * Creates the default template engine for the given template set.
-	 *
-	 * @param templateSet name of the template set
-	 * @return the template engine
-	 */
-	private TemplateEngine createTemplateEngine(String templateSet) {
-		var templateResolver = new ClassLoaderTemplateResolver();
-		templateResolver.setPrefix(STR."templateSets/\{templateSet}/");
-		templateResolver.setSuffix(".html");
-		templateResolver.setTemplateMode("HTML");
-		templateResolver.setCharacterEncoding("UTF-8");
-		templateResolver.setCacheable(false);
-		templateResolver.setCheckExistence(true);
-
-		var templateEngine = new TemplateEngine();
-		templateEngine.setTemplateResolver(templateResolver);
-		return templateEngine;
-	}
 
 	private void setOverallInfos(Context context, CourseNavigation navigation, CourseNavigation.MaterialLevel level) {
 		for (var entry : overallInfos.entrySet()) {
@@ -303,15 +284,8 @@ public class HTML_Exporter extends Exporter {
 		return imageService.loadAsResource(name);
 	}
 
-	public void saveToFile(String templateContent, File outputDir, String fileName) {
-		try (Writer writer = new BufferedWriter(new FileWriter(new File(outputDir, fileName)))) {
-			writer.write(templateContent);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 
-//region setter/getter
+	//region setter/getter
 	private void setOverallInfos(Context context) {
 		for (var entry : overallInfos.entrySet()) {
 			context.setVariable(entry.getKey(), entry.getValue());

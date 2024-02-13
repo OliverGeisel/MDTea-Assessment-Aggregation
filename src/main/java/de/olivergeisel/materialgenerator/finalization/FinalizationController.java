@@ -65,7 +65,7 @@ public class FinalizationController {
 	@PostMapping({"edit/{id}/deletePart",})
 	public String deleteCoursePart(@PathVariable UUID id, @RequestParam("id") UUID partId) {
 		repository.findById(id).ifPresent(course -> {
-			course.getCourseOrder().remove(partId);
+			course.getOrder().remove(partId);
 			repository.save(course);
 		});
 		return REDIRECT_EDIT + id + THEMEN_SECTION;
