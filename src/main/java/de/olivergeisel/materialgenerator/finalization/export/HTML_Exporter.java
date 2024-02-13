@@ -1,14 +1,12 @@
 package de.olivergeisel.materialgenerator.finalization.export;
 
 
-import de.olivergeisel.materialgenerator.StorageFileNotFoundException;
 import de.olivergeisel.materialgenerator.finalization.parts.*;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.transfer.ExampleMaterial;
 import de.olivergeisel.materialgenerator.generation.material.transfer.ImageMaterial;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -37,14 +35,14 @@ public class HTML_Exporter extends Exporter {
 
 	private static final Logger logger = LoggerFactory.getLogger(HTML_Exporter.class);
 
-	private final ImageService imageService;
-
 	/**
 	 * Shortcut for the context
 	 */
 	private final Map<String, String> overallInfos = new HashMap<>();
 
-	public HTML_Exporter(ImageService imageService) {this.imageService = imageService;}
+	public HTML_Exporter(ImageService imageService) {
+		super(imageService);
+	}
 
 
 	@Override
@@ -271,20 +269,6 @@ public class HTML_Exporter extends Exporter {
 		}
 		context.setVariable("navigation", navigation);
 		context.setVariable("rootPath", level.getPathToRoot());
-	}
-
-	private void loadImage(String image, File outputDir) {
-		try {
-			var imageFile = getImage(image);
-			Files.copy(imageFile.getInputStream(), new File(outputDir, image).toPath(),
-					StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException | StorageFileNotFoundException e) {
-			logger.warn(e.toString());
-		}
-	}
-
-	private Resource getImage(String name) throws StorageFileNotFoundException {
-		return imageService.loadAsResource(name);
 	}
 
 

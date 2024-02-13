@@ -45,7 +45,8 @@ class SinglePageOPALTest {
 		var parent = "org.olat.course.nodes.STCourseNode";
 		var realMaterial =
 				new Material(MaterialType.WIKI, TemplateType.DEFINITION, "Test-Term", "TEST_ID", "STRUCTURE_ID");
-		var material = new OPALMaterialInfo("Test", 1, realMaterial);
+		var material = new OPALMaterialInfo("Test", 1, realMaterial, null);
+
 		var result = singlePageOPAL.createRunStructureOPAL(material, parent, document);
 
 		assertEquals("org.olat.course.nodes.STCourseNode", result.getTagName(), "Tagname is wrong");
@@ -83,7 +84,7 @@ class SinglePageOPALTest {
 		var parent = "org.olat.course.tree.CourseEditorTreeNode";
 		var realMaterial =
 				new Material(MaterialType.WIKI, TemplateType.DEFINITION, "Test-Term", "TEST_ID", "STRUCTURE_ID");
-		var material = new OPALMaterialInfo("Test", 1, realMaterial);
+		var material = new OPALMaterialInfo("Test", 1, realMaterial, null);
 		var result = singlePageOPAL.createTreeStructureOPAL(material, parent, document);
 
 		assertEquals("org.olat.course.tree.CourseEditorTreeNode", result.getTagName(), "Tagname is wrong");

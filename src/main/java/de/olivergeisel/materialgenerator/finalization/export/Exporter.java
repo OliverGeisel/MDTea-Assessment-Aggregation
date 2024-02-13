@@ -1,13 +1,20 @@
 package de.olivergeisel.materialgenerator.finalization.export;
 
+import de.olivergeisel.materialgenerator.StorageFileNotFoundException;
 import de.olivergeisel.materialgenerator.finalization.export.opal.OPAL_Exporter;
 import de.olivergeisel.materialgenerator.finalization.parts.CourseNavigation;
 import de.olivergeisel.materialgenerator.finalization.parts.GroupOrder;
 import de.olivergeisel.materialgenerator.finalization.parts.MaterialHierarchy;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 /**
@@ -28,7 +35,14 @@ import java.util.List;
  * @see RawCourse
  * @since 1.1.0
  */
+@Service
 public abstract class Exporter {
+
+	private static final Logger logger = LoggerFactory.getLogger(Exporter.class);
+
+	private final ImageService imageService;
+
+	protected Exporter(ImageService imageService) {this.imageService = imageService;}
 
 	/**
 	 * Creates a MaterialHierarchy for the next group
@@ -63,5 +77,19 @@ public abstract class Exporter {
 	 * @throws IOException if an error occurs during the export
 	 */
 	public abstract void export(RawCourse rawCourse, String templateSetName, File targetDirectory) throws IOException;
+
+	protected void loadImage(String image, File outputDir) {
+		try {
+			var imageFile = getImage(image);
+			Files.copy(imageFile.getInputStream(), new File(outputDir, image).toPath(),
+					StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException | StorageFileNotFoundException e) {
+			logger.warn(e.toString());
+		}
+	}
+
+	protected Resource getImage(String name) throws StorageFileNotFoundException {
+		return imageService.loadAsResource(name);
+	}
 
 }

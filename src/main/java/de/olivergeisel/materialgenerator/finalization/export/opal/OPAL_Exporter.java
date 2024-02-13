@@ -2,6 +2,7 @@ package de.olivergeisel.materialgenerator.finalization.export.opal;
 
 import de.olivergeisel.materialgenerator.finalization.export.DownloadManager;
 import de.olivergeisel.materialgenerator.finalization.export.Exporter;
+import de.olivergeisel.materialgenerator.finalization.export.ImageService;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,10 @@ public class OPAL_Exporter extends Exporter {
 
 	private static final Logger logger = LoggerFactory.getLogger(OPAL_Exporter.class);
 
+	public OPAL_Exporter(ImageService imageService) {
+		super(imageService);
+	}
+
 	/**
 	 * Exports the course to the desired format.
 	 * <p>
@@ -78,6 +83,9 @@ public class OPAL_Exporter extends Exporter {
 		CourseOrganizerOPAL organizer = new CourseOrganizerOPAL(rawCourse);
 		// infos and general structure
 		writeBasicDirectories(targetDirectory);
+		// materials
+		var courseDir = new File(targetDirectory, "coursefolder");
+		organizer.creatMaterials(courseDir);
 		// config
 		writeCourseConfig(targetDirectory);
 		writeEditorTreeModel(targetDirectory, organizer);

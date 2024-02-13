@@ -24,7 +24,8 @@ class OPALTaskInfo extends TaskOrder implements MaterialCollectionOPAL<TaskOrder
 		this.nodeId = courseOrganizer.getNextId();
 		this.originalTask = task;
 		for (var material : task.getMaterials()) {
-			var newMaterial = new OPALMaterialInfo(task.getName(), courseOrganizer.getNextId(), material);
+			var newMaterial =
+					new OPALMaterialInfo(task.getName(), courseOrganizer.getNextId(), material, courseOrganizer);
 			materials.add(newMaterial);
 		}
 	}
@@ -41,7 +42,7 @@ class OPALTaskInfo extends TaskOrder implements MaterialCollectionOPAL<TaskOrder
 				taskDirectory.mkdirs();
 			}*/
 		for (var material : materials) {
-			material.createFile(targetDirectory, courseOrganizer);
+			material.createFile(targetDirectory);
 		}
 	}
 

@@ -5,6 +5,7 @@ import de.olivergeisel.materialgenerator.core.course.Meta;
 import de.olivergeisel.materialgenerator.finalization.parts.ChapterOrder;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourse;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourseOrder;
+import lombok.AccessLevel;
 import lombok.Getter;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -19,13 +20,15 @@ import static de.olivergeisel.materialgenerator.finalization.export.ExportUtils.
  */
 public class CourseOrganizerOPAL extends Course {
 
-	final         TemplateEngine templateEngine;
+	@Getter(AccessLevel.PACKAGE)
+	private final TemplateEngine templateEngine;
 	@Getter
 	private final long           nodeId =
 			new Random().nextLong(10_000_000_000_000_000L) + 1_000_000_000_000_000L;
 	private final RawCourse      originalCourse;
 	private final OpalOrderRaw   order;
-	Context context = new Context(Locale.GERMANY);
+	@Getter(AccessLevel.PACKAGE)
+	private       Context        context = new Context(Locale.GERMANY);
 	@Getter
 	private boolean materialCreated = false;
 	private long    runId           = nodeId + 1;

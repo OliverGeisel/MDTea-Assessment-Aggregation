@@ -14,11 +14,13 @@ class OPALMaterialInfo extends Material {
 	private final String materialName;
 	private final long   nodeId;
 	private final Material originalMaterial;
+	private final CourseOrganizerOPAL courseOrganizer;
 
-	public OPALMaterialInfo(String name, long nodeId, Material material) {
+	public OPALMaterialInfo(String name, long nodeId, Material material, CourseOrganizerOPAL courseOrganizer) {
 		this.materialName = name;
 		this.nodeId = nodeId;
 		this.originalMaterial = material;
+		this.courseOrganizer = courseOrganizer;
 	}
 
 	public String fileName() {
@@ -30,8 +32,11 @@ class OPALMaterialInfo extends Material {
 		return originalMaterial.getTemplateType().getType();
 	}
 
-	public void createFile(File targetDirectory, CourseOrganizerOPAL courseOrganizer) {
-		String htmlString = courseOrganizer.templateEngine.process(materialType(), courseOrganizer.context);
+	public void createFile(File targetDirectory) {
+		var context = courseOrganizer.getContext();
+		context.setVariable("material", originalMaterial);
+		context.setVariable("title", materialName);
+		String htmlString = courseOrganizer.getTemplateEngine().process(materialType(), context);
 		saveToFile(htmlString, targetDirectory, STR."\{fileName()}.html");
 	}
 

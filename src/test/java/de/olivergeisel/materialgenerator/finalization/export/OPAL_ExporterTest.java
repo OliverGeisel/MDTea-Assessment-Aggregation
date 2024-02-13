@@ -3,11 +3,13 @@ package de.olivergeisel.materialgenerator.finalization.export;
 import de.olivergeisel.materialgenerator.finalization.export.opal.OPAL_Exporter;
 import de.olivergeisel.materialgenerator.finalization.parts.CourseMetadataFinalization;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourse;
+import de.olivergeisel.materialgenerator.finalization.parts.RawCourseOrder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,7 +22,8 @@ class OPAL_ExporterTest {
 
 	@BeforeEach
 	void setUp() {
-		opalExporter = new OPAL_Exporter();
+		var imageService = mock(ImageService.class);
+		opalExporter = new OPAL_Exporter(imageService);
 	}
 
 	@Test
@@ -36,11 +39,16 @@ class OPAL_ExporterTest {
 
 	@Test
 	void exportBasic() throws IOException {
+		var order = mock(RawCourseOrder.class);
+		when(order.getChapterOrder()).thenReturn(List.of());
+
 		var templateSet = "templateSet";
 		var rawCourse = mock(RawCourse.class);
 		var courseMeta = new CourseMetadataFinalization("title", "2024", "easy", "University", "description", Map.of());
 		when(rawCourse.getMeta()).thenReturn(courseMeta);
 		when(rawCourse.getMetadata()).thenReturn(courseMeta);
+		when(rawCourse.getTemplateName()).thenReturn(templateSet);
+		when(rawCourse.getOrder()).thenReturn(null);
 		var directory = File.createTempFile("test", "");
 		try {
 			opalExporter.export(rawCourse, templateSet, directory);
