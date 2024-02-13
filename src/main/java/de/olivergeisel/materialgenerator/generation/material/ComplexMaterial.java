@@ -2,9 +2,7 @@ package de.olivergeisel.materialgenerator.generation.material;
 
 import de.olivergeisel.materialgenerator.core.knowledge.metamodel.element.Term;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +19,10 @@ import java.util.List;
 @Entity
 public abstract class ComplexMaterial extends Material {
 
-	@OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@JoinTable(name = "complex_material_material",
+			joinColumns = @JoinColumn(name = "complex_material_id"),
+			inverseJoinColumns = @JoinColumn(name = "material_id"))
 	private final List<Material> parts = new ArrayList<>();
 
 	protected ComplexMaterial() {

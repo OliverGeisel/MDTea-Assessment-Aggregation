@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -233,6 +234,34 @@ public class Material extends MaterialOrderPart {
 		this.type = type;
 	}
 //endregion
+
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Material material)) return false;
+		if (!super.equals(o)) return false;
+
+		if (!values.equals(material.values)) return false;
+		if (!Objects.equals(term, material.term)) return false;
+		if (!Objects.equals(termId, material.termId)) return false;
+		if (!Objects.equals(structureId, material.structureId))
+			return false;
+		if (type != material.type) return false;
+		return Objects.equals(templateType, material.templateType);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = super.hashCode();
+		result = 31 * result + values.hashCode();
+		result = 31 * result + (term != null ? term.hashCode() : 0);
+		result = 31 * result + (termId != null ? termId.hashCode() : 0);
+		result = 31 * result + (structureId != null ? structureId.hashCode() : 0);
+		result = 31 * result + (type != null ? type.hashCode() : 0);
+		result = 31 * result + (templateType != null ? templateType.hashCode() : 0);
+		return result;
+	}
 
 	@Override
 	public String toString() {

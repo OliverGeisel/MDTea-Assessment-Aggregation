@@ -4,6 +4,7 @@ import de.olivergeisel.materialgenerator.finalization.parts.CourseNavigation;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import jakarta.persistence.*;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -67,17 +68,21 @@ public abstract class MaterialOrderPart {
 	}
 //endregion
 
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (!(o instanceof MaterialOrderPart that)) return false;
 
-		return id.equals(that.id);
+		if (!Objects.equals(id, that.id)) return false;
+		return Objects.equals(name, that.name);
 	}
 
 	@Override
 	public int hashCode() {
-		return id.hashCode();
+		int result = id != null ? id.hashCode() : 0;
+		result = 31 * result + (name != null ? name.hashCode() : 0);
+		return result;
 	}
 
 	@Override
