@@ -52,13 +52,12 @@ public class CourseOrganizerOPAL extends Course {
 		}
 		order.createMaterials(targetDirectory);
 		materialCreated = true;
-
 	}
 
 	//region setter/getter
 	@Override
 	public Meta getMeta() {
-		return null;
+		return originalCourse.getMeta();
 	}
 
 	@Override

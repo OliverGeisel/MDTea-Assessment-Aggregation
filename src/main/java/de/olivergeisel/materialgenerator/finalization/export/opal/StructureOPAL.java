@@ -41,12 +41,11 @@ public class StructureOPAL {
 		for (var part : collection.getMaterialOrder()) {
 			if (part instanceof MaterialCollectionOPAL subCollection) {
 				var xmlGroup =
-						new StructureOPAL().createTreeStructureOPAL(subCollection, TREE_TYPE, doc);
+						new StructureOPAL().createTreeStructureOPAL(subCollection, TREE_PARENT, doc);
 				children.appendChild(xmlGroup);
 			} else if (part instanceof OPALMaterialInfo material) {
 				var page = new SinglePageOPAL();
-				Element xmlTask = page.createTreeStructureOPAL(material, TREE_TYPE, doc); //
-				// Todo change to a file that is linked with the task
+				Element xmlTask = page.createTreeStructureOPAL(material, TREE_PARENT, doc);
 				children.appendChild(xmlTask);
 			}
 		}
@@ -73,7 +72,7 @@ public class StructureOPAL {
 	 * @param doc        The document to create the structure in
 	 * @return the document with the structure
 	 */
-	protected Element createStructureOPAL(MaterialCollectionOPAL collection, String parentType, FileCreationType type,
+	private Element createStructureOPAL(MaterialCollectionOPAL collection, String parentType, FileCreationType type,
 			Document doc) {
 		var root = doc.createElement(type == RUN ? RUN_TYPE : TREE_TYPE);
 		if (type == TREE) {
@@ -109,14 +108,17 @@ public class StructureOPAL {
 		root.appendChild(typeElement);
 		var titele = elementWithText(doc, "shortTitle", collection.getName());
 		root.appendChild(titele);
-		var longTitle = doc.createElement("longTitle");
-		longTitle.setTextContent(collection.getName());
-		root.appendChild(longTitle);
-		var learningObjets = doc.createElement("learningObjects");
-		root.appendChild(learningObjets);
-		var displayOptions = doc.createElement("displayOptions");
+		if (type == RUN) {
+			var longTitle = doc.createElement("longTitle");
+			longTitle.setTextContent(collection.getName());
+			root.appendChild(longTitle);
+			var learningObjets = elementWithText(doc, "learningObjectives", "");
+			root.appendChild(learningObjets);
+
+			var displayOptions = doc.createElement("displayOption");
 		root.appendChild(displayOptions);
 		displayOptions.setTextContent("title+desc+content");
+		}
 		root.appendChild(createDefaultModuleConfiguration(doc));
 		// Todo add other tags fo precondition
 		var scoreCalc = doc.createElement("scoreCalculator");

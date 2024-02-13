@@ -48,7 +48,7 @@ class OPALTaskInfo extends TaskOrder implements MaterialCollectionOPAL<TaskOrder
 	//region setter/getter
 	@Override
 	public List<OPALMaterialInfo> getMaterialOrder() {
-		throw new UnsupportedOperationException("Not allowed to get the materials");
+		return Collections.unmodifiableList(materials);
 	}
 
 	@Override

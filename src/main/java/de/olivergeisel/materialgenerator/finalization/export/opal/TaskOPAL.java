@@ -11,17 +11,18 @@ import static de.olivergeisel.materialgenerator.finalization.export.ExportUtils.
 
 @Getter
 class OPALMaterialInfo extends Material {
-	private final String   taskName;
-	private final long     nodeId;
+	private final String materialName;
+	private final long   nodeId;
 	private final Material originalMaterial;
 
 	public OPALMaterialInfo(String name, long nodeId, Material material) {
-		this.taskName = name;
+		this.materialName = name;
 		this.nodeId = nodeId;
 		this.originalMaterial = material;
 	}
 
 	public String fileName() {
+		// Todo better System for file name
 		return originalMaterial.getName();
 	}
 

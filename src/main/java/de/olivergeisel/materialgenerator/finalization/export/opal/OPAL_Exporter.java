@@ -210,60 +210,61 @@ public class OPAL_Exporter extends Exporter {
 		var ownerAccess = creationDate.toEpochSecond(ZoneOffset.UTC) * 1000;
 		// Todo replace with xml system or something else
 		var content = STR."""
-				<list>
-				    <org.olat.repository.MetaDataElement>
-				        <creationDate class="sql-timestamp">\{time}</creationDate>
-				        <version>0</version>
-				        <name>modulenumber</name>
-				        <value>\{moduleNumber}</value>
-				        <repoKey>0</repoKey>
-				    </org.olat.repository.MetaDataElement>
-				    <org.olat.repository.MetaDataElement>
-				        <creationDate class="sql-timestamp">\{time}</creationDate>
-				        <version>0</version>
-				        <name>modulename</name>
-				        <value>\{moduleName}</value>
-				        <repoKey>0</repoKey>
-				    </org.olat.repository.MetaDataElement>
-				    <org.olat.repository.MetaDataElement>
-				        <creationDate class="sql-timestamp">\{time}</creationDate>
-				        <version>0</version>
-				        <name>moduleversion</name>
-				        <value>\{version}</value>
-				        <repoKey>0</repoKey>
-				    </org.olat.repository.MetaDataElement>
-				    <org.olat.repository.MetaDataElement>
-				        <creationDate class="sql-timestamp">\{time}</creationDate>
-				        <version>0</version>
-				        <name>modulelevel</name>
-				        <value>\{level}</value>
-				        <repoKey>0</repoKey>
-				    </org.olat.repository.MetaDataElement>
-				    <org.olat.repository.MetaDataElement>
-				        <creationDate class="sql-timestamp">\{time}</creationDate>
-				        <version>0</version>
-				        <name>moduleduration</name>
-				        <value>\{moduleTime}</value>
-				        <repoKey>0</repoKey>
-				    </org.olat.repository.MetaDataElement>
-				    <org.olat.repository.MetaDataElement>
-				        <creationDate class="sql-timestamp">\{time}</creationDate>
-				        <version>0</version>
-				        <name>olatlinkinteresting</name>
-				        <value></value>
-				        <repoKey>0</repoKey>
-				    </org.olat.repository.MetaDataElement>
-				    <org.olat.repository.MetaDataElement>
-				        <creationDate class="sql-timestamp">\{time}</creationDate>
-				        <version>0</version>
-				        <name>lastOwnerAccess</name>
-				        <value>\{ownerAccess}</value>
-				        <repoKey>0</repoKey>
-				    </org.olat.repository.MetaDataElement>
-				</list>""";
-		var encoded = content.replace("<", "&lt;").replace(">", "&gt;");
-		var textNode = doc.createTextNode(encoded);
-		metadata.appendChild(textNode);
+<list>
+<org.olat.repository.MetaDataElement>
+<creationDate class="sql-timestamp">\{time}</creationDate>
+<version>0</version>
+<name>modulenumber</name>
+<value>\{moduleNumber}</value>
+<repoKey>0</repoKey>
+</org.olat.repository.MetaDataElement>
+<org.olat.repository.MetaDataElement>
+<creationDate class="sql-timestamp">\{time}</creationDate>
+<version>0</version>
+<name>modulename</name>
+<value>\{moduleName}</value>
+<repoKey>0</repoKey>
+</org.olat.repository.MetaDataElement>
+<org.olat.repository.MetaDataElement>
+<creationDate class="sql-timestamp">\{time}</creationDate>
+<version>0</version>
+<name>moduleversion</name>
+<value>\{version}</value>
+<repoKey>0</repoKey>
+</org.olat.repository.MetaDataElement>
+<org.olat.repository.MetaDataElement>
+<creationDate class="sql-timestamp">\{time}</creationDate>
+<version>0</version>
+<name>modulelevel</name>
+<value>\{level}</value>
+<repoKey>0</repoKey>
+</org.olat.repository.MetaDataElement>
+<org.olat.repository.MetaDataElement>
+<creationDate class="sql-timestamp">\{time}</creationDate>
+<version>0</version>
+<name>moduleduration</name>
+<value>\{moduleTime}</value>
+<repoKey>0</repoKey>
+</org.olat.repository.MetaDataElement>
+<org.olat.repository.MetaDataElement>
+<creationDate class="sql-timestamp">\{time}</creationDate>
+<version>0</version>
+<name>olatlinkinteresting</name>
+<value></value>
+<repoKey>0</repoKey>
+</org.olat.repository.MetaDataElement>
+<org.olat.repository.MetaDataElement>
+<creationDate class="sql-timestamp">\{time}</creationDate>
+<version>0</version>
+<name>lastOwnerAccess</name>
+<value>\{ownerAccess}</value>
+<repoKey>0</repoKey>
+</org.olat.repository.MetaDataElement>
+</list>""";
+
+
+		var encoded = doc.createCDATASection(content);
+		metadata.appendChild(encoded);
 		rootElement.appendChild(metadata);
 		// write to file
 		DefaultXMLWriter.write(doc, STR."\{exportDirectory.getAbsolutePath()}/repo.xml");
