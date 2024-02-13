@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
@@ -23,6 +24,11 @@ class MaterialOrderCollectionTest {
 	@BeforeEach
 	void setUp() {
 		collection = new MaterialOrderCollection() {
+			@Override
+			public Iterator<MaterialOrderPart> iterator() {
+				return null;
+			}
+
 			@Override
 			public Material findMaterial(UUID materialId) {
 				return null;

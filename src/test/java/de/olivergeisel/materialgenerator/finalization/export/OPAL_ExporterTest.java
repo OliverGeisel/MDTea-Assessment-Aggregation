@@ -1,5 +1,6 @@
 package de.olivergeisel.materialgenerator.finalization.export;
 
+import de.olivergeisel.materialgenerator.finalization.export.opal.OPAL_Exporter;
 import de.olivergeisel.materialgenerator.finalization.parts.CourseMetadataFinalization;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourse;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +35,7 @@ class OPAL_ExporterTest {
 	}
 
 	@Test
-	void export() throws IOException {
+	void exportBasic() throws IOException {
 		var templateSet = "templateSet";
 		var rawCourse = mock(RawCourse.class);
 		var courseMeta = new CourseMetadataFinalization("title", "2024", "easy", "University", "description", Map.of());

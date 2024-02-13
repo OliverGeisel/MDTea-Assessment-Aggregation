@@ -1,9 +1,8 @@
 package de.olivergeisel.materialgenerator.finalization.export.opal;
 
+import de.olivergeisel.materialgenerator.generation.material.Material;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import java.util.Random;
 
 import static de.olivergeisel.materialgenerator.finalization.export.opal.BasicElementsOPAL.FileCreationType.RUN;
 import static de.olivergeisel.materialgenerator.finalization.export.opal.BasicElementsOPAL.FileCreationType.TREE;
@@ -12,9 +11,13 @@ import static de.olivergeisel.materialgenerator.finalization.export.opal.BasicEl
 
 
 /**
- * A SinglePage in the OPAL xml.
+ * A SinglePage in the OPAL xml. Used for {@link Material}s.
  * Nodetype: org.olat.course.nodes.STCourseNode
  * TreeType: cn
+ *
+ * @since 1.1.0
+ * @version 1.1.0
+ * @author Oliver Geisel
  */
 public class SinglePageOPAL {
 
@@ -25,23 +28,31 @@ public class SinglePageOPAL {
 	private static final String CLASS        = "class";
 
 
-	public Element createRunStructureOPAL(String parentType, String file, Document doc) {
-		var id = new Random().nextLong(100_000_000);
-		return createSinglePageOPAL(parentType, file, RUN, id, doc);
+	/**
+	 * Create the node in the run structure.
+	 *
+	 * @param material   the material to create the page for
+	 * @param parentType parent type of the page (e.g. "org.olat.course.nodes.STCourseNode")
+	 * @param doc        the document to create the page in
+	 * @return the element for the run structure
+	 */
+	public Element createRunStructureOPAL(OPALMaterialInfo material, String parentType,
+			Document doc) {
+		return createSinglePageOPAL(material, parentType, RUN, doc);
 	}
 
 	/**
 	 * Create the node in the tree structure.
 	 *
 	 * @param parentType parent type of the page (e.g. "org.olat.course.nodes.STCourseNode")
-	 * @param file       file to link (html to display in the page)
+	 * @param material   the material to create the page for
 	 * @return the document with the tree structure
 	 */
-	public Element createTreeStructureOPAL(String parentType, String file, Document doc) {
+	public Element createTreeStructureOPAL(OPALMaterialInfo material, String parentType,
+			Document doc) {
 		var root = doc.createElement(TREE_ELEMENT);
-		var id = new Random().nextLong(100_000_000);
 		var ident = doc.createElement("ident");
-		ident.setTextContent(Long.toString(id));
+		ident.setTextContent(Long.toString(material.getNodeId()));
 		root.appendChild(ident);
 		var parent = doc.createElement("parent");
 		parent.setAttribute(CLASS, parentType);
@@ -54,7 +65,7 @@ public class SinglePageOPAL {
 		root.appendChild(elementWithText(doc, "selected", false));
 		root.appendChild(elementWithText(doc, "hrefPreferred", false));
 		root.appendChild(elementWithText(doc, "invisible", false));
-		var cn = createSinglePageOPAL(parentType, file, BasicElementsOPAL.FileCreationType.TREE, id, doc);
+		var cn = createSinglePageOPAL(material, parentType, BasicElementsOPAL.FileCreationType.TREE, doc);
 		children.appendChild(cn);
 		root.appendChild(elementWithText(doc, "dirty", false));
 		root.appendChild(elementWithText(doc, "deleted", false));
@@ -67,17 +78,18 @@ public class SinglePageOPAL {
 	 *
 	 * @param parentType parent type of the page (e.g. "org.olat.course.nodes.STCourseNode" or "org.olat.course.nodes
 	 *                   .RootCourseNode")
-	 * @param file       file to link (html to display in the page)
+	 * @param material   the material to create the page for
 	 * @return the document with the single page
 	 */
-	protected Element createSinglePageOPAL(String parentType, String file, BasicElementsOPAL.FileCreationType type,
-			long id, Document doc) {
+	protected Element createSinglePageOPAL(OPALMaterialInfo material, String parentType,
+			BasicElementsOPAL.FileCreationType type,
+			Document doc) {
 		var root = doc.createElement(type == RUN ? RUN_TYPE : TREE_TYPE);
 		if (type == TREE) {
 			root.setAttribute(CLASS, TREE_CLASS);
 		}
 		var ident = doc.createElement("ident");
-		ident.setTextContent(Long.toString(id));
+		ident.setTextContent(Long.toString(material.getNodeId()));
 		root.appendChild(ident);
 		if (type == RUN) {
 			var parent = doc.createElement("parent");
@@ -93,7 +105,7 @@ public class SinglePageOPAL {
 		root.appendChild(typeElement);
 		var title = doc.createElement("shortTitle");
 		root.appendChild(title);
-		root.appendChild(createModuleConfiguration(doc, file));
+		root.appendChild(createModuleConfiguration(doc, material.fileName()));
 		// TODO Skip preconditions at moment. can be added later maybe
 		return root;
 	}

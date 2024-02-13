@@ -1,8 +1,7 @@
-package de.olivergeisel.materialgenerator.finalization.export;
+package de.olivergeisel.materialgenerator.finalization.export.opal;
 
-import de.olivergeisel.materialgenerator.finalization.export.opal.CourseOrganizerOPAL;
-import de.olivergeisel.materialgenerator.finalization.export.opal.DefaultXMLWriter;
-import de.olivergeisel.materialgenerator.finalization.export.opal.RootOPAL;
+import de.olivergeisel.materialgenerator.finalization.export.DownloadManager;
+import de.olivergeisel.materialgenerator.finalization.export.Exporter;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +19,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Random;
 
 import static de.olivergeisel.materialgenerator.finalization.export.opal.BasicElementsOPAL.*;
 
@@ -54,8 +52,6 @@ public class OPAL_Exporter extends Exporter {
 
 	private static final Logger logger = LoggerFactory.getLogger(OPAL_Exporter.class);
 
-	private CourseOrganizerOPAL organizer;
-
 	/**
 	 * Exports the course to the desired format.
 	 * <p>
@@ -79,13 +75,13 @@ public class OPAL_Exporter extends Exporter {
 		if (targetDirectory == null) {
 			throw new IllegalArgumentException("TargetDirectory is null");
 		}
+		CourseOrganizerOPAL organizer = new CourseOrganizerOPAL(rawCourse);
 		// infos and general structure
 		writeBasicDirectories(targetDirectory);
 		// config
 		writeCourseConfig(targetDirectory);
-		var id = new Random().nextLong(100_000_000); // Todo check if this is okay or works
-		writeEditorTreeModel(targetDirectory, rawCourse, id);
-		writeRunStructure(targetDirectory, rawCourse, id);
+		writeEditorTreeModel(targetDirectory, organizer);
+		writeRunStructure(targetDirectory, organizer);
 		// export directory
 		var exportDirectory = new File(targetDirectory, "export");
 		createExportFile(exportDirectory, "learninggroupexport");
@@ -132,12 +128,12 @@ public class OPAL_Exporter extends Exporter {
 		DefaultXMLWriter.write(doc, STR."\{targetDirectory.getAbsolutePath()}/CourseConfig.xml");
 	}
 
-	private void writeEditorTreeModel(File directory, RawCourse course, long id) {
+	private void writeEditorTreeModel(File directory, CourseOrganizerOPAL course) {
 		Document doc = newDocument();
 		// root element
 		var root = doc.createElement("org.olat.course.tree.CourseEditorTreeModel");
 		doc.appendChild(root);
-		var rootNode = new RootOPAL().createRootOPAL(course, FileCreationType.TREE, id, doc);
+		var rootNode = new RootOPAL().createRootOPAL(course, FileCreationType.TREE, doc);
 		root.appendChild(rootNode);
 		root.appendChild(elementWithText(doc, "latestPublishTimestamp", -1));
 		root.appendChild(elementWithText(doc, "highestNodeId", 0));
@@ -146,12 +142,12 @@ public class OPAL_Exporter extends Exporter {
 		DefaultXMLWriter.write(doc, STR."\{directory.getAbsolutePath()}/editortreemodel.xml");
 	}
 
-	private void writeRunStructure(File targetDirectory, RawCourse course, long id) {
+	private void writeRunStructure(File targetDirectory, CourseOrganizerOPAL course) {
 		Document doc = newDocument();
 		// root element
 		var rootElement = doc.createElement("org.olat.course.Structure");
 		doc.appendChild(rootElement);
-		var rootNode = new RootOPAL().createRootOPAL(course, FileCreationType.RUN, id, doc);
+		var rootNode = new RootOPAL().createRootOPAL(course, FileCreationType.RUN, doc);
 		rootElement.appendChild(rootNode);
 		rootElement.appendChild(elementWithText(doc, "latestPublishTimestamp", -1));
 		rootElement.appendChild(elementWithText(doc, "version", 7));

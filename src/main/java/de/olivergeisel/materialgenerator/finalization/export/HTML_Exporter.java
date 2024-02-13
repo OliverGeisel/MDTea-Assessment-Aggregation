@@ -12,9 +12,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,6 +22,9 @@ import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import static de.olivergeisel.materialgenerator.finalization.export.ExportUtils.createTemplateEngine;
+import static de.olivergeisel.materialgenerator.finalization.export.ExportUtils.saveToFile;
 
 /**
  * Exports a {@link RawCourse} as a collection of HTML files.
@@ -140,7 +143,7 @@ public class HTML_Exporter extends Exporter {
 			var task = tasks.get(i);
 			var newTaskLevel = new CourseNavigation.MaterialLevel(level.getChapter(), level.getGroup(), task.getName());
 			nextTask = (i < tasks.size() - 1) ? tasks.get(i + 1) : null;
-			if (nextTask != null && nextTask.getMaterialOrder().isEmpty()) {
+			if (nextTask != null && nextTask.getMaterials().isEmpty()) {
 				nextTask = null;
 			}
 			MaterialHierarchy next = nextTask == null ?
@@ -179,8 +182,8 @@ public class HTML_Exporter extends Exporter {
 
 	private void exportMaterial(TaskOrder task, CourseNavigation.MaterialLevel level, CourseNavigation navigation,
 			Context context, File outputDir, TemplateEngine templateEngine) {
-		final int taskSize = task.getMaterialOrder().size();
-		var materials = task.getMaterialOrder();
+		final int taskSize = task.getMaterials().size();
+		var materials = task.getMaterials();
 		Material nextMaterial;
 		CourseNavigation previousNavigation = navigation;
 		for (int i = 0; i < materials.size(); i++) {

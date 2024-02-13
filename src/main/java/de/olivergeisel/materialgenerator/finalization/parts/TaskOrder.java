@@ -189,7 +189,7 @@ public class TaskOrder extends MaterialOrderCollection {
 		};
 	}
 
-	public List<Material> getMaterialOrder() {
+	public List<Material> getMaterials() {
 		return materialOrder;
 	}
 //endregion

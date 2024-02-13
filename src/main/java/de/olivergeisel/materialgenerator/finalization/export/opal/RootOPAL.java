@@ -1,6 +1,5 @@
 package de.olivergeisel.materialgenerator.finalization.export.opal;
 
-import de.olivergeisel.materialgenerator.finalization.parts.RawCourse;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -20,22 +19,22 @@ public class RootOPAL {
 	 *
 	 * @param course   The course to create the root for
 	 * @param nodeType The type of the node (RUN or TREE)
-	 * @param id       The id of the node
 	 * @return The document with the root node
 	 */
-	public Element createRootOPAL(RawCourse course, FileCreationType nodeType, long id, Document document) {
+	public Element createRootOPAL(CourseOrganizerOPAL course, FileCreationType nodeType, Document document) {
 		Element back;
 		if (nodeType == RUN) {
-			back = innerRoot(ROOT_TYPE, nodeType, id, course, document);
+			back = innerRoot(ROOT_TYPE, nodeType, course, document);
 		} else {
 			var root = document.createElement(ROOT_TYPE);
 			root.setAttribute(CLASS, TREE_ROOT_CLASS);
 			var ident = document.createElement("ident");
-			ident.setTextContent(Long.toString(id));
+			ident.setTextContent(Long.toString(course.getNodeId()));
 			root.appendChild(ident);
 			var children = document.createElement("children");
 			children.setAttribute(CLASS, "linked-list");
-			for (var part : course.getCourseOrder().getChapterOrder()) {
+			var order = (CourseOrganizerOPAL.OpalOrderRaw) course.getOrder();
+			for (var part : order.getChapterInfos()) {
 				var opalChild = new StructureOPAL();
 				var child = opalChild.createTreeStructureOPAL(part, TREE_PARENT, document);
 				children.appendChild(child);
@@ -45,7 +44,7 @@ public class RootOPAL {
 			root.appendChild(elementWithText(document, "selected", false));
 			root.appendChild(elementWithText(document, "hrefPreferred", false));
 			root.appendChild(elementWithText(document, "invisible", false)); // Todo maybe true for protection
-			root.appendChild(innerRoot("cn", nodeType, id, course, document));
+			root.appendChild(innerRoot("cn", nodeType, course, document));
 			root.appendChild(elementWithText(document, "dirty", false));
 			root.appendChild(elementWithText(document, "deleted", false));
 			root.appendChild(elementWithText(document, "newnode", false));
@@ -60,22 +59,22 @@ public class RootOPAL {
 	 *
 	 * @param tagType  The type of the tag (rootNode or cn)
 	 * @param fileType The type of the file (RUN or TREE)
-	 * @param id       The id of the node
 	 * @param course   The course to create the root for
 	 * @param doc      The document to create the node in
 	 * @return The new root node
 	 */
-	private Element innerRoot(String tagType, FileCreationType fileType, long id, RawCourse course, Document doc) {
+	private Element innerRoot(String tagType, FileCreationType fileType, CourseOrganizerOPAL course, Document doc) {
 		var node = doc.createElement(tagType);
 		node.setAttribute(CLASS, INNER_ROOT_CLASS);
 		var ident = doc.createElement("ident");
-		ident.setTextContent(Long.toString(id));
+		ident.setTextContent(Long.toString(course.getNodeId()));
 		node.appendChild(ident);
 		if (fileType == RUN) {
 			var children = doc.createElement("children");
 			children.setAttribute(CLASS, "linked-list");
 			node.appendChild(children);
-			for (var part : course.getCourseOrder().getChapterOrder()) {
+			var order = (CourseOrganizerOPAL.OpalOrderRaw) course.getOrder();
+			for (var part : order.getChapterInfos()) {
 				var opalChild = new StructureOPAL();
 				var child = opalChild.createRunStructureOPAL(part, INNER_ROOT_CLASS, doc);
 				children.appendChild(child);

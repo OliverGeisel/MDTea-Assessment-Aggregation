@@ -1,5 +1,6 @@
 package de.olivergeisel.materialgenerator.finalization.export;
 
+import de.olivergeisel.materialgenerator.finalization.export.opal.OPAL_Exporter;
 import de.olivergeisel.materialgenerator.finalization.parts.CourseNavigation;
 import de.olivergeisel.materialgenerator.finalization.parts.GroupOrder;
 import de.olivergeisel.materialgenerator.finalization.parts.MaterialHierarchy;
