@@ -3,7 +3,6 @@ package de.olivergeisel.materialgenerator.finalization.parts;
 import de.olivergeisel.materialgenerator.core.course.MaterialOrderPart;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.Relevance;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.StructureChapter;
-import de.olivergeisel.materialgenerator.finalization.Goal;
 import de.olivergeisel.materialgenerator.finalization.material_assign.MaterialAssigner;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import jakarta.persistence.CascadeType;
@@ -11,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 
@@ -148,6 +148,21 @@ public class ChapterOrder extends MaterialOrderCollection {
 			return true;
 		}
 		return groupOrder.stream().anyMatch(g -> g.remove(partId));
+	}
+
+	@Override
+	public Iterator<MaterialOrderPart> iterator() {
+		return groupOrder.stream().map(it -> (MaterialOrderPart) it).iterator();
+	}
+
+	@Override
+	public void forEach(Consumer<? super MaterialOrderPart> action) {
+		groupOrder.stream().map(it -> (MaterialOrderPart) it).forEach(action);
+	}
+
+	@Override
+	public Spliterator<MaterialOrderPart> spliterator() {
+		return groupOrder.stream().map(it -> (MaterialOrderPart) it).spliterator();
 	}
 
 	//region setter/getter

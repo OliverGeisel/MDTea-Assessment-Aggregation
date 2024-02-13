@@ -17,6 +17,17 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.stream.Stream;
 
+/**
+ * Service for storing and retrieving files.
+ * <p>
+ * The files are stored in the directory specified by the property {@code application.upload-location}.
+ * </p>
+ *
+ * @see StorageService
+ * @see StorageException
+ * @see StorageFileNotFoundException
+ * @since 0.2.0
+ */
 @Service
 public class FileSystemStorageService implements StorageService {
 
@@ -38,12 +49,10 @@ public class FileSystemStorageService implements StorageService {
 													.normalize().toAbsolutePath();
 			if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
 				// This is a security check
-				throw new StorageException(
-						"Cannot store file outside current directory.");
+				throw new StorageException("Cannot store file outside current directory.");
 			}
 			try (InputStream inputStream = file.getInputStream()) {
-				Files.copy(inputStream, destinationFile,
-						StandardCopyOption.REPLACE_EXISTING);
+				Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
 			}
 		} catch (IOException e) {
 			throw new StorageException("Failed to store file.", e);
@@ -74,12 +83,10 @@ public class FileSystemStorageService implements StorageService {
 			if (resource.exists() || resource.isReadable()) {
 				return resource;
 			} else {
-				throw new StorageFileNotFoundException(
-						"Could not read file: " + filename);
-
+				throw new StorageFileNotFoundException(STR."Could not read file: \{filename}");
 			}
 		} catch (MalformedURLException e) {
-			throw new StorageFileNotFoundException("Could not read file: " + filename, e);
+			throw new StorageFileNotFoundException(STR."Could not read file: \{filename}", e);
 		}
 	}
 

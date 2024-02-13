@@ -3,8 +3,6 @@ package de.olivergeisel.materialgenerator.finalization.parts;
 import de.olivergeisel.materialgenerator.core.course.MaterialOrderPart;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.Relevance;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.StructureTask;
-import de.olivergeisel.materialgenerator.finalization.Goal;
-import de.olivergeisel.materialgenerator.finalization.Topic;
 import de.olivergeisel.materialgenerator.finalization.material_assign.MaterialAssigner;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import jakarta.persistence.CascadeType;
@@ -12,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * A TaskOrder is a collection of Materials that are ordered in a specific way.
@@ -150,6 +149,21 @@ public class TaskOrder extends MaterialOrderCollection {
 		return materialOrder.removeIf(m -> m.getId().equals(partId));
 	}
 
+	@Override
+	public Iterator<MaterialOrderPart> iterator() {
+		return materialOrder.stream().map(it -> (MaterialOrderPart) it).iterator();
+	}
+
+	@Override
+	public void forEach(Consumer<? super MaterialOrderPart> action) {
+		materialOrder.stream().map(it -> (MaterialOrderPart) it).forEach(action);
+	}
+
+	@Override
+	public Spliterator<MaterialOrderPart> spliterator() {
+		return materialOrder.stream().map(it -> (MaterialOrderPart) it).spliterator();
+	}
+
 	//region setter/getter
 	@Override
 	public Relevance getRelevance() {
@@ -175,7 +189,7 @@ public class TaskOrder extends MaterialOrderCollection {
 		};
 	}
 
-	public List<Material> getMaterialOrder() {
+	public List<Material> getMaterials() {
 		return materialOrder;
 	}
 //endregion

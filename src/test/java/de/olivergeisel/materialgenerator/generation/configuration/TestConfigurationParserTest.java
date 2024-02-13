@@ -1,8 +1,9 @@
 package de.olivergeisel.materialgenerator.generation.configuration;
 
+import org.apache.tomcat.util.json.ParseException;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TestConfigurationParserTest {
 
@@ -25,7 +26,7 @@ class TestConfigurationParserTest {
 				}
 				""";
 
-		assertThrows(IllegalArgumentException.class, () -> TestConfigurationParser.parse(json));
+		assertThrows(ParseException.class, () -> TestConfigurationParser.parse(json));
 	}
 
 	@Test
