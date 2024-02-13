@@ -2,7 +2,6 @@ package de.olivergeisel.materialgenerator.finalization.export.opal;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -38,7 +37,7 @@ public class BasicElementsOPAL {
 		return elementWithText(doc, name, Long.toString(value));
 	}
 
-	public static Node elementWithText(Document doc, String nodeName, boolean booleanValue) {
+	public static Element elementWithText(Document doc, String nodeName, boolean booleanValue) {
 		return elementWithText(doc, nodeName, booleanValue ? "true" : "false");
 	}
 

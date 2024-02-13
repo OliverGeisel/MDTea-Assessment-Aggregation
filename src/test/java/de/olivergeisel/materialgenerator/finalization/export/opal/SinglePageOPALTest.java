@@ -5,6 +5,7 @@ import de.olivergeisel.materialgenerator.generation.material.MaterialType;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -14,6 +15,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Tag("Unit")
 class SinglePageOPALTest {
 
 	private SinglePageOPAL singlePageOPAL;
