@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Planwahl</title>
-    <th:block th:include="main :: head-tag"></th:block>
+    <th:block th:replace="~{main :: head-tag}"></th:block>
     <style>
         .drop-zone {
             border: 2px dashed #bbb;

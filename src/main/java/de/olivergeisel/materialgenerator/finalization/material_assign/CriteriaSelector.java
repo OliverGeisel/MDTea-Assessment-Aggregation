@@ -2,9 +2,9 @@ package de.olivergeisel.materialgenerator.finalization.material_assign;
 
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentGoal;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentTarget;
-import de.olivergeisel.materialgenerator.finalization.Goal;
-import de.olivergeisel.materialgenerator.finalization.Topic;
+import de.olivergeisel.materialgenerator.finalization.parts.Goal;
 import de.olivergeisel.materialgenerator.finalization.parts.MaterialOrderCollection;
+import de.olivergeisel.materialgenerator.finalization.parts.Topic;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 
 
@@ -16,7 +16,7 @@ import de.olivergeisel.materialgenerator.generation.material.Material;
  * material based on a topic, a goal or a target.
  *
  * @author Oliver Geisel
- * @version 1.0.0
+ * @version 1.1.0
  * @see ContentTarget
  * @see ContentGoal
  * @see Material

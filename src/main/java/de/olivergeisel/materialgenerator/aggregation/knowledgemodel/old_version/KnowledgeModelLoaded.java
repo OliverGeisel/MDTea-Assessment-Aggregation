@@ -555,14 +555,51 @@ public class KnowledgeModelLoaded implements KnowledgeModel<RelationEdge<Knowled
 	 * @return a Collection of all elements and relations that are connected with the given element
 	 * @throws NoSuchElementException if the element is not in the Model.
 	 */
+	@Override
 	public KnowledgeNode getKnowledgeNode(KnowledgeElement element) throws NoSuchElementException {
 		if (!contains(element)) {
 			throw new NoSuchElementException(STR."No element: \"\{element}\" found");
 		}
 		var structureObject = structure.getObjectById(element.getStructureId());
-		var relatedElements = getRelatedElements(element);
-		var relations = getAllRelations(element);
-		return new KnowledgeNode(structureObject, element, relatedElements, relations);
+		var linkedElements = structureObject.getLinkedElements();
+		var relatedElements = new LinkedList<>();
+		var relations = new HashSet<>();
+		for (var linked : linkedElements) {
+			var tempList = getRelatedElements(linked);
+			Arrays.stream(tempList).filter(it -> !linkedElements.contains(it)).forEach(relatedElements::add);
+			var tempRelations = getAllRelations(linked);
+			relations.addAll(Arrays.asList(tempRelations));
+		}
+		return new KnowledgeNode(structureObject, element, linkedElements.toArray(new KnowledgeElement[0]),
+				relatedElements.toArray(new KnowledgeElement[0]), relations.toArray(new Relation[0]));
+	}
+
+	/**
+	 * create a KnowledgeNode for a given KnowledgeElement
+	 *
+	 * @param element element you want
+	 * @return a Collection of all elements and relations that are connected with the given element
+	 * @throws NoSuchElementException if the element is not in the Model.
+	 */
+	public KnowledgeNode getKnowledgeNode(KnowledgeElement element, KnowledgeObject structureObject)
+			throws NoSuchElementException {
+		if (!contains(element)) {
+			throw new NoSuchElementException(STR."No element: \"\{element}\" found");
+		}
+		if (structureObject == null) {
+			structureObject = this.structure.getObjectById(element.getStructureId());
+		}
+		var linkedElements = structureObject.getLinkedElements();
+		var relatedElements = new LinkedList<>();
+		var relations = new HashSet<>();
+		for (var linked : linkedElements) {
+			var tempList = getRelatedElements(linked);
+			Arrays.stream(tempList).filter(it -> !linkedElements.contains(it)).forEach(relatedElements::add);
+			var tempRelations = getAllRelations(linked);
+			relations.addAll(Arrays.asList(tempRelations));
+		}
+		return new KnowledgeNode(structureObject, element, linkedElements.toArray(new KnowledgeElement[0]),
+				relatedElements.toArray(new KnowledgeElement[0]), relations.toArray(new Relation[0]));
 	}
 
 	private boolean hasStructureSimilar(String structureId) {

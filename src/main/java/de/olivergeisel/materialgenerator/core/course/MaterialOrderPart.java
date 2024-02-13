@@ -1,8 +1,10 @@
 package de.olivergeisel.materialgenerator.core.course;
 
 import de.olivergeisel.materialgenerator.finalization.parts.CourseNavigation;
+import de.olivergeisel.materialgenerator.generation.material.Material;
 import jakarta.persistence.*;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -11,11 +13,12 @@ import java.util.UUID;
  * It can be a Collection, of other {@link MaterialOrderPart}s or a {@link de.olivergeisel.materialgenerator.generation.material.Material}.
  *
  * @author Oliver Geisel
- * @version 1.0.0
- * @see de.olivergeisel.materialgenerator.generation.material.Material
+ * @version 1.1.0
+ * @see Material
  * @since 0.2.0
  */
 @Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class MaterialOrderPart {
 
 	@Id
@@ -65,22 +68,26 @@ public abstract class MaterialOrderPart {
 	}
 //endregion
 
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (!(o instanceof MaterialOrderPart that)) return false;
 
-		return id.equals(that.id);
+		if (!Objects.equals(id, that.id)) return false;
+		return Objects.equals(name, that.name);
 	}
 
 	@Override
 	public int hashCode() {
-		return id.hashCode();
+		int result = id != null ? id.hashCode() : 0;
+		result = 31 * result + (name != null ? name.hashCode() : 0);
+		return result;
 	}
 
 	@Override
 	public String toString() {
-		return "MaterialOrderPart{" + "name='" + name + ", id=" + id + '\'' + '}';
+		return STR."MaterialOrderPart{name='\{name}', id=\{id}}";
 	}
 }
 

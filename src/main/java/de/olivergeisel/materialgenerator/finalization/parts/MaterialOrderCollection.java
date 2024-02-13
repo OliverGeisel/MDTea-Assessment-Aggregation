@@ -2,7 +2,6 @@ package de.olivergeisel.materialgenerator.finalization.parts;
 
 import de.olivergeisel.materialgenerator.core.course.MaterialOrderPart;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.Relevance;
-import de.olivergeisel.materialgenerator.finalization.Topic;
 import de.olivergeisel.materialgenerator.finalization.material_assign.MaterialAssigner;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import jakarta.persistence.ElementCollection;
@@ -19,12 +18,12 @@ import java.util.*;
  * Every MaterialOrderCollection has a {@link Topic}. There is a list of aliases for the topic.
  *
  * @author Oliver Geisel
- * @version 1.0.0
+ * @version 1.1.0
  * @see MaterialOrderPart
  * @since 0.2.0
  */
 @Entity
-public abstract class MaterialOrderCollection extends MaterialOrderPart {
+public abstract class MaterialOrderCollection extends MaterialOrderPart implements Iterable<MaterialOrderPart> {
 
 	@ElementCollection
 	private final List<String> alias = new ArrayList<>(); // KnowledgeObject (Structure) ids
@@ -266,7 +265,7 @@ public abstract class MaterialOrderCollection extends MaterialOrderPart {
 //endregion
 
 	public record AliasPosition(int position, String alias) {
-//region setter/getter
+		//region setter/getter
 		public boolean isEmpty() {
 			return position == -1 || alias.isBlank();
 		}

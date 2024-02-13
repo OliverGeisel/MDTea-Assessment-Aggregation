@@ -5,7 +5,6 @@ import de.olivergeisel.materialgenerator.core.courseplan.structure.Relevance;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.StructureElementPart;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.StructureGroup;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.StructureTask;
-import de.olivergeisel.materialgenerator.finalization.Goal;
 import de.olivergeisel.materialgenerator.finalization.material_assign.MaterialAssigner;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import jakarta.persistence.CascadeType;
@@ -13,6 +12,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -155,6 +155,21 @@ public class GroupOrder extends MaterialOrderCollection {
 		return taskOrder.stream().anyMatch(t -> t.remove(partId));
 	}
 
+	@Override
+	public Iterator<MaterialOrderPart> iterator() {
+		return taskOrder.stream().map(it -> (MaterialOrderPart) it).iterator();
+	}
+
+	@Override
+	public void forEach(Consumer<? super MaterialOrderPart> action) {
+		taskOrder.stream().map(it -> (MaterialOrderPart) it).forEach(action);
+	}
+
+	@Override
+	public Spliterator<MaterialOrderPart> spliterator() {
+		return taskOrder.stream().map(it -> (MaterialOrderPart) it).spliterator();
+	}
+
 	//region setter/getter
 
 	/**
@@ -185,10 +200,6 @@ public class GroupOrder extends MaterialOrderCollection {
 
 	@Override
 	public String toString() {
-		return "GroupOrder{" +
-			   "name='" + getName() + '\'' +
-			   ", id=" + getId() +
-			   ", topic=" + getTopic() +
-			   '}';
+		return STR."GroupOrder{name='\{getName()}\{'\''}, id=\{getId()}, topic=\{getTopic()}}";
 	}
 }

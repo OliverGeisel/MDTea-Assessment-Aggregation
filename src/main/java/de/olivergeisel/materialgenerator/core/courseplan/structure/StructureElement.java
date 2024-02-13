@@ -4,13 +4,23 @@ import de.olivergeisel.materialgenerator.core.courseplan.content.ContentTarget;
 
 import java.util.*;
 
+/**
+ * A part of the {@link CourseStructure}. Use the Composite Pattern to build a {@link CourseStructure}.
+ * This class is the component role of the Composite Pattern.
+ *
+ * @author Oliver Geisel
+ * @version 1.1.0
+ * @see CourseStructure
+ * @see StructureChapter
+ * @see StructureElementPart
+ * @since 1.0.0
+ */
 public abstract class StructureElement {
 
-	private final List<String> alias = new ArrayList<>(); // KnowledgeObject ids
-	protected     Relevance    relevance;
-
-	private ContentTarget topic;
-	private String        name; // KnowledgeObject id; most important alias
+	private final List<String>  alias = new ArrayList<>(); // KnowledgeObject ids
+	protected     Relevance     relevance;
+	private       ContentTarget topic;
+	private       String        name; // KnowledgeObject id; most important alias
 
 	protected StructureElement() {
 
@@ -109,6 +119,17 @@ public abstract class StructureElement {
 	}
 
 	/**
+	 * Finds an alternative in the list of alternatives or the name of the element.
+	 *
+	 * @param alias alternative to find
+	 * @return the Element that contains the alias, {@literal null} if it was not found
+	 */
+	public StructureElement findByAlias(String alias) {
+		if (name.equals(alias) || hasAlias(alias)) return this;
+		return null;
+	}
+
+	/**
 	 * Checks if an alternative is in the list of alternatives
 	 *
 	 * @param alternative alternative to check
@@ -123,8 +144,11 @@ public abstract class StructureElement {
 	 */
 	public abstract Relevance updateRelevance();
 
-
 	//region setter/getter
+	public List<String> getAlias() {
+		return alias;
+	}
+
 	public Set<String> getAlternatives() {
 		return Collections.unmodifiableSet(new LinkedHashSet<>(alias));
 	}
