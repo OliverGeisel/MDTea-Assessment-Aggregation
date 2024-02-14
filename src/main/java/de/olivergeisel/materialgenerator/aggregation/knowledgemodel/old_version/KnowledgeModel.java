@@ -1,9 +1,11 @@
 package de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version;
 
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.Relation;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationType;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeFragment;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeObject;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.RootStructureElement;
 import de.olivergeisel.materialgenerator.aggregation.source.KnowledgeSource;
 import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
 
@@ -11,7 +13,21 @@ import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
-
+/**
+ * A model of knowledge. It contains structure, all elements, relations and sources.
+ *
+ * @see KnowledgeElement
+ * @see Relation
+ * @see KnowledgeSource
+ * @see KnowledgeStructure
+ * @see KnowledgeFragment
+ * @see KnowledgeObject
+ * @see RootStructureElement
+ *
+ * @version 1.1.0
+ * @since 0.2.0
+ * @author Oliver Geisel
+ */
 public interface KnowledgeModel<T> {
 
 	/**
@@ -105,7 +121,7 @@ public interface KnowledgeModel<T> {
 	 * @param from     the element to link from
 	 * @param to       the element to link to
 	 * @param relation the relation to link with
-	 * @return true if the elements were linked, false if not
+	 * @return the new created Relation, or null if already linked
 	 */
 	T link(KnowledgeElement from, KnowledgeElement to, RelationType relation);
 

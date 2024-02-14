@@ -22,6 +22,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Parse a JSON-File to a {@link KnowledgeModel}.
+ *
+ * @author Oliver Geisel
+ * @version 1.0.0
+ * @see KnowledgeModel
+ * @see KnowledgeElement
+ * @see KnowledgeObject
+ * @see Relation
+ * @since 0.0.1
+ */
 public class KnowledgeParser {
 
 
