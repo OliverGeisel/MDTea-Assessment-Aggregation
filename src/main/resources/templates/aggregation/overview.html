@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Aggregation - Übersicht</title>
+    <th:block th:replace="~{main::head-tag}"></th:block>
+</head>
+<body>
+<div th:replace="~{main::navigation}"></div>
+<main>
+    <div class="container">
+        <header class="mb-2"><h1>Übersicht der Aggregation</h1></header>
+        <section class="pt-1">
+            <h2>Mehr Wissen</h2>
+            <div>
+                <a th:href="@{/aggregation/collect}">
+                    <button class="btn btn-primary">Neues Wissen aus Quelle</button>
+                </a>
+                <a th:href="@{/knowledge-model/elements/link}">
+                    <button class="btn btn-info">Elemente linken</button>
+                </a>
+            </div>
+        </section>
+        <section class="mt-1">
+            <header>
+                <h2>Statistik</h2>
+            </header>
+            <article class="ms-2">
+                <h3>Struktur</h3>
+                Struktur Objekte: <span th:text="${structureCount}"></span><br>
+                <hr>
+                <h3>Wissen</h3> <a th:href="@{/knowledge-model/elements}">
+                <button class="btn btn-success" th:text="#{knowledgemodel.elements}">Element</button>
+            </a>
+                <a th:href="@{/knowledge-model/relations}">
+                    <button class="btn btn-warning" th:text="#{knowledgemodel.relations}">Relation</button>
+                </a>
+                <br>
+                Elemente: <span th:text="${aggregation.elements}"></span><br>
+                Relationen: <span th:text="${aggregation.relations}"></span>
+                <hr>
+                Terme: <span th:text="${aggregation.terms}"></span><br>
+                Definitionen: <span th:text="${aggregation.definitions}"></span><br>
+                Beispiele: <span th:text="${aggregation.examples}"></span>
+                <hr>
+                <h3>Quellen</h3>
+            </article>
+
+        </section>
+    </div>
+
+</main>
+<footer th:replace="~{main::footer}">
+
+</footer>
+</body>
+</html>

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title th:text="${title}">Title</title>
     <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport">
-    <th:block th:include="~{${material.templateInfo.templateType.type}:: head}"></th:block>
+    <th:block th:replace="~{${material.templateType.type}:: head}"></th:block>
 </head>
 <body>
 <nav id="mainNav">
@@ -34,7 +34,7 @@
 </nav>
 <main>
     <section>
-        <div th:replace="~{${material.templateInfo.templateType.type} :: content}"></div>
+        <div th:replace="~{${material.abstractTemplateCategory.abstractTemplateCategory.type} :: content}"></div>
     </section>
     <section id="task-navigation">
         <a th:href="${navigation.previousMaterial}+'.html'" th:if="${navigation.hasPrevious}">

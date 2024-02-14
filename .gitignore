@@ -1,5 +1,10 @@
 upload-dir/
 target/
+neo4j
+
+
+*.gguf
+args.txt
 
 .idea/discord.xml
 .idea/workspace.xml
@@ -8,6 +13,7 @@ target/
 .idea/sonarlint
 .idea/libraries
 .idea/shelf
+*.iml
 # Compiled class file
 *.class
 

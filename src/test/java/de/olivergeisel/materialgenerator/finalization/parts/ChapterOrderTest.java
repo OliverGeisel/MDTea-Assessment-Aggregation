@@ -2,7 +2,6 @@ package de.olivergeisel.materialgenerator.finalization.parts;
 
 import de.olivergeisel.materialgenerator.core.courseplan.structure.Relevance;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.StructureChapter;
-import de.olivergeisel.materialgenerator.finalization.Goal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;

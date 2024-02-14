@@ -1,0 +1,5 @@
+This folder contains all models for a local GPT4All (backend) instance you can run with this application by calling the python program `gpt4all.py` in the gpt-connection folder.
+If the wanted model is not in this folder, it will be downloaded.
+
+Or you can download the models by yourself. The files must end with 'Q4_0.gguf'.
+The name of the model is the filename without the ending.

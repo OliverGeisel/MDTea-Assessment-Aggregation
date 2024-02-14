@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Konfiguration</title>
+    <th:block th:replace="~{main::head-tag}"></th:block>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div th:replace="~{main::navigation}"></div>
+<main class="flex-grow-1 container-fluid mb-3">
+    <div th:replace="~{main::aggregationProgress}"></div>
+    <header class="flex-header"><h1>Konfiguration für NLP</h1></header>
+    <section class="container-fluid">
+        <form method="post" th:action="@{top-level-scan}">
+
+            <th:block th:replace="~{aggregation/fragments :: model-configs}"></th:block>
+
+            <label class="form-control">Fragment (wenn notwendig):
+                <textarea class="form-control" cols="80" name="fragment" rows="10"
+                          th:if="${process.sources.isEmpty()}" th:text="${process.currentFragment}"></textarea>
+            </label>
+            <div th:replace="~{aggregation/fragments :: area-of-knowledge-fragment}"></div>
+            <div class="btn-group mt-2">
+                <input class="btn btn-primary" type="submit" value="Submit">
+            </div>
+        </form>
+        <div class="alert alert-danger mt-2" role="alert" th:if="${error}">
+            <p th:text="${error}"></p>
+        </div>
+    </section>
+
+</main>
+<footer th:replace="~{main::footer}"></footer>
+</body>
+</html>

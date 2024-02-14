@@ -1,32 +1,49 @@
 package de.olivergeisel.materialgenerator.generation;
 
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Term;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.Relation;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationType;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeObject;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.KnowledgeModel;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentGoal;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentGoalExpression;
-import de.olivergeisel.materialgenerator.core.knowledge.metamodel.element.KnowledgeElement;
-import de.olivergeisel.materialgenerator.core.knowledge.metamodel.relation.Relation;
-import de.olivergeisel.materialgenerator.core.knowledge.metamodel.structure.KnowledgeObject;
 import lombok.Getter;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
- * Contains all Knowledge from a KnowledgeModel, that is related to a specific topic in the structure.
- * Each Node has a main KnowledgeElement. It should be a Term
+ * Contains all Knowledge from a {@link KnowledgeModel}, that is related to a specific topic in the structure. This
+ * is the {@link KnowledgeObject} where the {@link KnowledgeElement}s are linked to.
+ * Each Node has a main {@link KnowledgeElement}. It should be a {@link Term}.
+ * Furthermore it contains a list of related {@link KnowledgeElement}s and the {@link Relation}s between them.
+ *
+ * @see KnowledgeModel
+ * @see KnowledgeElement
+ * @see KnowledgeObject
+ *
+ * @author Oliver Geisel
+ * @version 1.1.0
+ * @since 0.2.0
  */
 public class KnowledgeNode {
 
-	private final   List<String>          topics = new ArrayList<>();
+	private final   List<String>       topics = new ArrayList<>();
+			// list of topics from a goal that is related to this node
 	@Getter private KnowledgeObject       structurePoint;
 	@Getter private KnowledgeElement      mainElement;
+	@Getter private KnowledgeElement[] linkedElements;
 	// todo remove duplicates in relatedElements
 	@Getter private KnowledgeElement[]    relatedElements;
 	@Getter private Relation[]            relations;
 	@Getter private Optional<ContentGoal> goal   = Optional.empty();
 
 	public KnowledgeNode(KnowledgeObject structurePoint, KnowledgeElement mainElement,
-			KnowledgeElement[] relatedElements, Relation[] relations) {
+			KnowledgeElement[] linkedElements, KnowledgeElement[] relatedElements, Relation[] relations) {
 		this.structurePoint = structurePoint;
 		this.mainElement = mainElement;
+		this.linkedElements = linkedElements;
 		this.relatedElements = relatedElements;
 		this.relations = relations;
 	}
@@ -38,6 +55,47 @@ public class KnowledgeNode {
 		this.topics.add(topic);
 	}
 
+	/**
+	 * Get all Relations of a KnowledgeNode that match a RelationType.
+	 * It searches in the relatedElements of the KnowledgeNode.
+	 *
+	 * @param type          RelationType to search for. Should be a Relation, that points to the main Element of the
+	 *                      KnowledgeNode
+	 * @return Set of Relations that match the RelationType
+	 */
+	public Set<Relation> getWantedRelationsFromRelated(RelationType type) {
+		return Arrays.stream(getRelatedElements())
+					 .flatMap(it -> it.getRelations().stream().filter(relation -> relation.getType().equals(type)))
+					 .collect(Collectors.toSet());
+	}
+
+	/**
+	 * Get all Relations of a KnowledgeNode that match a RelationType. Search only in the mainElement of the
+	 * KnowledgeNode.
+	 *
+	 * @param type          RelationType to search for. Should be a Relation, that goes from the main Element of the
+	 *                      KnowledgeNode. Like DefinedBy
+	 * @return Set of Relations that match the RelationType
+	 */
+	public Set<Relation> getWantedRelationsFromMain(RelationType type) {
+		return getMainElement().getRelations().stream()
+							.filter(relation -> relation.getType().equals(type)).collect(Collectors.toSet());
+	}
+
+	/**
+	 * Get all Relations of this KnowledgeNode that match a RelationType.
+	 * <p>
+	 * Includes the Relations from the mainElement <b>and</b> the relatedElements.
+	 *
+	 * @param type          RelationType to search for.
+	 * @return Set of Relations that match the RelationType
+	 */
+	public Set<Relation> getWantedRelationsFrom(RelationType type) {
+		var back = getWantedRelationsFromMain(type);
+		back.addAll(getWantedRelationsFromRelated(type));
+		return back;
+	}
+
 	//region setter/getter
 	public List<String> getTopics() {
 		return Collections.unmodifiableList(topics);
@@ -47,13 +105,17 @@ public class KnowledgeNode {
 		return goal.map(ContentGoal::getExpression);
 	}
 
+	/**
+	 * Returns the master keyword of the {@link ContentGoal} of this {@link KnowledgeNode}.
+	 * @return the master keyword of the {@link ContentGoal} of this {@link KnowledgeNode} if present.
+	 */
 	public Optional<String> getMasterKeyWord() {
 		return goal.map(ContentGoal::getMasterKeyword);
 	}
 
 	public void setGoal(ContentGoal goal) {
 		if (goal == null) {
-			throw new IllegalArgumentException("goal must not be null");
+			throw new IllegalArgumentException("goal can't be set to null");
 		}
 		this.goal = Optional.of(goal);
 	}
@@ -99,11 +161,6 @@ public class KnowledgeNode {
 
 	@Override
 	public String toString() {
-		return "KnowledgeNode{" +
-			   "structurePoint=" + structurePoint +
-			   ", mainElement=" + mainElement +
-			   ", relatedElements size=" + relatedElements.length +
-			   ", relations size=" + relations.length +
-			   '}';
+		return STR."KnowledgeNode{structurePoint=\{structurePoint},	mainElement=\{mainElement}, relatedElements size=\{relatedElements.length}, relations size=\{relations.length}";
 	}
 }

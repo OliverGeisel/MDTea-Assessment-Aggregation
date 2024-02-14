@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{knowledgemodel.title}">Wissensmodell</title>
+    <th:block th:replace="~{main::head-tag}"></th:block>
+    <style>
+        .sticky {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 80px;
+        }
+    </style>
+    <script>
+        function getElements(button) {
+            let id = button.getAttribute('data-id');
+            console.log("getElements: " + id);
+            const url = "/knowledge-model/elements/json";
+            let complete = url + "?id=" + id;
+            fetch(complete)
+                .then(response => response.json())
+                .then(data => {
+                    let elementArea = document.getElementById("elements");
+                    elementArea.innerHTML = "";
+                    let headline = document.createElement("h3");
+                    headline.innerHTML = "Elemente für " + id;
+                    elementArea.appendChild(headline);
+                    if (data.length === 0) {
+                        let p = document.createElement("p");
+                        p.innerHTML = "Keine Elemente vorhanden";
+                        elementArea.appendChild(p);
+                    } else {
+                        data.forEach(element => {
+                            let el = createElementField(element);
+                            elementArea.appendChild(el);
+                        });
+                    }
+                });
+        }
+
+        function createElementField(element) {
+            let div = document.createElement("div");
+            div.classList.add("border", "border-2", "border-primary", "rounded-1", "ps-1", "mb-2");
+            let p1 = document.createElement("p");
+            p1.innerHTML = "Inhalt: " + element.content;
+            let p2 = document.createElement("p");
+            p2.innerHTML = "Id: " + element.id;
+            let p3 = document.createElement("p");
+            p3.innerHTML = "Type: " + element.type;
+            div.appendChild(p3);
+            div.appendChild(p2);
+            div.appendChild(p1);
+            div.appendChild(addButton(element.id));
+            return div;
+        }
+
+        function addButton(id) {
+            let anchor = document.createElement("a");
+            anchor.setAttribute("href", "/knowledge-model/elements/edit?id" + id);
+            let editButton = document.createElement("button");
+            editButton.classList.add("btn", "btn-danger");
+            editButton.setAttribute("type", "submit");
+            let icon = document.createElement("i");
+            icon.classList.add("bi", "bi-pencil-fill");
+            editButton.appendChild(icon);
+            let textNode = document.createTextNode(" Edit");
+            editButton.appendChild(textNode);
+            anchor.appendChild(editButton);
+            return anchor;
+        }
+    </script>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div th:replace="~{main::navigation}"></div>
+<main class="flex-grow-1 container-fluid">
+    <header class=" pb-2">
+        <h1 th:text="#{knowledgemodel.headline}">Internes Wissensmodell</h1>
+    </header>
+    <article>
+        <div class="row">
+            <div class="col-md-7">
+                <section class="container">
+                    <div th:replace="~{knowledgeModel/fragments :: structure-object (${rootElement}, ${1}) }"></div>
+                </section>
+            </div>
+            <div class="col-md-4 ">
+                <aside class="container sticky">
+                    <div id="elements"> Bereich für die Elemente, die mit der Struktur verbunden sind</div>
+                </aside>
+            </div>
+
+        </div>
+    </article>
+</main>
+<footer th:replace="~{main::footer}"></footer>
+</body>
+</html>

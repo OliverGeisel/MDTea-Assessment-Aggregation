@@ -3,7 +3,7 @@
 
 <head>
     <title>Projects - MDTea-Gen</title>
-    <th:block th:insert="~{main :: head-tag}"></th:block>
+    <th:block th:replace="~{main :: head-tag}"></th:block>
     <link href="https://fonts.googleapis.com/css?family=Inter:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&amp;display=swap"
           rel="stylesheet">
 </head>
@@ -44,7 +44,7 @@
             <h3>Themen</h3>
         </header>
         <div class="container border border-secondary border-3 m-2 " style="margin-left: 20px"
-             th:each="chapter,statc : ${course.courseOrder.chapterOrder}"
+             th:each="chapter,statc : ${course.order.chapterOrder}"
              th:id="'chapter-'+${chapter.name.replace(' ','-')}">
             <div class="row">
                 <h4 class="col-lg order-first" th:text="${chapter.name}"></h4>
@@ -131,8 +131,8 @@
                                                 </select>
                                                 <button class="btn badge bg-primary" data-bs-target="#taskModal"
                                                         data-bs-toggle="modal" name="task" th:value="${task.id}"
-                                                        type="submit"><i
-                                                        class="bi bi-arrow-clockwise"></i></button>
+                                                        type="submit"><i class="bi bi-arrow-clockwise"></i>
+                                                </button>
                                             </form>
                                         </div>
                                         <div class="col-sm-1 order">
@@ -160,7 +160,7 @@
                                     </div>
                                     <hr>
                                     <div class="container pt-2">
-                                        <div class="row pt-1" th:each="material,stat:${task.materialOrder}"
+                                        <div class="row pt-1" th:each="material,stat:${task.materials}"
                                              th:id="'material-'+${material.id}">
                                             <p class="col-sm order-first m-1 mt-2" th:text="${material.shortName}"></p>
                                             <div class="col-sm-3 order-last">
@@ -229,8 +229,9 @@
         </header>
         <article>
             <form method="post" th:action="${course.id}+'/export'">
-                <button class="btn btn-primary" disabled name="export" value="pdf">PDF</button>
-                <button class="btn btn-primary" name="export" th:disabled="${!course.valid}" value="html">HTML</button>
+                <button class="btn btn-danger" disabled name="kind" value="pdf">PDF</button>
+                <button class="btn btn-primary" name="kind" th:disabled="${!course.valid}" value="HTML">HTML</button>
+                <button class="btn btn-success" name="kind" th:disabled="${!course.valid}" value="OPAL">OPAL</button>
             </form>
         </article>
     </section>

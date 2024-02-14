@@ -12,7 +12,7 @@ import java.util.Objects;
  * The goal is the big picture, the targets are the small peaces, which are needed to reach the goal.
  *
  * @author Oliver Geisel
- * @version 1.0.0
+ * @version 1.1.0
  * @see ContentGoal
  * @see ContentGoalExpression
  * @since 0.2.0
@@ -24,11 +24,11 @@ public class ContentTarget {
 	 */
 	public static final ContentTarget EMPTY = new ContentTarget("NO_TARGET");
 
-	private String      value;
-	private ContentGoal relatedGoal;
+	private String                      value;
+	private ContentGoal                 relatedGoal;
+	private TopicStructureAliasMappings topicStructureAliasMappings = new TopicStructureAliasMappings();
 
 	protected ContentTarget() {
-
 	}
 
 	/**
@@ -40,7 +40,22 @@ public class ContentTarget {
 		this.value = value;
 	}
 
+	public ContentTarget(String value, ContentGoal relatedGoal) {
+		this.value = value;
+		this.relatedGoal = relatedGoal;
+	}
+
+	public ContentTarget(String value, ContentGoal relatedGoal, TopicStructureAliasMappings aliases) {
+		this.value = value;
+		this.relatedGoal = relatedGoal;
+		this.topicStructureAliasMappings = aliases;
+	}
+
 	//region setter/getter
+	public TopicStructureAliasMappings getAliases() {
+		return topicStructureAliasMappings;
+	}
+
 	public String getValue() {
 		return value;
 	}
@@ -57,6 +72,12 @@ public class ContentTarget {
 		this.relatedGoal = relatedGoal;
 	}
 
+	/**
+	 * Get the most important alias of the target.
+	 * This method is identical to {@link #getValue()}.
+	 *
+	 * @return the most important alias of the target.
+	 */
 	public String getTopic() {
 		return value;
 	}
@@ -80,9 +101,6 @@ public class ContentTarget {
 
 	@Override
 	public String toString() {
-		return "ContentTarget{" +
-			   "value='" + value + '\'' +
-			   ", relatedGoal=" + relatedGoal +
-			   '}';
+		return STR."ContentTarget{value='\{value}\{'\''}, relatedGoal=\{relatedGoal}}";
 	}
 }

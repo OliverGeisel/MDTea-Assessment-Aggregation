@@ -3,6 +3,7 @@ package de.olivergeisel.materialgenerator.finalization;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentGoal;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.Relevance;
+import de.olivergeisel.materialgenerator.finalization.export.DownloadManager;
 import de.olivergeisel.materialgenerator.finalization.parts.*;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
@@ -46,7 +47,7 @@ public class FinalizationService {
 		var rawCourse = new RawCourse(coursePlan, template, goals);
 		rawCourse.assignMaterial(materials);
 		saveMetadata(rawCourse.getMetadata());
-		saveMaterialOrder(rawCourse.getCourseOrder());
+		saveMaterialOrder(rawCourse.getOrder());
 		return rawCourseRepository.save(rawCourse);
 	}
 
@@ -60,9 +61,9 @@ public class FinalizationService {
 		return back;
 	}
 
-	private void saveMaterialOrder(CourseOrder courseOrder) {
-		saveChapterOrder(courseOrder.getChapterOrder());
-		courseOrderRepository.save(courseOrder);
+	private void saveMaterialOrder(RawCourseOrder rawCourseOrder) {
+		saveChapterOrder(rawCourseOrder.getChapterOrder());
+		courseOrderRepository.save(rawCourseOrder);
 	}
 
 	private void saveMetadata(CourseMetadataFinalization metadata) {
@@ -90,7 +91,7 @@ public class FinalizationService {
 	public void moveUp(UUID id, UUID parentChapterId, UUID parentGroupId, UUID parentTaskId, UUID idUp)
 			throws NoSuchElementException, IllegalStateException {
 		var course = rawCourseRepository.findById(id).orElseThrow();
-		var order = course.getCourseOrder();
+		var order = course.getOrder();
 		var element = order.find(idUp);
 		switch (element) {
 			case ChapterOrder chapter -> order.moveUp(chapter);
@@ -106,7 +107,7 @@ public class FinalizationService {
 				var task = order.findTask(parentTaskId);
 				task.moveUp(material);
 			}
-			default -> throw new IllegalStateException("Unexpected value: " + element);
+			default -> throw new IllegalStateException(STR."Unexpected value: \{element}");
 		}
 		rawCourseRepository.save(course);
 	}
@@ -114,7 +115,7 @@ public class FinalizationService {
 	public void moveDown(UUID id, UUID parentChapterId, UUID parentGroupId, UUID parentTaskId, UUID idDown)
 			throws NoSuchElementException, IllegalStateException {
 		var course = rawCourseRepository.findById(id).orElseThrow();
-		var order = course.getCourseOrder();
+		var order = course.getOrder();
 		var element = order.find(idDown);
 		switch (element) {
 			case ChapterOrder chapter -> order.moveDown(chapter);
@@ -130,24 +131,25 @@ public class FinalizationService {
 				var task = order.findTask(parentTaskId);
 				task.moveDown(material);
 			}
-			default -> throw new IllegalStateException("Unexpected value: " + element);
+			default -> throw new IllegalStateException(STR."Unexpected value: \{element}");
 		}
 		rawCourseRepository.save(course);
 	}
 
-	public void exportCourse(UUID id, HttpServletResponse response) {
-		generateAndDownloadTemplates(rawCourseRepository.findById(id).orElseThrow(), response);
+	public void exportCourse(UUID id, DownloadManager.ExportKind kind, HttpServletResponse response) {
+		generateAndDownloadTemplates(rawCourseRepository.findById(id).orElseThrow(), kind, response);
 	}
 
-	public void generateAndDownloadTemplates(RawCourse plan, HttpServletResponse response) {
+	public void generateAndDownloadTemplates(RawCourse plan, DownloadManager.ExportKind kind,
+			HttpServletResponse response) {
 		var zipName = plan.getMetadata().getName().orElse("course");
-		downloadManager.createDownloadZip(zipName, plan.getTemplateName(), plan, response);
+		downloadManager.createAndDownload(kind, zipName, plan, plan.getTemplateName(), response);
 	}
 
 	public void setRelevance(UUID id, UUID taskId, Relevance relevance)
 			throws IllegalArgumentException, NoSuchElementException {
 		var course = rawCourseRepository.findById(id).orElseThrow();
-		var order = course.getCourseOrder();
+		var order = course.getOrder();
 		var taskOrder = order.findTask(taskId);
 		if (taskOrder != null) {
 			taskOrder.setRelevance(relevance);

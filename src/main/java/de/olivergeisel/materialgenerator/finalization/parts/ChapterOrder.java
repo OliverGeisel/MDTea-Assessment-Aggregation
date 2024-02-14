@@ -3,7 +3,6 @@ package de.olivergeisel.materialgenerator.finalization.parts;
 import de.olivergeisel.materialgenerator.core.course.MaterialOrderPart;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.Relevance;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.StructureChapter;
-import de.olivergeisel.materialgenerator.finalization.Goal;
 import de.olivergeisel.materialgenerator.finalization.material_assign.MaterialAssigner;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import jakarta.persistence.CascadeType;
@@ -11,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * Is the largest unit in the course plan. Contains a list of {@link GroupOrder}s.
  *
  * @author Oliver Geisel
- * @version 1.0.0
+ * @version 1.1.0
  * @see MaterialOrderPart
  * @since 0.2.0
  */
@@ -81,7 +81,7 @@ public class ChapterOrder extends MaterialOrderCollection {
 	}
 
 	public MaterialOrderPart find(UUID id) {
-		if (this.getId().equals(id)) return this;
+		if (id.equals(this.getId())) return this;
 		return groupOrder.stream().map(g -> g.find(id)).filter(Objects::nonNull).findFirst().orElse(null);
 	}
 
@@ -150,6 +150,21 @@ public class ChapterOrder extends MaterialOrderCollection {
 		return groupOrder.stream().anyMatch(g -> g.remove(partId));
 	}
 
+	@Override
+	public Iterator<MaterialOrderPart> iterator() {
+		return groupOrder.stream().map(it -> (MaterialOrderPart) it).iterator();
+	}
+
+	@Override
+	public void forEach(Consumer<? super MaterialOrderPart> action) {
+		groupOrder.stream().map(it -> (MaterialOrderPart) it).forEach(action);
+	}
+
+	@Override
+	public Spliterator<MaterialOrderPart> spliterator() {
+		return groupOrder.stream().map(it -> (MaterialOrderPart) it).spliterator();
+	}
+
 	//region setter/getter
 
 	/**
@@ -181,10 +196,6 @@ public class ChapterOrder extends MaterialOrderCollection {
 
 	@Override
 	public String toString() {
-		return "ChapterOrder{" +
-			   "name='" + getName() + '\'' +
-			   ", id=" + getId() +
-			   ", topic=" + getTopic() +
-			   '}';
+		return STR."ChapterOrder{name='\{getName()}', id=\{getId()}, topic=\{getTopic()}}";
 	}
 }

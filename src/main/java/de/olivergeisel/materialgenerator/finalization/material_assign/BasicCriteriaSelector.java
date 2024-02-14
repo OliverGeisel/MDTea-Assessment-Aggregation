@@ -1,23 +1,25 @@
 package de.olivergeisel.materialgenerator.finalization.material_assign;
 
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentGoal;
-import de.olivergeisel.materialgenerator.finalization.Goal;
-import de.olivergeisel.materialgenerator.finalization.Topic;
+import de.olivergeisel.materialgenerator.core.courseplan.content.ContentTarget;
+import de.olivergeisel.materialgenerator.finalization.parts.Goal;
 import de.olivergeisel.materialgenerator.finalization.parts.MaterialOrderCollection;
+import de.olivergeisel.materialgenerator.finalization.parts.Topic;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 
 import java.util.LinkedList;
+
 
 /**
  * Basic implementation of a criteria selector. It selects a material based on the alias of the material.
  *
  * @author Oliver Geisel
- * @version 1.0.0
+ * @version 1.1.0
  * @see CriteriaSelector
  * @see MaterialAssigner
  * @see Material
  * @see ContentGoal
- * @see de.olivergeisel.materialgenerator.core.courseplan.content.ContentTarget
+ * @see ContentTarget
  * @since 0.2.0
  */
 public class BasicCriteriaSelector implements CriteriaSelector {
@@ -28,7 +30,7 @@ public class BasicCriteriaSelector implements CriteriaSelector {
 	 * implementation.
 	 *
 	 * @param material material to check
-	 * @param criteria criteria to check
+	 * @param criteria criteria that the material should satisfy
 	 * @return {@literal true} if material satisfies the criteria, otherwise {@literal false}
 	 */
 	@Override

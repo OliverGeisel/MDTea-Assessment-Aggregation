@@ -44,7 +44,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="chapter : ${course.courseOrder.chapterOrder}">
+                <tr th:each="chapter : ${course.order.chapterOrder}">
                     <td th:unless="${chapter.materialCount == 0}">
                         <a th:href="@{${chapter.name}+'/overview.html'}">
                             <h2 th:text="${chapter.name}"></h2>
@@ -54,8 +54,7 @@
                                 <tbody>
                                 <tr th:each="group : ${chapter.groupOrder}">
                                     <td th:unless="${group.materialCount==0}">
-                                        <a
-                                                th:href="@{${chapter.name}+'/'+${group.name}+'/overview.html'}">
+                                        <a th:href="@{${chapter.name}+'/'+${group.name}+'/overview.html'}">
                                             <h3 th:text="${group.name}"></h3>
                                         </a>
                                     </td>

@@ -1,13 +1,20 @@
 package de.olivergeisel.materialgenerator.generation.generator;
 
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.KnowledgeModel;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
-import de.olivergeisel.materialgenerator.core.knowledge.metamodel.KnowledgeModel;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateSet;
 
 public class GeneratorInput {
 	private TemplateSet    templates;
 	private KnowledgeModel model;
 	private CoursePlan     plan;
+
+
+	public GeneratorInput(TemplateSet templates, KnowledgeModel model, CoursePlan plan) {
+		this.templates = templates;
+		this.model = model;
+		this.plan = plan;
+	}
 
 	//region setter/getter
 	public CoursePlan getPlan() {
