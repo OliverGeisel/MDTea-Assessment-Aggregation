@@ -4,7 +4,7 @@ import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentTarget;
 import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
-import de.olivergeisel.materialgenerator.generation.generator.task_exctraction.TrueFalseExtractor;
+import de.olivergeisel.materialgenerator.generation.generator.item_exctraction.TrueFalseExtractor;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateSet;
@@ -168,7 +168,7 @@ public class AssessmentGenerator extends AbstractGenerator {
 	public List<MaterialAndMapping> createTrueFalse(Set<KnowledgeNode> knowledge) {
 		var materials = new LinkedList<MaterialAndMapping>();
 		var extractor = new TrueFalseExtractor();
-		final var templateInfo = TemplateType.TASK;
+		final var templateInfo = TemplateType.ITEM;
 		// todo get Tasks, that are stored in knowledge (added while aggregation)
 		for (var node : knowledge) {
 			var questions = extractor.extract(node, templateInfo);

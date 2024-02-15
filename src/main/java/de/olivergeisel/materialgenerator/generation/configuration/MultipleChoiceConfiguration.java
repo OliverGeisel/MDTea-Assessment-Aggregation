@@ -1,8 +1,8 @@
 package de.olivergeisel.materialgenerator.generation.configuration;
 
-import de.olivergeisel.materialgenerator.generation.material.assessment.TaskType;
+import de.olivergeisel.materialgenerator.generation.material.assessment.ItemType;
 
-public class MultipleChoiceConfiguration extends TaskConfiguration {
+public class MultipleChoiceConfiguration extends ItemConfiguration {
 	private final int numberOfCorrectChoices;
 	private final int numberOfChoices;
 
@@ -13,7 +13,7 @@ public class MultipleChoiceConfiguration extends TaskConfiguration {
 
 	public MultipleChoiceConfiguration(int numberOfChoices, int numberOfCorrectChoices,
 			TestParameters testParameters) {
-		super(TaskType.MULTIPLE_CHOICE, testParameters);
+		super(ItemType.MULTIPLE_CHOICE, testParameters);
 		this.numberOfChoices = numberOfChoices;
 		this.numberOfCorrectChoices = numberOfCorrectChoices;
 	}

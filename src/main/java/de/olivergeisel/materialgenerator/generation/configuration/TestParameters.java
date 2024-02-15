@@ -3,7 +3,7 @@ package de.olivergeisel.materialgenerator.generation.configuration;
 import jakarta.persistence.Embeddable;
 
 /**
- * Configuration for a Task, if it is used in a Test.
+ * Configuration for an Item, if it is used in a Test.
  *
  * @author Oliver Geisel
  * @version 1.1.0

@@ -1,6 +1,6 @@
 package de.olivergeisel.materialgenerator.generation.configuration;
 
-import de.olivergeisel.materialgenerator.generation.material.assessment.TaskType;
+import de.olivergeisel.materialgenerator.generation.material.assessment.ItemType;
 import org.apache.tomcat.util.json.JSONParser;
 import org.apache.tomcat.util.json.ParseException;
 import org.slf4j.Logger;
@@ -56,7 +56,7 @@ public class TestConfigurationParser {
 			var taskConfigs = parseTaskConfigurations(jsonTasks);
 			var numberOfTasks = (int) rootObject.get("numberTasks");
 			var jsonOrdering = rootObject.get("ordering");
-			var ordering = TestConfiguration.TaskOrdering.valueOf(jsonOrdering.toString().trim());
+			var ordering = TestConfiguration.ItemSorting.valueOf(jsonOrdering.toString().trim());
 			var jsonMarkSchema = rootObject.get("markSchema").toString();
 			var marks = (List<String>) rootObject.get("marks");
 			var markMappingPercentage = (Map<String, Integer>) rootObject.get("markMappingPercentage");
@@ -66,18 +66,18 @@ public class TestConfigurationParser {
 		throw new IllegalArgumentException("root element must be a abject");
 	}
 
-	private static List<TaskConfiguration> parseTaskConfigurations(List<Map<String, ?>> jsonTasks)
+	private static List<ItemConfiguration> parseTaskConfigurations(List<Map<String, ?>> jsonTasks)
 			throws IllegalArgumentException {
-		List<TaskConfiguration> back = new LinkedList<>();
+		List<ItemConfiguration> back = new LinkedList<>();
 		for (var jsonTask : jsonTasks) {
 			var jsonTaskType = (String) jsonTask.get("type");
-			var taskType = Arrays.stream(TaskType.values()).toList().stream()
+			var taskType = Arrays.stream(ItemType.values()).toList().stream()
 								 .filter(it -> it.name().equals(jsonTaskType)).findFirst()
 								 .orElseThrow();
 			var jsonTestParameters = (Map<String, ? extends Number>) jsonTask.get("testParameters");
 
 			var testParameters = parseTestParameters(jsonTestParameters);
-			TaskConfiguration config = switch (taskType) {
+			ItemConfiguration config = switch (taskType) {
 				case TRUE_FALSE -> new TrueFalseConfiguration(testParameters);
 
 				case SINGLE_CHOICE -> {
@@ -96,7 +96,7 @@ public class TestConfigurationParser {
 					yield new FillOutBlanksConfiguration(numberOfBlanks, blanks, testParameters);
 				}
 				case ASSIGNMENT -> new AssignmentConfiguration(testParameters);
-				case UNDEFINED -> throw new IllegalArgumentException("TaskType is undefined");
+				case UNDEFINED -> throw new IllegalArgumentException("ItemType is undefined");
 			};
 			back.add(config);
 		}

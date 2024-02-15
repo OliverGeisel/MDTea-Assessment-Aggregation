@@ -1,4 +1,4 @@
-package de.olivergeisel.materialgenerator.generation.generator.task_exctraction;
+package de.olivergeisel.materialgenerator.generation.generator.item_exctraction;
 
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeType;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationType;

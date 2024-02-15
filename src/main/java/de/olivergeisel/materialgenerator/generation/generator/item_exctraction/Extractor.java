@@ -1,10 +1,10 @@
-package de.olivergeisel.materialgenerator.generation.generator.task_exctraction;
+package de.olivergeisel.materialgenerator.generation.generator.item_exctraction;
 
 
 import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
-import de.olivergeisel.materialgenerator.generation.material.assessment.TaskMaterial;
+import de.olivergeisel.materialgenerator.generation.material.assessment.ItemMaterial;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.List;
  * @author Oliver Geisel
  * @version 1.1.0
  * @see KnowledgeNode
- * @see TaskMaterial
+ * @see ItemMaterial
  * @see Material
  * @since 1.1.0
  */

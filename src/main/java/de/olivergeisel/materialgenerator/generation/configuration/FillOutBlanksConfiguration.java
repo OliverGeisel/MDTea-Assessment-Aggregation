@@ -1,8 +1,8 @@
 package de.olivergeisel.materialgenerator.generation.configuration;
 
-import de.olivergeisel.materialgenerator.generation.material.assessment.TaskType;
+import de.olivergeisel.materialgenerator.generation.material.assessment.ItemType;
 
-public class FillOutBlanksConfiguration extends TaskConfiguration {
+public class FillOutBlanksConfiguration extends ItemConfiguration {
 
 	private int               numberOfBlanks;
 	private FillOutBlanksType blankType;
@@ -17,7 +17,7 @@ public class FillOutBlanksConfiguration extends TaskConfiguration {
 	}
 
 	public FillOutBlanksConfiguration(int numberOfBlanks, FillOutBlanksType blankType, TestParameters testParameters) {
-		super(TaskType.FILL_OUT_BLANKS, testParameters);
+		super(ItemType.FILL_OUT_BLANKS, testParameters);
 		this.numberOfBlanks = numberOfBlanks;
 		this.blankType = blankType;
 	}

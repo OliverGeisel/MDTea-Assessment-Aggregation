@@ -9,4 +9,4 @@
  * @since 1.1.0
  */
 
-package de.olivergeisel.materialgenerator.generation.generator.task_exctraction;
+package de.olivergeisel.materialgenerator.generation.generator.item_exctraction;

@@ -6,9 +6,9 @@ import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 import jakarta.persistence.Entity;
 
 @Entity
-public class TrueFalseQuestion extends TaskMaterial {
+public class TrueFalseQuestion extends ItemMaterial {
 
-	private static final TaskConfiguration DEFAULT_CONFIGURATION = new TrueFalseConfiguration();
+	private static final ItemConfiguration DEFAULT_CONFIGURATION = new TrueFalseConfiguration();
 
 	private final boolean trueStatement;
 	private       String  statement;
@@ -51,7 +51,8 @@ public class TrueFalseQuestion extends TaskMaterial {
 		this(statement, true, reason, templateType);
 	}
 
-	public TrueFalseQuestion(String statement, boolean trueStatement, String reason, TaskConfiguration configuration) throws IllegalArgumentException {
+	public TrueFalseQuestion(String statement, boolean trueStatement, String reason, ItemConfiguration configuration)
+			throws IllegalArgumentException {
 		super(configuration, "", null);
 		if (statement == null || statement.isBlank())
 			throw new IllegalArgumentException("The statement must not be null or blank.");

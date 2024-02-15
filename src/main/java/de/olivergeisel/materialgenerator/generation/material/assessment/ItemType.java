@@ -1,6 +1,15 @@
 package de.olivergeisel.materialgenerator.generation.material.assessment;
 
-public enum TaskType {
+/**
+ * The type of {@link ItemMaterial} in an assessment or {@link TestMaterial}.
+ *
+ * @author Oliver Geisel
+ * @version 1.1.0
+ * @see TestMaterial
+ * @see ItemMaterial
+ * @since 1.1.0
+ */
+public enum ItemType {
 
 	FILL_OUT_BLANKS("FILL_OUT_BLANKS"),
 	SINGLE_CHOICE("SINGLE_CHOICE"),
@@ -11,20 +20,23 @@ public enum TaskType {
 
 	private final String type;
 
-	TaskType(String type) {
+	ItemType(String type) {
 		this.type = type;
-	}
-
-	public String getType() {
-		return type;
 	}
 
 	/**
 	 * Checks if the given type is equal to the current type. Ignores case.
+	 *
 	 * @param type The type to check
 	 * @return true if the given type is equal to the current type. Ignores case.
 	 */
 	public boolean machtType(String type) {
-		return type.equalsIgnoreCase(type);
+		return this.type.equalsIgnoreCase(type);
 	}
+
+	//region setter/getter
+	public String getType() {
+		return type;
+	}
+//endregion
 }
