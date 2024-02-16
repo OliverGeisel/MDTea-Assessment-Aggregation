@@ -6,7 +6,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-
+/**
+ * A part of the {@link CourseStructure}. Use the Composite Pattern to build a {@link CourseStructure}.
+ * This class is a component role of the Composite Pattern. It can only be contained in a {@link CourseStructure}.
+ * Only {@link StructureElementPart} should be contained in a {@link StructureChapter}
+ *
+ * @author Oliver Geisel
+ * @version 1.1.0
+ * @see CourseStructure
+ * @see StructureElementPart
+ * @see StructureGroup
+ * @since 1.0.0
+ */
 public class StructureChapter extends StructureElement {
 
 	private final List<StructureElementPart> parts = new ArrayList<>();
@@ -48,6 +59,17 @@ public class StructureChapter extends StructureElement {
 	public Relevance updateRelevance() {
 		relevance = parts.stream().map(StructureElement::getRelevance).max(Enum::compareTo).orElseThrow();
 		return relevance;
+	}
+
+	@Override
+	public StructureElement findByAlias(String alias) {
+		var foundThis = super.findByAlias(alias);
+		if (foundThis != null) return foundThis;
+		for (StructureElement element : parts) {
+			var found1 = element.findByAlias(alias);
+			if (found1 != null) return found1;
+		}
+		return null;
 	}
 
 	public boolean add(StructureElementPart element) throws IllegalArgumentException {

@@ -2,14 +2,24 @@ package de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.eleme
 
 
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.Relation;
+import jakarta.persistence.Column;
 import org.springframework.data.neo4j.core.schema.Node;
 
 import java.util.Collection;
 import java.util.HashMap;
 
+/**
+ * A Text is a long text with a headline.
+ *
+ * @author Oliver Geisel
+ * @version 1.1.0
+ * @see KnowledgeElement
+ * @since 0.2.0
+ */
 @Node
 public class Text extends KnowledgeElement {
 
+	@Column(length = 10_000)
 	private String textField;
 	private String headline;
 
@@ -31,8 +41,20 @@ public class Text extends KnowledgeElement {
 		this.headline = elements.getOrDefault("headline", "");
 	}
 
-	public Text(String textField, String id, String type) {
+	public Text(String textField, String headline, String id) {
+		super(textField, id, "TEXT");
+		this.textField = textField;
+		this.headline = headline;
+	}
+
+	protected Text(String textField, String headline, String id, String type) {
 		super(textField, id, type);
+		this.textField = textField;
+		this.headline = headline;
+	}
+
+	public Text(String textField, String id) {
+		super(textField, id, "TEXT");
 	}
 
 	//region setter/getter

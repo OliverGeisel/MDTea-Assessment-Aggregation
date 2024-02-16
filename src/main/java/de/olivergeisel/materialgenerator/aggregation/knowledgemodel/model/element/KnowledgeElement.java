@@ -35,7 +35,7 @@ public abstract class KnowledgeElement {
 	@Relationship
 	private   Set<Relation> relations = new HashSet<>();
 	/**
-	 * The id of the element in the knowledge base. Can differ from the content field if is Type term.
+	 * The id of the element in the knowledge base.
 	 */
 	@Id
 	private   String        id;

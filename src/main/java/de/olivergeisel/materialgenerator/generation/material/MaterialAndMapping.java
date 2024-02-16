@@ -1,6 +1,6 @@
 package de.olivergeisel.materialgenerator.generation.material;
 
-public record MaterialAndMapping(Material material, MaterialMappingEntry mapping) {
+public record MaterialAndMapping<M extends Material>(M material, MaterialMappingEntry mapping) {
 
 
 }

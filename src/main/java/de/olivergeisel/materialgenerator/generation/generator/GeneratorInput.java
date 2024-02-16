@@ -9,6 +9,13 @@ public class GeneratorInput {
 	private KnowledgeModel model;
 	private CoursePlan     plan;
 
+
+	public GeneratorInput(TemplateSet templates, KnowledgeModel model, CoursePlan plan) {
+		this.templates = templates;
+		this.model = model;
+		this.plan = plan;
+	}
+
 	//region setter/getter
 	public CoursePlan getPlan() {
 		return plan;

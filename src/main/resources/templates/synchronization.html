@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Synchronization</title>
+    <th:block th:replace="~{main::head-tag}"></th:block>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div th:replace="~{main::navigation}"></div>
+<main class="page container flex-grow-1">
+    <header><h1>Infos zur Synchronization-Phase</h1></header>
+    <section>
+        Die Synchronization-Phase ist die vierte Phase von MDTea. In dieser Phase werden Interaktionen zwischen
+        Nutzern und den Materialien ausgewertet und in das Wissensmodell einbindet.
+        <br>
+        Dadurch kann es sein, dass die Kurse aktualisiert werden müssen. Dies wird über Update-Pakte realisiert.
+        <br>
+        <br>
+        <b class="text-bg-danger">Die Phase ist im Prototyp nicht implementiert!</b>
+    </section>
+</main>
+<footer th:replace="~{main::footer}"></footer>
+</body>
+</html>

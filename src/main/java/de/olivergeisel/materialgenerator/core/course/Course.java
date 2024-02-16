@@ -6,7 +6,7 @@ package de.olivergeisel.materialgenerator.core.course;
  * A Course contains a {@link Meta} and a {@link CourseOrder}.
  *
  * @author Oliver Geisel
- * @version 1.0.0
+ * @version 1.1.0
  * @see CourseChapter
  * @see CourseElement
  * @since 0.2.0

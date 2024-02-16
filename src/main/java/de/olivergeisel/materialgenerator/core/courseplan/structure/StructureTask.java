@@ -23,11 +23,7 @@ public class StructureTask extends StructureElementPart {
 
 	@Override
 	public String toString() {
-		return "StructureTask{" +
-			   "name=" + getName() +
-			   ", topic=" + getTopic() +
-			   ", relevance=" + relevance +
-			   '}';
+		return STR."StructureTask{name=\{getName()}, topic=\{getTopic()}, relevance=\{relevance}}";
 	}
 
 

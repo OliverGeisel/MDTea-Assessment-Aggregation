@@ -2,6 +2,7 @@ package de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relat
 
 
 import org.springframework.data.neo4j.repository.Neo4jRepository;
+import org.springframework.data.util.Streamable;
 
 import java.util.UUID;
 
@@ -18,5 +19,11 @@ import java.util.UUID;
  */
 public interface RelationRepository extends Neo4jRepository<Relation, UUID> {
 
+	Streamable<Relation> findByType(RelationType type);
 
+	Streamable<Relation> findByToId(String toId); // TODO WHY IS the ID necessary and not the to property?
+
+	Streamable<Relation> findDistinctByToId(String toId);
+
+	Streamable<Relation> findByFromId(String fromId);
 }

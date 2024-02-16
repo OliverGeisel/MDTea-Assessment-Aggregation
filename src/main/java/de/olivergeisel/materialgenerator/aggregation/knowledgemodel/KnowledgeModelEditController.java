@@ -1,11 +1,15 @@
 package de.olivergeisel.materialgenerator.aggregation.knowledgemodel;
 
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.forms.AddElementForm;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeType;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationType;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -52,6 +56,21 @@ public class KnowledgeModelEditController {
 		model.addAttribute("elements", knowledgeModelService.getAllElements());
 		return "knowledgeModel/elements";
 	}
+
+	@GetMapping("/elements/add")
+	public String addElement(Model model, AddElementForm form) {
+		model.addAttribute("form", form);
+		model.addAttribute("knowledgeTypes", KnowledgeType.values());
+		model.addAttribute("structures", knowledgeModelService.getStructureIds());
+		return "knowledgeModel/element-add";
+	}
+
+	@PostMapping("/elements/add")
+	public String addElementPost(@Valid AddElementForm form, Errors errors, Model model) {
+		knowledgeModelService.addElement(form);
+		return "redirect:/knowledge-model/elements";
+	}
+
 
 	@GetMapping("/elements/edit")
 	public String editElement(Model model, @RequestParam("id") String id) {

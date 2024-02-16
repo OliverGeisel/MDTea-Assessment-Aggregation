@@ -17,6 +17,16 @@ public abstract class KnowledgeObject {
 	@Relationship("LINKED_TO")
 	private Set<KnowledgeElement> linkedElements;
 
+	/**
+	 * Links a KnowledgeElement to this KnowledgeObject
+	 *
+	 * @param element the element to link
+	 * @return true if the element was not already linked
+	 */
+	public boolean linkElement(KnowledgeElement element) {
+		return linkedElements.add(element);
+	}
+
 	@Id
 	@GeneratedValue(GeneratedValue.UUIDGenerator.class)
 	private String                id;
@@ -31,11 +41,10 @@ public abstract class KnowledgeObject {
 		linkedElements = new HashSet<>();
 	}
 
-	public boolean linkElement(KnowledgeElement element) {
-		return linkedElements.add(element);
-	}
-
 	//region setter/getter
+	public String getId() {
+		return id;
+	}
 	public String getName() {
 		return id;
 	}

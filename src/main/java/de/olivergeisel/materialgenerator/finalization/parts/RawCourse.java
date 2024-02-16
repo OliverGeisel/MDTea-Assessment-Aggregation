@@ -3,7 +3,6 @@ package de.olivergeisel.materialgenerator.finalization.parts;
 import de.olivergeisel.materialgenerator.core.course.Course;
 import de.olivergeisel.materialgenerator.core.course.Meta;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
-import de.olivergeisel.materialgenerator.finalization.Goal;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
 import jakarta.persistence.*;
 
@@ -15,13 +14,13 @@ import java.util.stream.Collectors;
 /**
  * A RawCourse is a {@link Course} that is not yet finalized.
  * <p>
- * A RawCourse contains a {@link CourseOrder} and a {@link CourseMetadataFinalization}.
+ * A RawCourse contains a {@link RawCourseOrder} and a {@link CourseMetadataFinalization}.
  * It can be edited.
  *
  * @author Oliver Geisel
- * @version 1.0.0
+ * @version 1.1.0
  * @see Course
- * @see CourseOrder
+ * @see RawCourseOrder
  * @see CourseMetadataFinalization
  * @since 0.2.0
  */
@@ -32,12 +31,18 @@ public class RawCourse extends Course {
 	@Column(name = "id", nullable = false)
 	private UUID id;
 
+	/**
+	 * The id of the plan that is used to create this course.
+	 */
 	private UUID                       planId;
+	/**
+	 * The name of the templateSet that is used to create this course.
+	 */
 	private String                     templateName;
 	@OneToOne(cascade = CascadeType.ALL)
 	private CourseMetadataFinalization metadata;
 	@OneToOne(cascade = CascadeType.ALL)
-	private CourseOrder                courseOrder;
+	private RawCourseOrder rawCourseOrder;
 
 	@OneToMany(cascade = CascadeType.ALL)
 	private Set<Goal> goals;
@@ -50,7 +55,7 @@ public class RawCourse extends Course {
 		this.templateName = templateName;
 		this.goals = goals;
 		metadata = new CourseMetadataFinalization(plan);
-		courseOrder = new CourseOrder(plan, goals);
+		rawCourseOrder = new RawCourseOrder(plan, goals);
 	}
 
 	/**
@@ -59,7 +64,7 @@ public class RawCourse extends Course {
 	 * @return The number of materials
 	 */
 	public int materialCount() {
-		return courseOrder.materialCount();
+		return rawCourseOrder.materialCount();
 	}
 
 	/**
@@ -67,10 +72,17 @@ public class RawCourse extends Course {
 	 */
 	public void changePlan(CoursePlan plan) {
 		setPlanId(plan.getId());
+		// Todo change rawCourseOrder
 	}
 
+	/**
+	 * Assign materials to this course.
+	 *
+	 * @param materials The materials to assign
+	 * @return True if all materials are assigned. False otherwise
+	 */
 	public boolean assignMaterial(Collection<MaterialAndMapping> materials) {
-		return courseOrder.assignMaterial(materials.stream().map(MaterialAndMapping::material).collect(
+		return rawCourseOrder.assignMaterial(materials.stream().map(MaterialAndMapping::material).collect(
 				Collectors.toSet()));
 	}
 
@@ -82,15 +94,11 @@ public class RawCourse extends Course {
 	 * @return True if all requirements are fulfilled. False otherwise
 	 */
 	public boolean isValid() {
-		return courseOrder.isValid();
+		return rawCourseOrder.isValid();
 	}
 
 	public UUID getId() {
 		return id;
-	}
-
-	public CourseOrder getCourseOrder() {
-		return courseOrder;
 	}
 
 	public String getTemplateName() {
@@ -133,8 +141,8 @@ public class RawCourse extends Course {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public CourseOrder getOrder() {
-		return courseOrder;
+	public RawCourseOrder getOrder() {
+		return rawCourseOrder;
 	}
 //endregion
 }

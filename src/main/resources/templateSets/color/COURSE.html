@@ -50,7 +50,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="chapter : ${course.courseOrder.chapterOrder}">
+                <tr th:each="chapter : ${course.order.chapterOrder}">
                     <td th:unless="${chapter.materialCount == 0}">
                         <a class="link-info link-opacity-75" th:href="@{${chapter.name}+'/overview.html'}">
                             <h2 th:text="${chapter.name}"></h2>

@@ -1,30 +1,44 @@
 package de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element;
 
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.Relation;
+import de.olivergeisel.materialgenerator.generation.material.assessment.TaskType;
 import org.springframework.data.neo4j.core.schema.Node;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.Collection;
 
+
+/**
+ * Represents a task in the knowledge base.
+ * A {@link Task} is the base class for all tasks in the knowledge base. It contains the task type. Every subclass
+ * has as KnowledgeType {@link KnowledgeType#TASK}. But the taskType is different.
+ *
+ * @author Oliver Geisel
+ * @version 1.1.0
+ * @see TaskType
+ * @see KnowledgeType
+ * @see KnowledgeElement
+ * @since 1.1.0
+ */
 @Node
-public class Task extends KnowledgeElement {
+public abstract class Task extends KnowledgeElement {
 
-	private String task;
+	private final TaskType taskType;
 
-	private List<String> answers;
-
-	protected Task() {
-		super();
+	protected Task(String content, String id, String taskType) {
+		super(content, id, KnowledgeType.TASK.name());
+		this.taskType = TaskType.valueOf(taskType.toUpperCase());
 	}
 
-	public Task(String task, String content, String answers) {
-		super(task, STR."\{UUID.randomUUID().toString()}-TASK", "TASK");
-		this.task = task;
-		this.answers = List.of(answers.split(","));
+	protected Task(String content, String id, String taskType, Collection<Relation> relations) {
+		super(content, id, KnowledgeType.TEXT.name(), relations);
+		this.taskType = TaskType.valueOf(taskType.toUpperCase());
 	}
 
-//region setter/getter
-	public String getTask() {
-		return task;
+	//region setter/getter
+	public TaskType getTaskType() {
+		return taskType;
 	}
 //endregion
+
+
 }

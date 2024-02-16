@@ -4,7 +4,7 @@
  * <p>
  * The {@link de.olivergeisel.materialgenerator.finalization.material_assign.MaterialAssigner} class defines the methods to assign materials to a part.
  *
- * @version 1.0.0
+ * @version 1.1.0
  * @author Oliver Geisel
  * @see de.olivergeisel.materialgenerator.finalization.material_assign.MaterialAssigner
  * @since 0.2.0

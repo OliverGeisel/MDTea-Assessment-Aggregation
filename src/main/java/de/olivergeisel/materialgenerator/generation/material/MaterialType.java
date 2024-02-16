@@ -8,5 +8,6 @@ public enum MaterialType {
 	FORUM,
 	REPORT,
 	FAQ,
-	COMPLEX
+	COMPLEX,
+	TASK,
 }

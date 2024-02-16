@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <th:block th:include="~{main::head-tag}"></th:block>
+    <th:block th:replace="~{main::head-tag}"></th:block>
     <title>Start - MDTea-Gen</title>
 </head>
 
@@ -87,9 +87,11 @@
                             </div>
                             <h5 class="fw-bold card-title">Export</h5>
                             <p class="text-muted card-text mb-4">Jeder Kurs kann einfach exportiert werden und in
-                                anderen Plattformen genutzt werden</p><a href="export.html">
-                            <button class="btn btn-primary shadow" type="button"><strong>Mehr erfahren</strong></button>
-                        </a>
+                                anderen Plattformen genutzt werden</p>
+                            <a href="/export.html">
+                                <button class="btn btn-primary shadow" type="button"><strong>Mehr erfahren</strong>
+                                </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -107,7 +109,11 @@
                             </div>
                             <h5 class="fw-bold card-title">Updates</h5>
                             <p class="text-muted card-text mb-4">Leider noch nicht da</p>
-                            <button class="btn btn-primary shadow" type="button"><strong>Mehr erfahren</strong></button>
+                            <a href="/synchronization.html" th:href="@{/synchronization}">
+                                <button class="btn btn-primary shadow" type="button">
+                                    <strong>Mehr erfahren</strong>
+                                </button>
+                            </a>
                         </div>
                     </div>
                 </div>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Seitentitel</title>
+    <th:block th:replace="~{main::head-tag}"></th:block>
+    <script>
+
+        function getTermInputs() {
+            const result = [];
+            result.push(createType("TERM"));
+            // content
+
+            const content = document.createElement("label");
+            content.classList.add("form-control", "mt-3");
+            let labelText = document.createTextNode("Content: ");
+            content.appendChild(labelText);
+            let input = document.createElement("input");
+            content.appendChild(input);
+            input.setAttribute("name", "content");
+            input.setAttribute("required", "required");
+            input.setAttribute("placeholder", "Term eingeben");
+            result.push(content);
+            // structure
+            result.push(createStructureId());
+            // button
+            result.push(createSubmitButton("Term"));
+            return result
+        }
+
+        function getDefinitionInputs() {
+            const result = [];
+            result.push(createType("DEFINITION"));
+            // content
+            result.push(createTextArea());
+            // structure
+            result.push(createStructureId());
+            // button
+            result.push(createSubmitButton("Definition"));
+            return result
+        }
+
+        function getFactInputs() {
+            const result = [];
+            result.push(createType("FACT"));
+            // content
+            result.push(createTextArea());
+            // structure
+            result.push(createStructureId());
+            // button
+            result.push(createSubmitButton("Fakt"));
+            return result
+        }
+
+        function getCodeInputs() {
+            const result = [];
+            result.push(createType("CODE"));
+            // language
+            const language = document.createElement("label");
+            language.classList.add("form-control", "mt-3");
+            let labelText = document.createTextNode("Language: ");
+            language.appendChild(labelText);
+            let input = document.createElement("input");
+            language.appendChild(input);
+            input.setAttribute("type", "text");
+            input.setAttribute("name", "language");
+            input.setAttribute("placeholder", "Sprache eingeben");
+            result.push(language);
+            result.push(createHeadline());
+            // content
+            result.push(createTextArea());
+            // structure
+            result.push(createStructureId());
+            // button
+            result.push(createSubmitButton("Codeschnipsel"));
+            return result
+
+        }
+
+        function loadElementMask(select) {
+            var type = select.value;
+            var form = document.getElementById("element-add-form");
+            form.innerHTML = "";
+            let result;
+            switch (type) {
+                case "TEXT":
+                    result = getTextInputs();
+                    break;
+                case "TERM":
+                    result = getTermInputs();
+                    break;
+                case "DEFINITION":
+                    result = getDefinitionInputs();
+                    break;
+                case "FACT":
+                    result = getFactInputs();
+                    break;
+                case "CODE":
+                    result = getCodeInputs();
+                    break;
+                default:
+                    form.innerHTML = "FALSCHER TYP";
+            }
+            result.forEach(input => form.appendChild(input));
+        }
+
+        function getTextInputs() {
+            const result = [];
+            result.push(createType("TEXT"));
+            result.push(createHeadline());
+            // content
+            result.push(createTextArea());
+            // structure
+            result.push(createStructureId());
+            // button
+            result.push(createSubmitButton("Text"));
+            return result
+        }
+
+
+        function createStructureId() {
+            const structure = document.createElement("label");
+            structure.classList.add("form-control", "mt-3");
+            let labelText = document.createTextNode("Structure-Id: ");
+            structure.appendChild(labelText);
+            let input = document.createElement("input");
+            structure.appendChild(input);
+            input.setAttribute("type", "text");
+            input.setAttribute("name", "structureId");
+            input.setAttribute("placeholder", "Structure-Id eingeben");
+            input.setAttribute("list", "structure-list");
+            return structure;
+        }
+
+        function createType(typeName) {
+            const type = document.createElement("input");
+            type.setAttribute("type", "hidden");
+            type.setAttribute("name", "type");
+            type.setAttribute("value", typeName);
+            return type;
+        }
+
+        function createHeadline() {
+            const headline = document.createElement("label");
+            let labelText = document.createTextNode("Headline: ");
+            headline.appendChild(labelText);
+            headline.classList.add("form-control", "mt-3");
+            let input = document.createElement("input");
+            input.setAttribute("type", "text");
+            input.setAttribute("name", "headline");
+            input.setAttribute("placeholder", "Headline eingeben");
+            headline.appendChild(input);
+            return headline;
+        }
+
+        function createSubmitButton(elementName = "Element") {
+            const submit = document.createElement("input");
+            submit.setAttribute("type", "submit");
+            submit.setAttribute("value", elementName + " erstellen");
+            submit.classList.add("btn", "btn-primary", "mt-3");
+            return submit;
+        }
+
+        function createTextArea() {
+            const content = document.createElement("label");
+            content.classList.add("form-control", "mt-3");
+            let labelText = document.createTextNode("Content: ");
+            content.appendChild(labelText);
+            let input = document.createElement("textarea");
+            content.appendChild(input);
+            input.setAttribute("name", "content");
+            input.setAttribute("placeholder", "Text eingeben");
+            input.setAttribute("rows", "4");
+            input.setAttribute("cols", "80");
+            return content;
+        }
+    </script>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div th:replace="~{main::navigation}"></div>
+<main class="flex-grow-1">
+    <header><h1>Neues Element</h1></header>
+    <section>
+        <header><h3 th:text="#{knowledgemodel.element.add.header}">Element Wahl</h3></header>
+        <form method="post">
+            <label> Type:
+                <select name="type" onchange="loadElementMask(this)">
+                    <option value="NONE"></option>
+                    <option th:each="type: ${knowledgeTypes}" th:text="${type.name}" th:value="${type.name}"></option>
+                </select>
+            </label>
+        </form>
+        <article id="element-fields">
+            <form id="element-add-form" method="post">
+
+            </form>
+            <datalist id="structure-list">
+                <option th:each="structure: ${structures}" th:text="${structure}" th:value="${structure}"></option>
+            </datalist>
+        </article>
+    </section>
+</main>
+<footer th:replace="~{main::footer}"></footer>
+</body>
+</html>

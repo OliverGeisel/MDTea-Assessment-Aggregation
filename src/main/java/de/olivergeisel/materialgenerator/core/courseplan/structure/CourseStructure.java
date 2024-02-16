@@ -19,9 +19,7 @@ public class CourseStructure {
 
 	@Override
 	public String toString() {
-		return "CourseStructure{" +
-			   "chapters=" + order.size() +
-			   '}';
+		return STR."CourseStructure{chapters=\{order.size()}}";
 	}
 
 }

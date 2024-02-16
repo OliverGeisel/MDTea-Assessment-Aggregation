@@ -2,7 +2,6 @@ package de.olivergeisel.materialgenerator.finalization.parts;
 
 import de.olivergeisel.materialgenerator.core.course.MaterialOrderPart;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.Relevance;
-import de.olivergeisel.materialgenerator.finalization.Topic;
 import de.olivergeisel.materialgenerator.finalization.material_assign.MaterialAssigner;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import org.junit.jupiter.api.AfterEach;
@@ -10,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
@@ -24,6 +24,11 @@ class MaterialOrderCollectionTest {
 	@BeforeEach
 	void setUp() {
 		collection = new MaterialOrderCollection() {
+			@Override
+			public Iterator<MaterialOrderPart> iterator() {
+				return null;
+			}
+
 			@Override
 			public Material findMaterial(UUID materialId) {
 				return null;
