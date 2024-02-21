@@ -46,7 +46,7 @@ public class ChapterOrder extends MaterialOrderCollection {
 		setName(stChapter.getName());
 		var chapterTopic = stChapter.getTopic();
 		var topic = goals.stream().flatMap(goal -> goal.getTopics().stream().filter(t -> t.isSame(chapterTopic)))
-						 .findFirst().orElse(null);
+						 .findFirst().orElse(Topic.empty());
 		setTopic(topic);
 		stChapter.getAlternatives().forEach(this::appendAlias);
 	}
@@ -151,6 +151,14 @@ public class ChapterOrder extends MaterialOrderCollection {
 	}
 
 	@Override
+	public Collection<NameAndId> collectionsNameAndId() {
+		var names = new LinkedList<NameAndId>();
+		names.add(new NameAndId(getName(), getId()));
+		groupOrder.forEach(g -> names.addAll(g.collectionsNameAndId()));
+		return names;
+	}
+
+	@Override
 	public Iterator<MaterialOrderPart> iterator() {
 		return groupOrder.stream().map(it -> (MaterialOrderPart) it).iterator();
 	}
@@ -176,6 +184,14 @@ public class ChapterOrder extends MaterialOrderCollection {
 	public Relevance getRelevance() {
 		return groupOrder.stream().map(GroupOrder::getRelevance).max(Comparator.comparingInt(Enum::ordinal))
 						 .orElse(Relevance.TO_SET);
+	}
+
+	@Override
+	public List<UUID> getCollectionIds() {
+		var ids = new LinkedList<UUID>();
+		ids.add(getId());
+		groupOrder.forEach(g -> ids.addAll(g.getCollectionIds()));
+		return ids;
 	}
 
 	/**

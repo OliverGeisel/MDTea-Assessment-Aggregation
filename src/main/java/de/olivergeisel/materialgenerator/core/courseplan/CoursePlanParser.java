@@ -6,6 +6,8 @@ import de.olivergeisel.materialgenerator.core.courseplan.content.ContentGoalExpr
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentTarget;
 import de.olivergeisel.materialgenerator.core.courseplan.meta.CourseMetadata;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.*;
+import de.olivergeisel.materialgenerator.generation.configuration.TestConfiguration;
+import de.olivergeisel.materialgenerator.generation.configuration.TestConfigurationParser;
 import org.apache.tomcat.util.json.JSONParser;
 import org.apache.tomcat.util.json.ParseException;
 import org.slf4j.Logger;
@@ -20,7 +22,7 @@ import java.util.regex.Pattern;
 
 
 /**
- * A JSON Parser for CoursePlans. The JSON structure is as follows:
+ * A JSON Parser for {@link CoursePlan}s. The JSON structure is as follows:
  * <p>
  * A CoursePlan is a JSON Object with three attributes: meta, content and structure.
  * <p>
@@ -50,12 +52,22 @@ import java.util.regex.Pattern;
  *         <li>groups: a JSON Array with JSON Objects. Each JSON Object represents a group</li>
  *    </ul>
  * <p>
+ *    Additionally, a course can have a testConfiguration attribute. This is the name of a {@link TestConfiguration}
+ *    file. Will be parsed by the {@link TestConfigurationParser}. If no testConfiguration is given, the default is used.
+ * <p>
  * A group has the similar attributes as a chapter except the tasks attribute.
  * This is a JSON Array with JSON Objects. Each JSON Object represents a task.<br>
  * A task is similar to a group but has no further subparts.
  *
  * <p>
  * The parser will parse the JSON and create a CoursePlan object from it.
+ *
+ * @author Oliver Geisel
+ * @version 1.1.0
+ * @see CoursePlan
+ * @see TestConfiguration
+ * @see TestConfigurationParser
+ * @since 0.2.0
  */
 public class CoursePlanParser {
 
@@ -79,6 +91,7 @@ public class CoursePlanParser {
 	private static final String GROUPS              = "groups";
 	private static final String STRUCTURE_TASKS     = "tasks";
 	private static final String STRUCTURE_RELEVANCE = "relevance";
+	private static final String DEFAULT = "DEFAULT";
 
 
 	private final List<ContentTarget> targets = new ArrayList<>();
@@ -170,6 +183,7 @@ public class CoursePlanParser {
 		}
 		back.updateRelevance();
 		if (!back.isValid()) {
+			logger.warn("Chapter %s is not valid".formatted(back.getName()));
 			throw new IllegalStateException(String.format("Chapter %s is not valid", back.getName()));
 		}
 		return back;
@@ -187,7 +201,7 @@ public class CoursePlanParser {
 		topic.getAliases().addAliases(back.getName(), alternatives);
 		List<Map<String, ?>> tasks = (List<Map<String, ?>>) groupJSON.get(STRUCTURE_TASKS);
 		for (var task : tasks) {
-			// Todo decide between group and task!
+			// Todo decide between sub-group and task!
 			try {
 				back.add(createTask(task));
 			} catch (CoursePlanParserException e) {
@@ -281,7 +295,7 @@ public class CoursePlanParser {
 	 * Parses the CurriculumGoals from the given Input. The input must be a valid JSON.
 	 *
 	 * @param file the input
-	 * @return a @see CoursePlan
+	 * @return a {@link CoursePlan}
 	 * @throws CoursePlanParserException if the input is not valid
 	 */
 	public CoursePlan parseFromFile(InputStream file) throws CoursePlanParserException {
@@ -314,7 +328,27 @@ public class CoursePlanParser {
 			List<ContentGoal> goals = parsePlanGoals(goalsJSON);
 			// STRUCTURE
 			List<Map<String, ?>> courseStructure = (List<Map<String, ?>>) parsedPlan.get(PLAN_STRUCTURE);
-			back = new CoursePlan(meta, goals, parseCourseStructure(courseStructure), targets);
+			// TEST CONFIGURATION
+			String testConfigurationName;
+			var testConfigurationNameLoad = parsedPlan.get("testConfiguration");
+			testConfigurationName =
+					testConfigurationNameLoad == null ? DEFAULT : testConfigurationNameLoad.toString();
+			TestConfiguration testConfiguration;
+			try {
+				if (testConfigurationName.isBlank() || testConfigurationName.equals(DEFAULT)) {
+					testConfiguration = TestConfigurationParser.getDefaultConfiguration();
+				} else {
+					var fileName = testConfigurationName.endsWith(".json") ? testConfigurationName :
+							STR."\{testConfigurationName}.json";
+					InputStream testConfigurationStream =
+							CoursePlanParser.class.getClassLoader().getResourceAsStream(fileName);
+					testConfiguration = TestConfigurationParser.parseFromFile(testConfigurationStream);
+					// Todo handle if config not exist
+				}
+			} catch (ParseException e) {
+				throw new RuntimeException(e);
+			}
+			back = new CoursePlan(meta, goals, parseCourseStructure(courseStructure), targets, testConfiguration);
 		}
 		return back;
 

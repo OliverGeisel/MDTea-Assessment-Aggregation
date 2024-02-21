@@ -9,18 +9,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Assign materials to a MaterialOrderCollection.
+ * Assign materials to a {@link MaterialOrderCollection}.
  * <p>
  * Has internal states to hande assignment. The {@link CriteriaSelector} is used to check if a {@link Material} match
  * the criteria of it. If it does it will be assigned to the {@link MaterialOrderCollection}. If not it will return
  * false.
- * the next material
- * to
- * assign.
  * </p>
  *
  * @author Oliver Geisel
- * @version 1.0
+ * @version 1.1.0
  * @see CriteriaSelector
  * @see MaterialOrderCollection
  * @see Material

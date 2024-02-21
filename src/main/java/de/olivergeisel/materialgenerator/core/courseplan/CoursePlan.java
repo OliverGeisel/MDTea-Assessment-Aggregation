@@ -4,6 +4,9 @@ import de.olivergeisel.materialgenerator.core.courseplan.content.ContentGoal;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentTarget;
 import de.olivergeisel.materialgenerator.core.courseplan.meta.CourseMetadata;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.CourseStructure;
+import de.olivergeisel.materialgenerator.generation.configuration.TestConfiguration;
+import de.olivergeisel.materialgenerator.generation.configuration.TestConfigurationParser;
+import org.apache.tomcat.util.json.ParseException;
 
 import java.util.*;
 
@@ -43,19 +46,42 @@ public class CoursePlan {
 
 	//-----------STRUCTURE---------------------
 	private final CourseStructure structure;
+	//-----------Configuration-----------------
+	private final TestConfiguration testConfiguration;
 
 	public CoursePlan(CourseMetadata metadata, Collection<ContentGoal> goals, CourseStructure structure,
-			Collection<ContentTarget> targets) {
+			Collection<ContentTarget> targets, TestConfiguration testConfiguration) {
 		this.metadata = metadata;
 		this.goals = new HashSet<>();
 		this.goals.addAll(goals);
 		this.structure = structure;
 		this.targets = new ArrayList<>();
 		this.targets.addAll(targets);
-
+		if (testConfiguration == null) {
+			// use default configuration
+			try {
+				this.testConfiguration = TestConfigurationParser.getDefaultConfiguration();
+			} catch (ParseException e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			this.testConfiguration = testConfiguration;
+		}
 	}
 
 	//region setter/getter
+	public TestConfiguration getTestConfiguration() {
+		return testConfiguration;
+	}
+
+	public boolean isValid() {
+		var isNull = metadata == null || structure == null || goals.isEmpty() || targets.isEmpty();
+		if (isNull) {
+			return false;
+		}
+		return structure.isValid();
+	}
+
 	public Set<ContentGoal> getGoals() {
 		return goals;
 	}

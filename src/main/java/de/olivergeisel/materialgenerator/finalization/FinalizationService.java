@@ -5,9 +5,16 @@ import de.olivergeisel.materialgenerator.core.courseplan.content.ContentGoal;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.Relevance;
 import de.olivergeisel.materialgenerator.finalization.export.DownloadManager;
 import de.olivergeisel.materialgenerator.finalization.parts.*;
+import de.olivergeisel.materialgenerator.generation.configuration.TestConfiguration;
+import de.olivergeisel.materialgenerator.generation.configuration.TestConfigurationParser;
+import de.olivergeisel.materialgenerator.generation.generator.test_assamble.TestAssembler;
+import de.olivergeisel.materialgenerator.generation.material.ComplexMaterial;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
+import de.olivergeisel.materialgenerator.generation.material.MaterialRepository;
+import de.olivergeisel.materialgenerator.generation.material.assessment.TestMaterial;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.tomcat.util.json.ParseException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,11 +33,13 @@ public class FinalizationService {
 	private final RawCourseRepository                  rawCourseRepository;
 	private final CourseMetadataFinalizationRepository metadataRepository;
 	private final GoalRepository                       goalRepository;
+	private final MaterialRepository materialRepository;
 
 	public FinalizationService(DownloadManager downloadManager, CourseOrderRepository courseOrderRepository,
 			ChapterOrderRepository chapterOrderRepository, GroupOrderRepository groupOrderRepository,
 			TaskOrderRepository taskOrderRepository, RawCourseRepository rawCourseRepository,
-			CourseMetadataFinalizationRepository metadataRepository, GoalRepository goalRepository) {
+			CourseMetadataFinalizationRepository metadataRepository, GoalRepository goalRepository,
+			MaterialRepository materialRepository) {
 		this.downloadManager = downloadManager;
 		this.courseOrderRepository = courseOrderRepository;
 		this.chapterOrderRepository = chapterOrderRepository;
@@ -39,6 +48,7 @@ public class FinalizationService {
 		this.rawCourseRepository = rawCourseRepository;
 		this.metadataRepository = metadataRepository;
 		this.goalRepository = goalRepository;
+		this.materialRepository = materialRepository;
 	}
 
 	public RawCourse createRawCourse(CoursePlan coursePlan, String template, Collection<MaterialAndMapping> materials) {
@@ -157,5 +167,51 @@ public class FinalizationService {
 		} else {
 			throw new IllegalArgumentException("Task not found");
 		}
+	}
+
+	public TestMaterial generateTest(String topic) {
+		TestConfiguration configuration;
+		try {
+			configuration = TestConfigurationParser.getDefaultConfiguration();
+		} catch (ParseException e) {
+			throw new RuntimeException(e);
+		}
+
+		var assembler = new TestAssembler(null, null, configuration);
+		List<TestMaterial> materials = assembler.assemble();
+		return materials.stream().findFirst().orElse(null);
+	}
+
+	public void downloadMaterial(UUID materialId, HttpServletResponse response) {
+		var material = materialRepository.findById(materialId);
+		material.ifPresent(value -> downloadManager.downloadTest(value, response));
+	}
+
+	public void assignMaterialToCollection(UUID id, UUID partId, UUID collectionId) {
+		rawCourseRepository.findById(id).ifPresent(course -> {
+			var material = course.getUnassignedMaterials().stream().filter(it -> it.getId().equals(partId)).findFirst();
+			var collection = course.getOrder().find(collectionId);
+			if (material.isPresent() && collection != null) {
+				boolean assigned = false;
+				switch (collection) {
+					case GroupOrder group -> {
+						if (material.get() instanceof ComplexMaterial complexMaterial) {
+							group.assignComplex(complexMaterial);
+							assigned = true;
+						}
+					}
+					case TaskOrder task -> {
+						task.append(material.orElseThrow());
+						assigned = true;
+					}
+					default -> {
+					}
+				}
+				if (assigned) {
+					course.getUnassignedMaterials().remove(material.get());
+				}
+			}
+			rawCourseRepository.save(course);
+		});
 	}
 }

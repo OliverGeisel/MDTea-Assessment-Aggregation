@@ -23,7 +23,8 @@ public abstract class ComplexMaterial extends Material {
 	@JoinTable(name = "complex_material_material",
 			joinColumns = @JoinColumn(name = "complex_material_id"),
 			inverseJoinColumns = @JoinColumn(name = "material_id"))
-	private final List<Material> parts = new ArrayList<>();
+	private final List<Material> parts       = new ArrayList<>();
+	private       String         description = "";
 
 	protected ComplexMaterial() {
 		super(MaterialType.COMPLEX);
@@ -44,7 +45,18 @@ public abstract class ComplexMaterial extends Material {
 
 	protected ComplexMaterial(MaterialType type, TemplateType templateType, List<Material> parts) {
 		super(type, templateType);
+		if (parts != null) {
+			this.parts.addAll(parts);
+		}
+	}
+
+	protected ComplexMaterial(MaterialType type, TemplateType templateType, Term term, List<Material> parts) {
+		super(type, templateType, term.getContent(), term.getId(), term.getStructureId());
 		this.parts.addAll(parts);
+	}
+
+	public int size() {
+		return parts.size();
 	}
 
 	public boolean move(Material part, int index) {
@@ -127,8 +139,15 @@ public abstract class ComplexMaterial extends Material {
 		return parts.indexOf(part);
 	}
 
-
 	//region setter/getter
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
 	public List<Material> getParts() {
 		return parts;
 	}

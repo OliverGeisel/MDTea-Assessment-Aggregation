@@ -6,6 +6,7 @@ import de.olivergeisel.materialgenerator.finalization.export.DownloadManager;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourse;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourseRepository;
 import de.olivergeisel.materialgenerator.generation.material.MaterialRepository;
+import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
@@ -46,14 +47,32 @@ public class FinalizationController {
 		return PATH + "edit";
 	}
 
-	@GetMapping({"edit/{id}",})
+	@GetMapping({"edit/{id}", "edit/{id}/"})
 	public String editCourse(@PathVariable UUID id, Model model) {
 		return repository.findById(id).map(course -> {
 			model.addAttribute("course", course);
+			model.addAttribute("collectionIds", course.getOrder().getCollectionsNameAndId());
 			model.addAttribute("RELEVANCE",
 					Arrays.stream(Relevance.values()).filter(it -> it != Relevance.TO_SET).toList());
 			return PATH + "edit-course";
 		}).orElse(REDIRECT_EDIT);
+	}
+
+	private String getTemplateForComplex(TemplateType type) {
+		return switch (type.getType()) {
+			case "OVERVIEW" -> "view-overview";
+			case "SUMMARY" -> "view-summary";
+			case "TEST" -> "view-test";
+			default -> throw new IllegalStateException(STR."Unexpected value: \{type}");
+		};
+	}
+
+	@GetMapping({"edit/{id}/viewComplex",})
+	public String viewComplex(@PathVariable("id") UUID id, @RequestParam("materialId") UUID materialId, Model model) {
+		var material = materialRepository.findById(materialId);
+		material.ifPresent(it -> model.addAttribute("material", it));
+		repository.findById(id).ifPresent(course -> model.addAttribute("course", course));
+		return material.map(it -> PATH + getTemplateForComplex(it.getTemplateType())).orElse(REDIRECT_EDIT);
 	}
 
 
@@ -72,11 +91,34 @@ public class FinalizationController {
 		return REDIRECT_EDIT + id + THEMEN_SECTION;
 	}
 
+	@PostMapping({"edit/{id}/unassignPart",})
+	public String unassignCoursePart(@PathVariable UUID id, @RequestParam("id") UUID partId) {
+		repository.findById(id).ifPresent(course -> {
+			var material = course.getOrder().findMaterial(partId);
+			course.getUnassignedMaterials().add(material);
+			course.getOrder().remove(partId);
+			repository.save(course);
+		});
+		return REDIRECT_EDIT + id + THEMEN_SECTION;
+	}
+
+	@PostMapping({"edit/{id}/assignPart",})
+	public String assignCoursePart(@PathVariable UUID id, @RequestParam("id") UUID partId,
+			@RequestParam("collectionId") UUID collectionId) {
+		service.assignMaterialToCollection(id, partId, collectionId);
+		return REDIRECT_EDIT + id + THEMEN_SECTION;
+	}
+
 	@PostMapping("edit/{id}/export")
 	public void exportCourse(@PathVariable UUID id,
 			@RequestParam(value = "kind", defaultValue = "HTML") DownloadManager.ExportKind kind,
 			HttpServletResponse response) {
 		service.exportCourse(id, kind, response);
+	}
+
+	@PostMapping("/edit/download-material")
+	public void downloadMaterial(@RequestParam("materialId") UUID materialId, HttpServletResponse response) {
+		service.downloadMaterial(materialId, response);
 	}
 
 	@PostMapping("edit/{id}/relevance")

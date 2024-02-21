@@ -3,10 +3,10 @@ package de.olivergeisel.materialgenerator.finalization.parts;
 import de.olivergeisel.materialgenerator.core.course.MaterialOrderPart;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.Relevance;
 import de.olivergeisel.materialgenerator.finalization.material_assign.MaterialAssigner;
+import de.olivergeisel.materialgenerator.generation.material.ComplexMaterial;
 import de.olivergeisel.materialgenerator.generation.material.Material;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
+import de.olivergeisel.materialgenerator.generation.material.assessment.TestMaterial;
+import jakarta.persistence.*;
 
 import java.util.*;
 
@@ -17,6 +17,10 @@ import java.util.*;
  * A MaterialOrderCollection can contain itself.
  * Every MaterialOrderCollection has a {@link Topic}. There is a list of aliases for the topic.
  *
+ * <p>
+ * Since 1.1.0, MaterialOrderCollection can contain a list of {@link TestMaterial} that are assigned to the collection.
+ * </p>
+ *
  * @author Oliver Geisel
  * @version 1.1.0
  * @see MaterialOrderPart
@@ -26,10 +30,11 @@ import java.util.*;
 public abstract class MaterialOrderCollection extends MaterialOrderPart implements Iterable<MaterialOrderPart> {
 
 	@ElementCollection
-	private final List<String> alias = new ArrayList<>(); // KnowledgeObject (Structure) ids
-
-	@ManyToOne
-	private Topic topic;
+	private final List<String>          alias            = new ArrayList<>(); // KnowledgeObject (Structure) ids
+	@ManyToMany(cascade = CascadeType.ALL)
+	private       List<ComplexMaterial> complexMaterials = new ArrayList<>();
+	@ManyToOne(cascade = CascadeType.ALL)
+	private       Topic                 topic;
 
 	protected MaterialOrderCollection() {
 		super();
@@ -44,6 +49,14 @@ public abstract class MaterialOrderCollection extends MaterialOrderPart implemen
 		super(name);
 		this.topic = topic;
 		this.alias.addAll(alias);
+	}
+
+	public void assignComplex(ComplexMaterial test) {
+		complexMaterials.add(test);
+	}
+
+	public void removeComplex(ComplexMaterial test) {
+		complexMaterials.remove(test);
 	}
 
 	public abstract Material findMaterial(UUID materialId);
@@ -240,13 +253,25 @@ public abstract class MaterialOrderCollection extends MaterialOrderPart implemen
 
 	public abstract boolean remove(UUID partId);
 
+	public abstract Collection<NameAndId> collectionsNameAndId();
 
 	//region setter/getter
+	public List<ComplexMaterial> getComplexMaterials() {
+		return complexMaterials;
+	}
+
 	public abstract Relevance getRelevance();
 
 	public Topic getTopic() {
 		return topic;
 	}
+
+	/**
+	 * Get all ids of the parts in the collection. First it returns its own id, then it returns the ids of all parts.
+	 *
+	 * @return list of ids
+	 */
+	public abstract List<UUID> getCollectionIds();
 
 	public void setTopic(Topic topic) {
 		this.topic = topic;
@@ -271,4 +296,8 @@ public abstract class MaterialOrderCollection extends MaterialOrderPart implemen
 		}
 //endregion
 	}
+}
+
+
+record NameAndId(String name, UUID id) {
 }

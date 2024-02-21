@@ -50,6 +50,7 @@ public class StrictMaterialAssigner extends MaterialAssigner {
 	 */
 	@Override
 	public boolean assign(MaterialOrderCollection part) {
+		// todo implement
 		return false;
 	}
 
@@ -58,6 +59,7 @@ public class StrictMaterialAssigner extends MaterialAssigner {
 	 */
 	@Override
 	public boolean assign(Material material, MaterialOrderCollection part) {
+		// todo implement
 		return false;
 	}
 

@@ -63,11 +63,10 @@ public class RawCourseOrder extends CourseOrder {
 	 * @param materials Materials to assign
 	 * @return True if all chapters, groups and parts could assign to the materials. False otherwise
 	 */
-	public boolean assignMaterial(Set<Material> materials) {
-		var materialAssigner =
-				new BasicMaterialAssigner(materials);
+	public MaterialAssigner assignMaterial(Set<Material> materials) {
+		var materialAssigner = new BasicMaterialAssigner(materials);
 		chapterOrder.forEach(c -> c.assignMaterial(materialAssigner));
-		return true;
+		return materialAssigner;
 	}
 
 	public boolean assignMaterial(Set<Material> materials, MaterialAssigner assigner) {
@@ -126,6 +125,22 @@ public class RawCourseOrder extends CourseOrder {
 	public UUID getId() {
 		return id;
 	}
+
+	public List<UUID> getCollectionIds() {
+		var back = new LinkedList<UUID>();
+		for (var chapter : chapterOrder) {
+			back.addAll(chapter.getCollectionIds());
+		}
+		return back;
+	}
+
+	public List<NameAndId> getCollectionsNameAndId() {
+		var back = new LinkedList<NameAndId>();
+		for (var chapter : chapterOrder) {
+			back.addAll(chapter.collectionsNameAndId());
+		}
+		return back;
+	}
 //endregion
 
 	@Override
@@ -146,3 +161,4 @@ public class RawCourseOrder extends CourseOrder {
 		return "MaterialOrder{" + "chapterOrder=" + chapterOrder + '}';
 	}
 }
+

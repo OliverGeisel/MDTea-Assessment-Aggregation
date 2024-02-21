@@ -1,23 +1,26 @@
 package de.olivergeisel.materialgenerator.finalization.parts;
 
+import de.olivergeisel.materialgenerator.core.course.Course;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentTarget;
+import de.olivergeisel.materialgenerator.core.courseplan.content.TopicStructureAliasMappings;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**
  * A topic is a part of a {@link Goal}. It is the smallest unit that has to be mastered by the students.
  * <p>
  * Each topic is linked with at least one StructureElement of the Plan. In this case a chapter, group or task of
- * the {@link RawCourse}. Or more specific a {@link MaterialOrderCollection}
+ * the {@link Course}. Or more general a {@link MaterialOrderCollection}
  *
  * @author Oliver Geisel
  * @version 1.1.0
  * @see Goal
  * @see MaterialOrderCollection
- * @see RawCourse
+ * @see Course
  * @since 0.2.0
  */
 
@@ -27,13 +30,15 @@ import java.util.UUID;
 @Table(name = "topic")
 public class Topic {
 
-	private String name;
+	private String                      name;
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	@Column(name = "id", nullable = false)
-	private UUID   id;
+	private UUID                        id;
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private Goal   goal;
+	private Goal                        goal;
+	@Embedded
+	private TopicStructureAliasMappings topicStructureAliasMappings = new TopicStructureAliasMappings();
 
 	/**
 	 * Create a new Topic with the given {@link ContentTarget} and {@link Goal}.
@@ -53,11 +58,8 @@ public class Topic {
 			throw new IllegalArgumentException("Topic must not be null or blank");
 		}
 		name = contentTarget.getTopic();
+		topicStructureAliasMappings = contentTarget.getAliases();
 		this.goal = goal;
-	}
-
-	public Topic(ContentTarget contentTarget) {
-		name = contentTarget.getTopic();
 	}
 
 	protected Topic() {
@@ -97,6 +99,15 @@ public class Topic {
 	}
 
 	//region setter/getter
+	public TopicStructureAliasMappings getTopicStructureAliasMappings() {
+		return topicStructureAliasMappings;
+	}
+
+	public void setTopicStructureAliasMappings(
+			TopicStructureAliasMappings topicStructureAliasMappings) {
+		this.topicStructureAliasMappings = topicStructureAliasMappings;
+	}
+
 	public Goal getGoal() {
 		return goal;
 	}
@@ -111,19 +122,26 @@ public class Topic {
 
 //endregion
 
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (!(o instanceof Topic topic)) return false;
 
-		if (!id.equals(topic.id)) return false;
-		return goal.equals(topic.goal);
+		if (id == null || topic.id == null) {
+			if (!Objects.equals(name, topic.name)) return false;
+			if (!Objects.equals(goal, topic.goal)) return false;
+			return topicStructureAliasMappings.equals(topic.topicStructureAliasMappings);
+		}
+		return Objects.equals(id, topic.id);
 	}
 
 	@Override
 	public int hashCode() {
-		int result = id.hashCode();
-		result = 31 * result + goal.hashCode();
+		int result = name != null ? name.hashCode() : 0;
+		result = 31 * result + (id != null ? id.hashCode() : 0);
+		result = 31 * result + (goal != null ? goal.hashCode() : 0);
+		result = 31 * result + topicStructureAliasMappings.hashCode();
 		return result;
 	}
 }

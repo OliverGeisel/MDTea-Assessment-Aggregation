@@ -3,6 +3,7 @@ package de.olivergeisel.materialgenerator.finalization.export;
 import de.olivergeisel.materialgenerator.finalization.export.opal.OPAL_Exporter;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourse;
 import de.olivergeisel.materialgenerator.generation.material.Material;
+import de.olivergeisel.materialgenerator.generation.material.assessment.TestMaterial;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -5,6 +5,8 @@ import de.olivergeisel.materialgenerator.core.course.CourseChapter;
 import de.olivergeisel.materialgenerator.core.course.CourseGroup;
 import de.olivergeisel.materialgenerator.generation.material.ComplexMaterial;
 import de.olivergeisel.materialgenerator.generation.material.Material;
+import de.olivergeisel.materialgenerator.generation.material.MaterialType;
+import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 
@@ -37,7 +39,7 @@ public class OverviewMaterial extends ComplexMaterial {
 	private String headline;
 
 	protected OverviewMaterial() {
-		super();
+		super(MaterialType.COMPLEX, TemplateType.OVERVIEW);
 	}
 
 	/**
@@ -47,7 +49,7 @@ public class OverviewMaterial extends ComplexMaterial {
 	 * @param description a short description of the overview. Can be empty.
 	 */
 	public OverviewMaterial(String headline, String description) {
-		super();
+		this();
 		this.headline = headline;
 		this.description = description;
 	}
@@ -60,7 +62,7 @@ public class OverviewMaterial extends ComplexMaterial {
 	 * @param parts       a list of {@link SummaryMaterial}s that are part of this overview
 	 */
 	public OverviewMaterial(String headline, String description, List<SummaryMaterial> parts) {
-		super();
+		this();
 		this.headline = headline;
 		this.description = description;
 		getParts().addAll(parts);

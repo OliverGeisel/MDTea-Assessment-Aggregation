@@ -95,6 +95,7 @@ public class GeneratorController {
 		model.addAttribute("template", template);
 		model.addAttribute("structure", coursePlan.getStructure());
 		model.addAttribute("meta", coursePlan.getMetadata());
+		model.addAttribute("testConfiguration", coursePlan.getTestConfiguration());
 		return PATH + "overview-all";
 	}
 
@@ -130,6 +131,7 @@ public class GeneratorController {
 		var completePlan = parser.parseFromFile(storageService.load(planName).toFile());
 		model.addAttribute("structure", completePlan.getStructure());
 		model.addAttribute("meta", completePlan.getMetadata());
+		model.addAttribute("testConfiguration", completePlan.getTestConfiguration());
 		return PATH + "overview-all";
 	}
 

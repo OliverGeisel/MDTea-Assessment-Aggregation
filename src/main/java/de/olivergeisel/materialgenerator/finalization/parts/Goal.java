@@ -94,9 +94,6 @@ public class Goal {
 
 	@Override
 	public String toString() {
-		return "Goal{" +
-			   "id=" + id + '\'' +
-			   ", completeSentence='" + completeSentence +
-			   '}';
+		return STR."Goal{id=\{id}, completeSentence='\{completeSentence}'}";
 	}
 }
