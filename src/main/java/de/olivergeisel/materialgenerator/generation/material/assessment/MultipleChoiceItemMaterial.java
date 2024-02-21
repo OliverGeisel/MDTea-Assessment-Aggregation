@@ -3,6 +3,7 @@ package de.olivergeisel.materialgenerator.generation.material.assessment;
 import de.olivergeisel.materialgenerator.generation.configuration.MultipleChoiceConfiguration;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import lombok.Getter;
 
@@ -23,9 +24,12 @@ public class MultipleChoiceItemMaterial extends ItemMaterial {
 	private List<String> correctAnswers;
 	@ElementCollection
 	private List<String> alternativeAnswers;
+	@Embedded
+	private MultipleChoiceConfiguration itemConfiguration;
 
 	protected MultipleChoiceItemMaterial() {
 		super(DEFAULT_CONFIGURATION, TemplateType.MULTIPLE_CHOICE);
+		itemConfiguration = DEFAULT_CONFIGURATION;
 	}
 
 	/**
@@ -49,6 +53,7 @@ public class MultipleChoiceItemMaterial extends ItemMaterial {
 			alternativeAnswers = new ArrayList<>();
 		}
 		this.alternativeAnswers = alternativeAnswers;
+		this.itemConfiguration = itemConfiguration;
 	}
 
 //region setter/getter

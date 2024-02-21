@@ -4,6 +4,7 @@ import de.olivergeisel.materialgenerator.generation.configuration.FillOutBlanksC
 import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 
 import java.util.List;
@@ -31,18 +32,26 @@ public class FillOutBlanksItemMaterial extends ItemMaterial {
 	private String      body;
 	@ElementCollection
 	private List<Blank> blanks;
+	@Embedded
+	private FillOutBlanksConfiguration itemConfiguration;
 
 	protected FillOutBlanksItemMaterial() {
 		super(DEFAULT_CONFIGURATION, TemplateType.FILL_OUT_BLANKS);
+		itemConfiguration = DEFAULT_CONFIGURATION;
 	}
 
 	public FillOutBlanksItemMaterial(String body, List<Blank> blanks) {
 		super();
 		this.body = body;
 		this.blanks = blanks;
+		this.itemConfiguration = DEFAULT_CONFIGURATION;
 	}
 
 	//region setter/getter
+	@Override
+	public FillOutBlanksConfiguration getItemConfiguration() {
+		return itemConfiguration;
+	}
 	public String getBody() {
 		return body;
 	}

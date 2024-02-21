@@ -3,6 +3,7 @@ package de.olivergeisel.materialgenerator.generation.material.assessment;
 import de.olivergeisel.materialgenerator.generation.configuration.TrueFalseConfiguration;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 
 @Entity
@@ -13,11 +14,14 @@ public class TrueFalseItemMaterial extends ItemMaterial {
 
 	private String  question;
 	private boolean correct;
+	@Embedded
+	private TrueFalseConfiguration itemConfiguration;
 
 	protected TrueFalseItemMaterial() {
 		super(DEFAULT_CONFIGURATION, TemplateType.TRUE_FALSE);
 		this.question = "";
 		this.correct = true;
+		itemConfiguration = DEFAULT_CONFIGURATION;
 	}
 
 	public TrueFalseItemMaterial(String question, boolean correctAnswer) {
@@ -42,6 +46,10 @@ public class TrueFalseItemMaterial extends ItemMaterial {
 	}
 
 	//region setter/getter
+	@Override
+	public TrueFalseConfiguration getItemConfiguration() {
+		return itemConfiguration;
+	}
 	public boolean isCorrect() {
 		return correct;
 	}

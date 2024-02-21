@@ -6,10 +6,7 @@ import de.olivergeisel.materialgenerator.generation.configuration.ItemConfigurat
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.MaterialType;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-
-import java.util.Objects;
 
 
 /**
@@ -20,8 +17,6 @@ import java.util.Objects;
 public abstract class ItemMaterial extends Material {
 
 	private ItemType itemType;
-	@Embedded
-	private ItemConfiguration itemConfiguration;
 
 	protected ItemMaterial() {
 		super();
@@ -29,7 +24,6 @@ public abstract class ItemMaterial extends Material {
 
 	protected ItemMaterial(ItemConfiguration itemConfiguration, TemplateType templateType) {
 		super(MaterialType.ITEM, templateType);
-		this.itemConfiguration = itemConfiguration;
 		itemType = itemConfiguration.getForItemType();
 	}
 
@@ -41,7 +35,7 @@ public abstract class ItemMaterial extends Material {
 		if (!super.isIdentical(material)) {
 			return false;
 		}
-		return this.itemType.equals(item.itemType) && Objects.equals(this.itemConfiguration, (item.itemConfiguration));
+		return this.itemType.equals(item.itemType);
 	}
 
 	//region setter/getter
@@ -49,9 +43,7 @@ public abstract class ItemMaterial extends Material {
 		return itemType;
 	}
 
-	public ItemConfiguration getItemConfiguration() {
-		return itemConfiguration;
-	}
+	public abstract ItemConfiguration getItemConfiguration();
 //endregion
 
 
