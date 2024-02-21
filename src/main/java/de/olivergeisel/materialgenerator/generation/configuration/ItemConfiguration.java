@@ -39,7 +39,13 @@ public class ItemConfiguration {
 
 	}
 
+	@Override
+	public ItemConfiguration clone() {
+		return new ItemConfiguration(forItemType, testParameters.clone());
+	}
+
 	//region setter/getter
+//endregion
 	public TestParameters getTestParameters() {
 		return testParameters;
 	}
@@ -47,7 +53,11 @@ public class ItemConfiguration {
 	public ItemType getForItemType() {
 		return forItemType;
 	}
-//endregion
+
+	@Override
+	public String toString() {
+		return STR."ItemConfiguration{forItemType=\{forItemType}, testParameters=\{testParameters}}";
+	}
 
 
 }

@@ -52,13 +52,15 @@
     {
       "type": "SingleChoice",
       "testParameters": null,
-      "numberOfChoices": 4
+      "numberOfChoices": 4,
+      "shuffle": true
     },
     {
       "type": "MultipleChoice",
       "testParameters": null,
       "numberOfChoices": 4,
-      "numberOfCorrectChoices": 2
+      "numberOfCorrectChoices": 2,
+      "shuffle": true
     },
     {
       "type": "Assignment",

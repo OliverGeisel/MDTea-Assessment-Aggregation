@@ -1,5 +1,7 @@
 package de.olivergeisel.materialgenerator.generation.material.assessment;
 
+import de.olivergeisel.materialgenerator.generation.configuration.FillOutBlanksConfiguration;
+import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
@@ -22,13 +24,16 @@ import java.util.List;
 @Entity
 public class FillOutBlanksItemMaterial extends ItemMaterial {
 
-	public static final String      ESCAPE_PATTERN = "\\|_N_\\|";
-	private             String      body;
+	public static final  String                     ESCAPE_PATTERN        = "\\|_N_\\|";
+	private static final FillOutBlanksConfiguration DEFAULT_CONFIGURATION = new FillOutBlanksConfiguration();
+
+
+	private String      body;
 	@ElementCollection
-	private             List<Blank> blanks;
+	private List<Blank> blanks;
 
 	protected FillOutBlanksItemMaterial() {
-		super();
+		super(DEFAULT_CONFIGURATION, TemplateType.FILL_OUT_BLANKS);
 	}
 
 	public FillOutBlanksItemMaterial(String body, List<Blank> blanks) {

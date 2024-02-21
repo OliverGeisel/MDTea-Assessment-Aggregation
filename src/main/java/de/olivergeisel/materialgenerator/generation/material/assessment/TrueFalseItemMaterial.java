@@ -1,6 +1,5 @@
 package de.olivergeisel.materialgenerator.generation.material.assessment;
 
-import de.olivergeisel.materialgenerator.generation.configuration.ItemConfiguration;
 import de.olivergeisel.materialgenerator.generation.configuration.TrueFalseConfiguration;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
@@ -9,7 +8,7 @@ import jakarta.persistence.Entity;
 @Entity
 public class TrueFalseItemMaterial extends ItemMaterial {
 
-	private static final ItemConfiguration DEFAULT_CONFIGURATION = new TrueFalseConfiguration();
+	private static final TrueFalseConfiguration DEFAULT_CONFIGURATION = new TrueFalseConfiguration();
 
 
 	private String  question;
@@ -25,7 +24,7 @@ public class TrueFalseItemMaterial extends ItemMaterial {
 		this(question, correctAnswer, DEFAULT_CONFIGURATION);
 	}
 
-	public TrueFalseItemMaterial(String question, boolean correctAnswer, ItemConfiguration itemConfiguration) {
+	public TrueFalseItemMaterial(String question, boolean correctAnswer, TrueFalseConfiguration itemConfiguration) {
 		super(itemConfiguration, TemplateType.TRUE_FALSE);
 		this.question = question;
 		this.correct = correctAnswer;

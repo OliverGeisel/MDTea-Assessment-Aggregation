@@ -367,24 +367,22 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 		if (structureObject.isEmpty()) {
 			return;
 		}
-		KnowledgeElement newElement;
-		switch (form.getType()) {
-			case TERM -> newElement = new Term(form.getContent(), createId(STR."\{form.getContent()}-TERM"),
+		KnowledgeElement newElement = switch (form.getType()) {
+			case TERM -> new Term(form.getContent(), createId(STR."\{form.getContent()}-TERM"),
 					form.getType().name());
-			case DEFINITION -> newElement = new Definition(form.getContent(),
+			case DEFINITION -> new Definition(form.getContent(),
 					createId(STR."\{form.getContent()}-DEFINITION"));
-			case EXAMPLE -> newElement = new Example(form.getContent(),
+			case EXAMPLE -> new Example(form.getContent(),
 					createId(STR."\{form.getContent()}-EXAMPLE"), form.getType().name());
-			case CODE -> newElement = new Code(form.getLanguage(), form.getHeadline(), form.getContent(),
+			case CODE -> new Code(form.getLanguage(), form.getHeadline(), form.getContent(),
 					createId(STR."\{form.getContent()}-CODE"));
-			case IMAGE -> newElement = new Image(form.getContent(), form.getDescription(), form.getHeadline(),
+			case IMAGE -> new Image(form.getContent(), form.getDescription(), form.getHeadline(),
 					(STR."\{form.getContent()}-IMAGE"));
-			case TEXT -> newElement =
-					new Text(form.getHeadline(), form.getContent(), createId(STR."\{form.getContent()}-TEXT"));
-			case FACT -> newElement = new Fact(form.getContent(), createId(STR."\{form.getContent()}-FACT"));
-			case ITEM -> newElement = createItem(form);
+			case TEXT -> new Text(form.getHeadline(), form.getContent(), createId(STR."\{form.getContent()}-TEXT"));
+			case FACT -> new Fact(form.getContent(), createId(STR."\{form.getContent()}-FACT"));
+			case ITEM -> createItem(form);
 			default -> throw new IllegalStateException(STR."Unexpected value: \{form.getType()}");
-		}
+		};
 		newElement.setStructureId(structureId);
 		structureObject.ifPresent(it -> {
 			it.linkElement(newElement);
@@ -394,21 +392,27 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	}
 
 	private Item createItem(AddElementForm form) {
-		switch (form.getItemType()) {
+		return switch (form.getItemType()) {
 			case TRUE_FALSE -> {
 				var item = new TrueFalseItem(form.getContent(), form.isTrue(),
 						createId(STR."\{form.getHeadline()}-TRUE_FALSE_ITEM"));
 				item.setStructureId(form.getStructureId());
-				return item;
+				yield item;
 			}
 			case SINGLE_CHOICE -> {
-				return null;
+				var answers = new LinkedList<String>();
+				answers.add(form.getCorrectAnswers().getFirst());
+				answers.addAll(form.getWrongAnswers());
+				var item = new SingleChoiceItem(form.getContent(), answers,
+						createId(STR."\{form.getHeadline()}-SINGLE_CHOICE_ITEM"));
+				item.setStructureId(form.getStructureId());
+				yield item;
 			}
 			case MULTIPLE_CHOICE -> {
-				return null;
+				yield null;
 			}
 			default -> throw new IllegalStateException(STR."Unexpected value: \{form.getItemType()}");
-		}
+		};
 	}
 
 	private String createId(String name) {
@@ -685,9 +689,9 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	/**
 	 * Create a KnowledgeNode for a given KnowledgeElement
 	 * <p>
-	 *     The given element is the center of the KnowledgeNode. This is the mainElement.
-	 *     Then the linked elements are added to the KnowledgeNode by getting the structureObject of the element. The
-	 *     relations are also added. The related elements are all elements that are connected with the linked elements.
+	 * The given element is the center of the KnowledgeNode. This is the mainElement.
+	 * Then the linked elements are added to the KnowledgeNode by getting the structureObject of the element. The
+	 * relations are also added. The related elements are all elements that are connected with the linked elements.
 	 *
 	 * @param element element you want
 	 * @return a Collection of all elements and relations that are connected with the given element

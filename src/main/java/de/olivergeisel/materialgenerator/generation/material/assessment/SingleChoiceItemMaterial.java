@@ -1,6 +1,6 @@
 package de.olivergeisel.materialgenerator.generation.material.assessment;
 
-import de.olivergeisel.materialgenerator.generation.configuration.ItemConfiguration;
+import de.olivergeisel.materialgenerator.generation.configuration.SingleChoiceConfiguration;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -10,26 +10,26 @@ import java.util.List;
 @Entity
 public class SingleChoiceItemMaterial extends ItemMaterial {
 
+	private static final SingleChoiceConfiguration DEFAULT_CONFIGURATION = new SingleChoiceConfiguration();
+
 	private String       question;
 	private String       correctAnswer;
 	@ElementCollection
 	private List<String> alternativeAnswers;
-	private boolean      shuffle;
 
 	protected SingleChoiceItemMaterial() {
-		super();
+		super(DEFAULT_CONFIGURATION, TemplateType.SINGLE_CHOICE);
 	}
 
 	public SingleChoiceItemMaterial(String question, String correctAnswer, List<String> alternativeAnswers,
-			ItemConfiguration itemConfiguration, boolean shuffle) {
+			SingleChoiceConfiguration itemConfiguration) {
 		super(itemConfiguration, TemplateType.SINGLE_CHOICE);
 		this.question = question;
 		this.correctAnswer = correctAnswer;
 		this.alternativeAnswers = alternativeAnswers;
-		this.shuffle = shuffle;
 	}
 
-//region setter/getter
+	//region setter/getter
 	public String getQuestion() {
 		return question;
 	}
@@ -43,7 +43,11 @@ public class SingleChoiceItemMaterial extends ItemMaterial {
 	}
 
 	public boolean isShuffle() {
-		return shuffle;
+		var itemConfiguration = getItemConfiguration();
+		if (itemConfiguration == null || !(itemConfiguration instanceof SingleChoiceConfiguration configuration)) {
+			return false;
+		}
+		return configuration.isShuffle();
 	}
 //endregion
 }

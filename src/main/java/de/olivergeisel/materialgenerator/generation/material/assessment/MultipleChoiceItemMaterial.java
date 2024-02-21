@@ -1,6 +1,6 @@
 package de.olivergeisel.materialgenerator.generation.material.assessment;
 
-import de.olivergeisel.materialgenerator.generation.configuration.ItemConfiguration;
+import de.olivergeisel.materialgenerator.generation.configuration.MultipleChoiceConfiguration;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -16,15 +16,16 @@ import java.util.List;
 @Entity
 public class MultipleChoiceItemMaterial extends ItemMaterial {
 
+	private static final MultipleChoiceConfiguration DEFAULT_CONFIGURATION = new MultipleChoiceConfiguration();
+
 	private String       question;
 	@ElementCollection
 	private List<String> correctAnswers;
 	@ElementCollection
 	private List<String> alternativeAnswers;
-	private boolean      shuffle;
 
 	protected MultipleChoiceItemMaterial() {
-		super();
+		super(DEFAULT_CONFIGURATION, TemplateType.MULTIPLE_CHOICE);
 	}
 
 	/**
@@ -37,7 +38,7 @@ public class MultipleChoiceItemMaterial extends ItemMaterial {
 	 * @throws IllegalArgumentException if the correct answer list is null or empty
 	 */
 	public MultipleChoiceItemMaterial(String question, List<String> correctAnswer, List<String> alternativeAnswers,
-			ItemConfiguration itemConfiguration) {
+			MultipleChoiceConfiguration itemConfiguration) {
 		super(itemConfiguration, TemplateType.MULTIPLE_CHOICE);
 		this.question = question;
 		if (correctAnswer == null || correctAnswer.isEmpty()) {
@@ -50,4 +51,9 @@ public class MultipleChoiceItemMaterial extends ItemMaterial {
 		this.alternativeAnswers = alternativeAnswers;
 	}
 
+//region setter/getter
+	public boolean isShuffle() {
+		return false;
+	}
+//endregion
 }

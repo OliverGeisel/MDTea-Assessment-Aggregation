@@ -6,10 +6,7 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
 
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -29,20 +26,20 @@ import java.util.stream.Collectors;
 @Embeddable
 public class TestConfiguration {
 
-	String      configurationName;
-	String      description;
-	String      version;
-	int         numberTasks;
-	ItemSorting ordering;
-	String      markSchema;
+	private String                  configurationName;
+	private String                  description;
+	private String                  version;
+	private int                     numberTasks;
+	private ItemSorting             ordering;
+	private String                  markSchema;
 	@ElementCollection
-	List<String>            marks;
+	private List<String>            marks;
 	@ElementCollection
-	Map<String, Integer>    markMappingPercentage;
+	private Map<String, Integer>    markMappingPercentage;
 	@ElementCollection
-	List<ItemConfiguration> itemConfigurations;
+	private List<ItemConfiguration> itemConfigurations;
 	@ElementCollection
-	Set<TestPer>            level;
+	private Set<TestPer>            level;
 
 	public TestConfiguration(String configurationName, String description, String version, int numberTasks,
 			ItemSorting ordering, String markSchema, List<String> marks, Map<String, Integer> markMappingPercentage,
@@ -53,9 +50,9 @@ public class TestConfiguration {
 		this.numberTasks = numberTasks;
 		this.ordering = ordering;
 		this.markSchema = markSchema;
-		this.marks = marks;
+		this.marks = new ArrayList<>(marks);
 		this.markMappingPercentage = markMappingPercentage;
-		this.itemConfigurations = itemConfigurations;
+		this.itemConfigurations = new ArrayList<>(itemConfigurations);
 		this.level = level;
 	}
 
@@ -76,12 +73,22 @@ public class TestConfiguration {
 		return this.level.contains(level);
 	}
 
-	//region setter/getter
+	@Override
+	public TestConfiguration clone() {
+		var itemConfigurationsCopy =
+				this.itemConfigurations.stream().map(ItemConfiguration::clone).collect(Collectors.toList());
+		var levelCopy = new HashSet<>(this.level);
+		var marksCopy = new ArrayList<>(this.marks);
+		var markMappingPercentageCopy = new HashMap<>(this.markMappingPercentage);
+		return new TestConfiguration(configurationName, description, version, numberTasks, ordering, markSchema,
+				marksCopy,
+				markMappingPercentageCopy, itemConfigurationsCopy, levelCopy);
+	}
 	public Set<ItemType> getItemTypes() {
 		return itemConfigurations.stream().map(ItemConfiguration::getForItemType).collect(Collectors.toSet());
 	}
+	//region setter/getter
 //endregion
-
 	/**
 	 * The sorting of the items in the test
 	 */

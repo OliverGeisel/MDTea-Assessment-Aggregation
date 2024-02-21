@@ -139,6 +139,26 @@ public abstract class ComplexMaterial extends Material {
 		return parts.indexOf(part);
 	}
 
+
+	@Override
+	public boolean isIdentical(Material material) {
+		if (!(super.isIdentical(material))) {
+			return false;
+		}
+		if (material instanceof ComplexMaterial complexMaterial) {
+			if (complexMaterial.size() == size()) {
+				for (int i = 0; i < size(); i++) {
+					if (!parts.get(i).isIdentical(complexMaterial.parts.get(i))) {
+						return false;
+					}
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+
+
 	//region setter/getter
 	public String getDescription() {
 		return description;

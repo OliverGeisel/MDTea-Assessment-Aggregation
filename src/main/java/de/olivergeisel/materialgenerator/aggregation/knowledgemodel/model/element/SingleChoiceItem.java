@@ -26,6 +26,9 @@ public class SingleChoiceItem extends Item {
 	}
 
 //region setter/getter
+	public String getQuestion() {
+		return getContent();
+	}
 	public String getCorrectAnswer() {
 		return correctAnswer;
 	}

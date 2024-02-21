@@ -29,7 +29,10 @@ public class TestParameters {
 		this(1, 1, 0);
 	}
 
-	//region setter/getter
+	@Override
+	public TestParameters clone() {
+		return new TestParameters(tries, pointsPerUnit, negativeFactor);
+	}
 	public int getTries() {
 		return tries;
 	}
@@ -53,7 +56,12 @@ public class TestParameters {
 	public void setNegativeFactor(double negativeFactor) {
 		this.negativeFactor = negativeFactor;
 	}
+	//region setter/getter
 //endregion
 
+	@Override
+	public String toString() {
+		return STR."TestParameters{tries=\{tries}, pointsPerUnit=\{pointsPerUnit}, negativeFactor=\{negativeFactor}}";
+	}
 
 }

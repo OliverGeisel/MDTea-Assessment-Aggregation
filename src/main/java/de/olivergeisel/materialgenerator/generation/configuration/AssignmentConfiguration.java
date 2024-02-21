@@ -12,4 +12,8 @@ public class AssignmentConfiguration extends ItemConfiguration {
 		super(ItemType.ASSIGNMENT, testParameters);
 	}
 
+	@Override
+	public AssignmentConfiguration clone() {
+		return new AssignmentConfiguration(getTestParameters().clone());
+	}
 }

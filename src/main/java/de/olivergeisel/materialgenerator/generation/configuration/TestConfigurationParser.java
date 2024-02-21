@@ -99,12 +99,15 @@ public class TestConfigurationParser {
 
 				case SINGLE_CHOICE -> {
 					var numberOfChoices = Integer.parseInt(jsonItem.get("numberOfChoices").toString());
-					yield new SingleChoiceConfiguration(numberOfChoices, testParameters);
+					boolean shuffle = Boolean.parseBoolean(jsonItem.get("shuffle").toString());
+					yield new SingleChoiceConfiguration(numberOfChoices, shuffle, testParameters);
 				}
 				case MULTIPLE_CHOICE -> {
 					var numberOfChoices = Integer.parseInt(jsonItem.get("numberOfChoices").toString());
 					var numberOfCorrectChoices = Integer.parseInt(jsonItem.get("numberOfCorrectChoices").toString());
-					yield new MultipleChoiceConfiguration(numberOfChoices, numberOfCorrectChoices, testParameters);
+					boolean shuffle = Boolean.parseBoolean(jsonItem.get("shuffle").toString());
+					yield new MultipleChoiceConfiguration(numberOfChoices, numberOfCorrectChoices, shuffle,
+							testParameters);
 				}
 				case FILL_OUT_BLANKS -> {
 					var blanks = FillOutBlanksConfiguration.FillOutBlanksType.valueOf(

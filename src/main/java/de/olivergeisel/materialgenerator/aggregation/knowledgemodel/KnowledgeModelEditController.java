@@ -128,7 +128,8 @@ public class KnowledgeModelEditController {
 		KnowledgeObject newObject = leaf ? new KnowledgeLeaf(newStructureId) : new KnowledgeFragment(newStructureId);
 		knowledgeModelService.addStructureTo(fragment, newObject);
 		if (withTerm) {
-			var form = new AddElementForm(newStructureId, "", newStructureId, KnowledgeType.TERM, null, "false");
+			var form = new AddElementForm(newStructureId, "", newStructureId, KnowledgeType.TERM, null, "false",
+					List.of(), List.of());
 			knowledgeModelService.addElement(form);
 		}
 		return "redirect:/knowledge-model/structure";

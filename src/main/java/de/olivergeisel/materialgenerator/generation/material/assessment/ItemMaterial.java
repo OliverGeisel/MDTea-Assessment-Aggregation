@@ -19,7 +19,7 @@ import java.util.Objects;
 @Entity
 public abstract class ItemMaterial extends Material {
 
-	private ItemType          itemType;
+	private ItemType itemType;
 	@Embedded
 	private ItemConfiguration itemConfiguration;
 
@@ -43,6 +43,16 @@ public abstract class ItemMaterial extends Material {
 		}
 		return this.itemType.equals(item.itemType) && Objects.equals(this.itemConfiguration, (item.itemConfiguration));
 	}
+
+	//region setter/getter
+	public ItemType getItemType() {
+		return itemType;
+	}
+
+	public ItemConfiguration getItemConfiguration() {
+		return itemConfiguration;
+	}
+//endregion
 
 
 }

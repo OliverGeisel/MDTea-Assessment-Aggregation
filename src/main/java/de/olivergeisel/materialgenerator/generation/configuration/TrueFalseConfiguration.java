@@ -10,4 +10,9 @@ public class TrueFalseConfiguration extends ItemConfiguration {
 	public TrueFalseConfiguration() {
 		super(ItemType.TRUE_FALSE);
 	}
+
+	@Override
+	public TrueFalseConfiguration clone() {
+		return new TrueFalseConfiguration(getTestParameters().clone());
+	}
 }

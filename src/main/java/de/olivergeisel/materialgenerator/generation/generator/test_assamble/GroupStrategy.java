@@ -14,8 +14,7 @@ import java.util.List;
 public class GroupStrategy<T extends TestMaterial> implements AssemblerStrategy<T> {
 
 	@Override
-	public List<MaterialAndMapping<T>> assemble(KnowledgeNode knowledgeNode,
-			List<MaterialAndMapping> relatedMaterials,
+	public List<MaterialAndMapping<T>> assemble(KnowledgeNode knowledgeNode, List<MaterialAndMapping> relatedMaterials,
 			TestConfiguration configuration) {
 
 		var back = new LinkedList<MaterialAndMapping<T>>();
@@ -31,7 +30,7 @@ public class GroupStrategy<T extends TestMaterial> implements AssemblerStrategy<
 		for (var entry : structureItemMapping.entrySet()) {
 			var elements = entry.getValue().stream().flatMap(it -> it.mapping().getRelatedElements().stream());
 			var materials = entry.getValue().stream().map(MaterialAndMapping::material).toList();
-			var testMaterial = new TestMaterial(materials, configuration);
+			var testMaterial = new TestMaterial(materials, configuration.clone());
 			testMaterial.setName(STR."Test für \{entry.getKey()}");
 			var mappingEntry = new MaterialMappingEntry(testMaterial, elements.toArray(String[]::new));
 			var mapping = new MaterialAndMapping<T>(mappingEntry);
