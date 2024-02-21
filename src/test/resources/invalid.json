@@ -1,0 +1,43 @@
+{
+  "meta": {
+    "name": "Testplan",
+    "description": "Das ist ein Testkurs f\u00fcr Debugging und Tests",
+    "year": 2024,
+    "type": "Universit\u00e4t",
+    "level": "Anfang",
+    "extra": [
+      {
+        "name": "Extra-Wert",
+        "value": "Hallo"
+      },
+      {
+        "name": "Studentenzahl",
+        "value": "15"
+      }
+    ]
+  },
+  "content": {
+    "goal-1": {
+      "key": "goal-1",
+      "expression": "Know",
+      "target": "MasterKey-Word",
+      "completeSentence": "Complete text!",
+      "content": [
+        "Inhalt 1",
+        "Inhalt 2"
+      ]
+    }
+  },
+  "structure": [
+    {
+      "key": "chapter-1",
+      "name": "Kapitel 1",
+      "weight": 8.0,
+      "alternatives": [
+        "Alternative"
+      ],
+      "topic": "Inhalt 1",
+      "groups": []
+    }
+  ]
+}

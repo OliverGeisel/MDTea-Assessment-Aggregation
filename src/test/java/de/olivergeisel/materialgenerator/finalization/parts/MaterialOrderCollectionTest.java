@@ -9,9 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import java.util.Iterator;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -65,6 +63,11 @@ class MaterialOrderCollectionTest {
 			}
 
 			@Override
+			public Collection<NameAndId> collectionsNameAndId() {
+				return null;
+			}
+
+			@Override
 			public MaterialOrderPart find(UUID id) {
 				return null;
 			}
@@ -72,6 +75,11 @@ class MaterialOrderCollectionTest {
 //region setter/getter
 			@Override
 			public Relevance getRelevance() {
+				return null;
+			}
+
+			@Override
+			public List<UUID> getCollectionIds() {
 				return null;
 			}
 
