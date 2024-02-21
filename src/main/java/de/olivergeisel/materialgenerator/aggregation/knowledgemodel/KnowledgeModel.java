@@ -1,4 +1,4 @@
-package de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version;
+package de.olivergeisel.materialgenerator.aggregation.knowledgemodel;
 
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.Relation;
@@ -6,13 +6,12 @@ import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relati
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeFragment;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeObject;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.RootStructureElement;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.KnowledgeStructure;
 import de.olivergeisel.materialgenerator.aggregation.source.KnowledgeSource;
 import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
 
-import java.util.Collection;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+
 /**
  * A model of knowledge. It contains structure, all elements, relations and sources.
  *
@@ -139,4 +138,10 @@ public interface KnowledgeModel<T> {
 	KnowledgeNode getKnowledgeNode(KnowledgeElement element) throws NoSuchElementException;
 
 	Set<KnowledgeNode> getKnowledgeNodesIncludingSimilarFor(String structureId);
+
+//region setter/getter
+	List<KnowledgeElement> getAllElements();
+
+	RootStructureElement getRoot();
+//endregion
 }

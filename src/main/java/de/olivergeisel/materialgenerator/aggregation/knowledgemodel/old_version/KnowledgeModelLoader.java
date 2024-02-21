@@ -1,5 +1,6 @@
 package de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version;
 
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModel;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
 import org.springframework.stereotype.Service;
 

@@ -1,6 +1,7 @@
 package de.olivergeisel.materialgenerator.generation;
 
 import de.olivergeisel.materialgenerator.FileSystemStorageService;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModelService;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.IncompleteJSONException;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlanParser;
@@ -31,13 +32,16 @@ public class GeneratorController {
 	private final FileSystemStorageService storageService;
 	private final TemplateSetRepository    templateSetRepository;
 	private final MaterialRepository       materialRepository;
+	private final KnowledgeModelService knowledgeModelService;
 
 	public GeneratorController(GeneratorService service, FileSystemStorageService storageService,
-			TemplateSetRepository templateSetRepository, MaterialRepository materialRepository) {
+			TemplateSetRepository templateSetRepository, MaterialRepository materialRepository,
+			KnowledgeModelService knowledgeModelService) {
 		this.service = service;
 		this.storageService = storageService;
 		this.templateSetRepository = templateSetRepository;
 		this.materialRepository = materialRepository;
+		this.knowledgeModelService = knowledgeModelService;
 	}
 
 	@GetMapping({"", "/", ".html"})

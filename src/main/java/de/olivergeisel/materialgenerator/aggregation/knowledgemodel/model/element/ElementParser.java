@@ -5,7 +5,16 @@ import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relati
 import java.util.Collection;
 import java.util.List;
 
-public class ElementGenerator {
+/**
+ * Parse the parts from an Element from a JSON-File to a concrete Object of the wanted {@link KnowledgeElement}.
+ *
+ * @author Oliver Geisel
+ * @version 1.1.0
+ * @see KnowledgeElement
+ * @see Relation
+ * @since 0.2.0
+ */
+public class ElementParser {
 
 	public static final String TERM        = "TERM";
 	public static final String TEXT        = "TEXT";
@@ -19,8 +28,10 @@ public class ElementGenerator {
 	public static final String NODE        = "NODE";
 	public static final String CODE        = "CODE";
 	public static final String STATEMENT   = "STATEMENT";
+	// Assessment
+	public static final String ITEM = "ITEM";
 
-	private ElementGenerator() {
+	private ElementParser() {
 	}
 
 	/**
@@ -49,6 +60,7 @@ public class ElementGenerator {
 			case TEXT -> new Text(content, id, type, relations);
 			case IMAGE -> new Image(content, id, type, relations);
 			case CODE -> new Code(content, id, type, relations);
+			case ITEM -> ItemParser.create(type, content, id, structureId, relations);
 			default -> new CustomElement(content, id, "CUSTOM", relations, type);
 		};
 		element.setStructureId(structureId);

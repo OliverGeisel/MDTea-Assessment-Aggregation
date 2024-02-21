@@ -1,7 +1,7 @@
 package de.olivergeisel.materialgenerator.core.courseplan.content;
 
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModel;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.KnowledgeModel;
 
 import java.util.ArrayList;
 import java.util.Collections;

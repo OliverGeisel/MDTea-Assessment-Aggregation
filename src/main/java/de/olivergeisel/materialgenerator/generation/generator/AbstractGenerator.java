@@ -1,11 +1,11 @@
 package de.olivergeisel.materialgenerator.generation.generator;
 
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModel;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeType;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Term;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.Relation;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationType;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.KnowledgeModel;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentGoal;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentGoalExpression;
@@ -21,6 +21,10 @@ import java.util.*;
 
 /**
  * Partial implementation of the {@link Generator} interface. This class contains the basic methods for the generation.
+ * <p>
+ * The #process method is the main method for the generation process. It should be called after the input and
+ * isReady method.
+ * </p>
  *
  * @author Oliver Geisel
  * @version 1.1.0

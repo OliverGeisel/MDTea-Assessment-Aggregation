@@ -1,21 +1,25 @@
 package de.olivergeisel.materialgenerator.generation.generator;
 
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.KnowledgeModel;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModel;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
-import de.olivergeisel.materialgenerator.core.courseplan.content.ContentTarget;
 import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
+import de.olivergeisel.materialgenerator.generation.configuration.TestConfiguration;
 import de.olivergeisel.materialgenerator.generation.generator.item_exctraction.TrueFalseExtractor;
+import de.olivergeisel.materialgenerator.generation.generator.test_assamble.TestAssembler;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
+import de.olivergeisel.materialgenerator.generation.material.MaterialMappingEntry;
+import de.olivergeisel.materialgenerator.generation.material.assessment.ItemType;
+import de.olivergeisel.materialgenerator.generation.material.assessment.TestMaterial;
+import de.olivergeisel.materialgenerator.generation.material.assessment.TrueFalseItemMaterial;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateSet;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**

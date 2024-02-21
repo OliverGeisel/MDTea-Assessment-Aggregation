@@ -8,7 +8,6 @@ import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relati
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationRepository;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationType;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.*;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.KnowledgeModel;
 import de.olivergeisel.materialgenerator.aggregation.source.KnowledgeSource;
 import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
 import org.neo4j.driver.Driver;
@@ -73,7 +72,7 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	//endregion
 
 
-	//region static and existence
+	//region statistic and existence
 
 	/**
 	 * Check if the model contains the given KnowledgeElement.
@@ -284,7 +283,7 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	 *
 	 * @param from the element to link from
 	 * @param to   the element to link to
-	 * @return true if the elements were linked, false if not
+	 * @return the created relation
 	 * @throws IllegalArgumentException if one of the arguments was null
 	 * @throws IllegalStateException    if the elements were not in the model
 	 */
@@ -396,7 +395,7 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 
 	private String createId(String name) {
 		var exists = elementRepository.existsById(name);
-		return exists ? createId(name + UUID.randomUUID().toString()) : name;
+		return exists ? createId(name + UUID.randomUUID()) : name;
 	}
 
 
@@ -542,7 +541,13 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	 */
 	private KnowledgeElement[] getRelatedElements(KnowledgeElement element) {
 		var returnList = new LinkedList<KnowledgeElement>();
-		var outgoing = element.getRelations().stream().map(Relation::getTo).toList();
+		var outgoing = new LinkedList<KnowledgeElement>();
+		relationRepository.findByFromId(element.getId()).forEach(it -> {
+			var to = it.getTo();
+			if (!outgoing.contains(to)) {
+				outgoing.add(to);
+			}
+		});
 		var incoming = relationRepository.findDistinctByToId(element.getId()).map(Relation::getFrom).toList();
 		returnList.addAll(outgoing);
 		returnList.addAll(incoming);
@@ -607,10 +612,11 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	}
 	//endregion
 
-	//region knowledgeNode (reading model)
+	//region knowledgeNode (reading partial model and give back)
 
 	/**
-	 * Returns all elements that are connected with the given structure object in the model.
+	 * Returns all elements that are connected with the given structure object in the model. If the structure object
+	 * is not found, it will not be searched for similar objects when includeSimilar is true.
 	 *
 	 * @param structureId    the id of the structure object
 	 * @param includeSimilar if true, also search for elements that contain the given structureId in their own
@@ -620,15 +626,18 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	private Set<KnowledgeNode> getKnowledgeNodesFor(String structureId, boolean includeSimilar,
 			boolean similarWhenFound) {
 		Set<KnowledgeNode> back = new HashSet<>();
-		var hasStructureObject = hasStructureObject(structureId);
+		boolean hasStructureObject = false;
+		try {
+			hasStructureObject = hasStructureObject(structureId);
+		} catch (IllegalArgumentException e) {
+			LOGGER.warn("No structure object with id: '{}' found.", structureId);
+		}
 		if (hasStructureObject) {
 			var structureObject = findStructureById(structureId).orElseThrow();
 			var elements = structureObject.getLinkedElements();
 			for (var element : elements) {
-				back.add(getKnowledgeNode(element.getId()));
+				back.add(getKnowledgeNode(element));
 			}
-		} else {
-			LOGGER.warn("No structure object with id: '{}' found.", structureId);
 		}
 		if (includeSimilar && (similarWhenFound || !hasStructureObject)) {
 			LOGGER.info("Include similar objects for structure object '{}'.", structureId);
@@ -656,7 +665,11 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	}
 
 	/**
-	 * create a KnowledgeNode for a given KnowledgeElement
+	 * Create a KnowledgeNode for a given KnowledgeElement
+	 * <p>
+	 *     The given element is the center of the KnowledgeNode. This is the mainElement.
+	 *     Then the linked elements are added to the KnowledgeNode by getting the structureObject of the element. The
+	 *     relations are also added. The related elements are all elements that are connected with the linked elements.
 	 *
 	 * @param element element you want
 	 * @return a Collection of all elements and relations that are connected with the given element
@@ -667,7 +680,7 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 			throw new NoSuchElementException(STR."No element: \"\{element}\" found");
 		}
 		var structureObject = structureRepository.findById(element.getStructureId()).orElseThrow();
-		var linkedElements = structureObject.getLinkedElements();
+		var linkedElements = structureObject.getLinkedElements(); // todo decide how deep
 		var relatedElements = new LinkedList<>();
 		var relations = new HashSet<>();
 		for (var linked : linkedElements) {
@@ -684,7 +697,7 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	private Set<KnowledgeNode> getKnowledgeNodesForSimilar(String structureId) throws NoSuchElementException {
 		Set<KnowledgeNode> back = new HashSet<>();
 		if (!hasStructureSimilar(structureId)) {
-			throw new NoSuchElementException("No structure object with id " + structureId + "or similar found");
+			throw new NoSuchElementException(STR."No structure object with id \{structureId}or similar found");
 		} else {
 			var similarObject = structureService.getSimilarObjectById(structureId);
 			var elements = similarObject.getLinkedElements();
@@ -731,11 +744,11 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	//endregion
 
 
-
 	//region setter/getter
 
 	/**
 	 * Returns all ids of all KnowledgeObjects in the model.
+	 *
 	 * @return a list of all ids of all KnowledgeObjects in the model
 	 */
 	public List<String> getStructureIds() {

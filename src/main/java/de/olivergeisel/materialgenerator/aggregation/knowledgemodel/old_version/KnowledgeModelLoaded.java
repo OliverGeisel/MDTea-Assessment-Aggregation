@@ -1,6 +1,7 @@
 package de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version;
 
 
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModel;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.Relation;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationGenerator;
@@ -520,6 +521,8 @@ public class KnowledgeModelLoaded implements KnowledgeModel<RelationEdge<Knowled
 		return getKnowledgeNodesFor(structureId, true, true);
 	}
 
+	//region setter/getter
+
 	private Set<KnowledgeNode> getKnowledgeNodesForSimilar(String structureId) throws NoSuchElementException {
 		Set<KnowledgeNode> back = new HashSet<>();
 		if (!hasStructureSimilar(structureId)) {
@@ -605,9 +608,13 @@ public class KnowledgeModelLoaded implements KnowledgeModel<RelationEdge<Knowled
 	private boolean hasStructureSimilar(String structureId) {
 		return structure.containsSimilar(structureId);
 	}
+	@Override
+	public List<KnowledgeElement> getAllElements() {
+		return graph.vertexSet().stream().toList();
+	}
 
-	//region setter/getter
-	public KnowledgeFragment getRoot() {
+	@Override
+	public RootStructureElement getRoot() {
 		return structure.getRoot();
 	}
 

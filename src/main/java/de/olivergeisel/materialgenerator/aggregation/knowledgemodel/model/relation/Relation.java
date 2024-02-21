@@ -62,6 +62,23 @@ public abstract class Relation {
 		this.name = name;
 	}
 
+	/**
+	 * Check if the relation is a reverse of the given relation
+	 *
+	 * @param other relation to compare with
+	 * @return true if the relation is a reverse of the given relation
+	 */
+	public boolean isReverseFrom(Relation other) {
+		if (other == null) {
+			return false;
+		}
+		var isReverseType = this.type.getInverted().equals(other.type);
+		if (!isReverseType) {
+			return false;
+		}
+		return this.fromId.equals(other.toId) && this.toId.equals(other.fromId);
+	}
+
 	public boolean hasType(RelationType type) {
 		return this.type.equals(type);
 	}

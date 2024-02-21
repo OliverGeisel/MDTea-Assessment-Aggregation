@@ -1,7 +1,7 @@
 package de.olivergeisel.materialgenerator.generation;
 
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModel;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModelService;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.KnowledgeModel;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
 import de.olivergeisel.materialgenerator.finalization.FinalizationService;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourse;
@@ -134,5 +134,4 @@ public class GeneratorService {
 		mappingRepository.saveAll(materials.stream().map(MaterialAndMapping::mapping).toList());
 		return materials;
 	}
-
 }
