@@ -53,6 +53,9 @@ public class MultipleChoiceItemMaterial extends ItemMaterial {
 
 //region setter/getter
 	public boolean isShuffle() {
+		if (getItemConfiguration() instanceof MultipleChoiceConfiguration config) {
+			return config.isShuffle();
+		}
 		return false;
 	}
 //endregion

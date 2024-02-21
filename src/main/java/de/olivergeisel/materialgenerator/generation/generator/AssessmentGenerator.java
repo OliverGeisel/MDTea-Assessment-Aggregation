@@ -1,15 +1,13 @@
 package de.olivergeisel.materialgenerator.generation.generator;
 
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModel;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Item;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.SingleChoiceItem;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.TrueFalseItem;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.*;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationType;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeObject;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
 import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
 import de.olivergeisel.materialgenerator.generation.configuration.ItemConfiguration;
+import de.olivergeisel.materialgenerator.generation.configuration.MultipleChoiceConfiguration;
 import de.olivergeisel.materialgenerator.generation.configuration.SingleChoiceConfiguration;
 import de.olivergeisel.materialgenerator.generation.configuration.TestConfiguration;
 import de.olivergeisel.materialgenerator.generation.generator.item_exctraction.TrueFalseExtractor;
@@ -17,10 +15,7 @@ import de.olivergeisel.materialgenerator.generation.generator.test_assamble.Test
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
 import de.olivergeisel.materialgenerator.generation.material.MaterialMappingEntry;
-import de.olivergeisel.materialgenerator.generation.material.assessment.ItemType;
-import de.olivergeisel.materialgenerator.generation.material.assessment.SingleChoiceItemMaterial;
-import de.olivergeisel.materialgenerator.generation.material.assessment.TestMaterial;
-import de.olivergeisel.materialgenerator.generation.material.assessment.TrueFalseItemMaterial;
+import de.olivergeisel.materialgenerator.generation.material.assessment.*;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateSet;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 import org.slf4j.Logger;
@@ -114,10 +109,12 @@ public class AssessmentGenerator extends AbstractGenerator {
 		var materials = new LinkedList<>(createTrueFalse(knowledge));
 		var singleChoice =
 				createSingleChoice(knowledge, plan.getTestConfiguration().getConfiguration(ItemType.SINGLE_CHOICE));
-		/*var multipleChoice = createMultipleChoice(knowledge, plan.getTestConfiguration());
-		var fillOut = createFillOut(knowledge, plan.getTestConfiguration());*/
+		var multipleChoice =
+				createMultipleChoice(knowledge, plan.getTestConfiguration().getConfiguration(ItemType.MULTIPLE_CHOICE));
+		//var fillOut = createFillOut(knowledge, plan.getTestConfiguration());
 
 		materials.addAll(singleChoice);
+		materials.addAll(multipleChoice);
 		// tests
 		var tests = createTests(knowledge, materials, plan.getTestConfiguration());
 		materials.addAll(tests);
@@ -299,10 +296,63 @@ public class AssessmentGenerator extends AbstractGenerator {
 		}
 	}
 
-	public List<MaterialAndMapping> createMultipleChoice(Set<KnowledgeNode> knowledge) {
+	public List<MaterialAndMapping> createMultipleChoice(Set<KnowledgeNode> knowledge,
+			ItemConfiguration configuration) {
+		if (configuration == null || !configuration.getForItemType().equals(ItemType.MULTIPLE_CHOICE)) {
+			throw new IllegalArgumentException("Configuration is not for MultipleChoice");
+		}
+		var multipleChoiceConfiguration = (MultipleChoiceConfiguration) configuration;
 		var materials = new LinkedList<MaterialAndMapping>();
-		// Todo implement
+		// collect - get all questions from knowledge
+		final var templateInfo = TemplateType.ITEM;
+		var firstNode = knowledge.stream().findFirst().orElseThrow();
+		var termNode = getTermNode(knowledge, firstNode);
+		var structure = termNode.getStructurePoint();
+		var mainTerm = termNode.getMainElement();
+		// If an Item is not connected to a Term, then find here
+		var items = getLinkedItems(knowledge);
+		items = items.stream().filter(it -> it instanceof MultipleChoiceItem).collect(Collectors.toSet());
+		for (var item : items) {
+			var multipleChoiceItem = (MultipleChoiceItem) item;
+			createMultipleChoiceInner(materials, structure, mainTerm, multipleChoiceItem, mainTerm.getStructureId(),
+					multipleChoiceConfiguration);
+		}
+		// Items in relations to the main term
+		var relationsWithQuestion = getWantedRelationsKnowledge(knowledge, RelationType.RELATED);
+		relationsWithQuestion.forEach(it -> {
+			if (!(it.getTo() instanceof MultipleChoiceItem item)) {
+				return;
+			}
+			var term = it.getFrom();
+			if (ItemType.SINGLE_CHOICE.equals(item.getItemType())) {
+				createMultipleChoiceInner(materials, structure, term, item, mainTerm.getStructureId(),
+						multipleChoiceConfiguration);
+			}
+		});
+
+		// todo extraction - find extra questions
 		return materials;
+	}
+
+	private void createMultipleChoiceInner(LinkedList<MaterialAndMapping> materials, KnowledgeObject structure,
+			KnowledgeElement mainTerm, MultipleChoiceItem singleChoiceItem, String structureId,
+			MultipleChoiceConfiguration multipleChoiceConfiguration) {
+		try {
+			String name =
+					getUniqueMaterialName(materials, STR."Frage zu \{mainTerm.getContent()}", singleChoiceItem.getId());
+			var question = singleChoiceItem.getContent();
+			var correct = singleChoiceItem.getCorrectAnswers();
+			var alternatives = singleChoiceItem.getAlternativeAnswers();
+			var material = new MultipleChoiceItemMaterial(question, correct, alternatives,
+					multipleChoiceConfiguration.clone());
+			material.setStructureId(structure.getId());
+			var mappingEntry = new MaterialMappingEntry(material, singleChoiceItem, mainTerm);
+			var mapping = new MaterialAndMapping(material, mappingEntry);
+			mapping.material().setStructureId(structureId);
+			materials.add(mapping);
+		} catch (Exception e) {
+			logger.error("Error while creating single choice material for term {}", mainTerm.getContent(), e);
+		}
 	}
 
 	/**

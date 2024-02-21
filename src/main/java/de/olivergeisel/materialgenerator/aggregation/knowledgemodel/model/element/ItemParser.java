@@ -50,8 +50,7 @@ public class ItemParser {
 			case SINGLE_CHOICE -> new SingleChoiceItem(parsedContent.get("Q").getFirst(),
 					parsedContent.get("A"), id);
 			case MULTIPLE_CHOICE -> new MultipleChoiceItem(parsedContent.get("Q").getFirst(),
-					parsedContent.get("A"), Integer.parseInt(parsedContent.get("C").getFirst()),
-					Boolean.parseBoolean(parsedContent.get("S").getFirst()), id);
+					parsedContent.get("A"), Integer.parseInt(parsedContent.get("C").getFirst()), id);
 			case FILL_OUT_BLANKS -> null;
 			case ASSIGNMENT, UNDEFINED -> null;
 		};

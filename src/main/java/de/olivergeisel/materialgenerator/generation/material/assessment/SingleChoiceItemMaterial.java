@@ -44,7 +44,7 @@ public class SingleChoiceItemMaterial extends ItemMaterial {
 
 	public boolean isShuffle() {
 		var itemConfiguration = getItemConfiguration();
-		if (itemConfiguration == null || !(itemConfiguration instanceof SingleChoiceConfiguration configuration)) {
+		if (!(itemConfiguration instanceof SingleChoiceConfiguration configuration)) {
 			return false;
 		}
 		return configuration.isShuffle();

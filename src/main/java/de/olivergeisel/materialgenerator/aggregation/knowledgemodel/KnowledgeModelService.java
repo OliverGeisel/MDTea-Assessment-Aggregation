@@ -393,23 +393,21 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 
 	private Item createItem(AddElementForm form) {
 		return switch (form.getItemType()) {
-			case TRUE_FALSE -> {
-				var item = new TrueFalseItem(form.getContent(), form.isTrue(),
-						createId(STR."\{form.getHeadline()}-TRUE_FALSE_ITEM"));
-				item.setStructureId(form.getStructureId());
-				yield item;
-			}
+			case TRUE_FALSE -> new TrueFalseItem(form.getContent(), form.isTrue(),
+					createId(STR."\{form.getHeadline()}-TRUE_FALSE_ITEM"));
 			case SINGLE_CHOICE -> {
 				var answers = new LinkedList<String>();
 				answers.add(form.getCorrectAnswers().getFirst());
-				answers.addAll(form.getWrongAnswers());
-				var item = new SingleChoiceItem(form.getContent(), answers,
+				answers.addAll(form.getWrongAnswers().stream().filter(it -> !it.isBlank()).toList());
+				yield new SingleChoiceItem(form.getContent(), answers,
 						createId(STR."\{form.getHeadline()}-SINGLE_CHOICE_ITEM"));
-				item.setStructureId(form.getStructureId());
-				yield item;
 			}
 			case MULTIPLE_CHOICE -> {
-				yield null;
+				var answers = new LinkedList<>(form.getCorrectAnswers().stream().filter(it -> !it.isBlank()).toList());
+				var correct = answers.size();
+				answers.addAll(form.getWrongAnswers().stream().filter(it -> !it.isBlank()).toList());
+				yield new MultipleChoiceItem(form.getContent(), answers, correct,
+						createId(STR."\{form.getHeadline()}-MULTIPLE_CHOICE_ITEM"));
 			}
 			default -> throw new IllegalStateException(STR."Unexpected value: \{form.getItemType()}");
 		};

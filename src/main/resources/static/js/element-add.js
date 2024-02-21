@@ -134,7 +134,63 @@ function addWrongAnswer() {
     input.setAttribute("name", "wrongAnswers");
     input.setAttribute("placeholder", "Falsche Antwort eingeben");
     wrong.appendChild(input);
+}
 
+function addCorrectAnswer() {
+    const correct = document.getElementById("correct-answers");
+    const input = document.createElement("input");
+    input.setAttribute("type", "text");
+    input.setAttribute("name", "correctAnswers");
+    input.setAttribute("placeholder", "Korrekte Antwort eingeben");
+    correct.appendChild(input);
+}
+
+function getMultipleChoiceInputs() {
+    const result = [];
+    result.push(createItemType("MULTIPLE_CHOICE"));
+    result.push(createTextArea());
+    // correct answer
+    const correct = document.createElement("label");
+    correct.classList.add("form-control", "mt-3");
+    correct.setAttribute("id", "correct-answers");
+    let labelText = document.createTextNode("Correct Answers: ");
+    correct.appendChild(labelText);
+    let input = document.createElement("input");
+    correct.appendChild(input);
+    input.setAttribute("type", "text");
+    input.setAttribute("name", "correctAnswers");
+    input.setAttribute("placeholder", "Korrekte Antwort eingeben");
+    correct.appendChild(input);
+    result.push(correct);
+    // wrong answers
+    const wrong = document.createElement("label");
+    wrong.classList.add("form-control", "mt-3");
+    wrong.setAttribute("id", "wrong-answers");
+    let wrongText = document.createTextNode("Wrong Answers: ");
+    wrong.appendChild(wrongText);
+    let wrongInput = document.createElement("input");
+    wrong.appendChild(wrongInput);
+    wrongInput.setAttribute("type", "text");
+    wrongInput.setAttribute("name", "wrongAnswers");
+    wrongInput.setAttribute("placeholder", "Falsche Antwort eingeben");
+    wrong.appendChild(wrongInput);
+    result.push(wrong);
+    // add button
+    const correctButton = document.createElement("button");
+    correctButton.setAttribute("type", "button");
+    correctButton.classList.add("btn", "btn-success", "mt-3");
+    correctButton.setAttribute("onclick", "addCorrectAnswer()");
+    correctButton.appendChild(document.createTextNode("Korrekte Antwort hinzufügen"));
+    result.push(correctButton);
+    const addButton = document.createElement("button");
+    addButton.setAttribute("type", "button");
+    addButton.classList.add("btn", "btn-warning", "mt-3");
+    addButton.setAttribute("onclick", "addWrongAnswer()");
+    addButton.appendChild(document.createTextNode("Falsche Antwort hinzufügen"));
+    result.push(addButton);
+    // submit
+    result.push(createSubmitButton("Multiple Choice"));
+    return result;
 }
 
 function loadItemMask(select) {
