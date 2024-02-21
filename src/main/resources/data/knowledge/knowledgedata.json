@@ -215,6 +215,42 @@
       ]
     },
     {
+      "type": "ITEM",
+      "id": "WAHR-FALSCH-ITEM",
+      "structure": "Wissenschaft Informatik",
+      "content": "T:TRUE_FALSE;Q:Ist die Informatik eine Ingenieurwissenschaft?;C:TRUE",
+      "relations": [
+        {
+          "relation_id": "Informatik-TERM",
+          "relation_type": "related"
+        }
+      ]
+    },
+    {
+      "type": "ITEM",
+      "id": "SINGLE-CHOICE-ITEM",
+      "structure": "Wissenschaft Informatik",
+      "content": "T:SINGLE_CHOICE;Q:Was ist kein Teilgebiet der Informatik?;A:Physik;A:Technische Informatik;A:Praktische Informatik;A:Angewandte Informatik;A:Theoretische Informatik",
+      "relations": [
+        {
+          "relation_id": "Informatik-TERM",
+          "relation_type": "related"
+        }
+      ]
+    },
+    {
+      "type": "ITEM",
+      "id": "MULTIPLE-CHOICE-ITEM",
+      "structure": "Wissenschaft Informatik",
+      "content": "T:MULTIPLE_CHOICE;Q:Welche der folgenden Aussagen sind wahr?;A:Die Informatik ist eine Ingenieurwissenschaft.;A:Die Informatik besteht aus mehreren Teilgebieten.;A:Die Informatik ist eine Naturwissenschaft.;A:Ein Teilgebiet der Informatik ist Magie.;C:2;S:true",
+      "relations": [
+        {
+          "relation_id": "Informatik-TERM",
+          "relation_type": "related"
+        }
+      ]
+    },
+    {
       "type": "TERM",
       "id": "Informatiksystem-TERM",
       "structure": "Wissenschaft Informatik",
