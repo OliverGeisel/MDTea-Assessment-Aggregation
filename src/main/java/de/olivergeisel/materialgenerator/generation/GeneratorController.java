@@ -135,6 +135,24 @@ public class GeneratorController {
 		return PATH + "overview-all";
 	}
 
+	@GetMapping("tests/generate")
+	String generateTests(Model model) {
+		var allSections = knowledgeModelService.getStructureIds();
+		model.addAttribute("areas", allSections);
+		return PATH + "tests-for-topic";
+	}
+
+	@PostMapping("tests/generate")
+	String generateTests(@RequestParam String topic, Model model) {
+		var allSections = knowledgeModelService.getStructureIds();
+		model.addAttribute("areas", allSections);
+		model.addAttribute("topic", topic);
+		var test = service.generateTest(topic);
+		model.addAttribute("test", test);
+
+		return PATH + "generated-test";
+	}
+
 	@GetMapping("generate")
 	public String generate(@RequestParam String plan, @RequestParam String template) throws FileNotFoundException {
 		var coursePlanFile = storageService.load(plan);

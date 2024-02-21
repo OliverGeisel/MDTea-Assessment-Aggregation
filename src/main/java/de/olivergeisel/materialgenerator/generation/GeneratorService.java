@@ -72,6 +72,18 @@ public class GeneratorService {
 	}
 
 	/**
+	 * Generate a new {@link TestMaterial} for the given topic. Use the default template and
+	 * {@link TestConfiguration} for the generation.
+	 *
+	 * @param topic the topic to generate the test for
+	 * @return the generated {@link TestMaterial}
+	 */
+	public TestMaterial generateTest(String topic) {
+		TestMaterial test = finalizationService.generateTest(topic);
+		return materialRepository.save(test);
+	}
+
+	/**
 	 * Create the materials for the given {@link CoursePlan}. The materials are created from the given
 	 * {@link KnowledgeModel}.
 	 *
