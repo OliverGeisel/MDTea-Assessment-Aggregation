@@ -12,6 +12,6 @@ public enum KnowledgeType {
 	TEXT,
 	IMAGE,
 	EXAMPLE,
-	TASK,
+	ITEM,
 	CUSTOM
 }

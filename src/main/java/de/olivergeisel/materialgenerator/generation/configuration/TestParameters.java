@@ -14,6 +14,7 @@ import jakarta.persistence.Embeddable;
 public class TestParameters {
 
 	public static final TestParameters DEFAULT = new TestParameters();
+
 	private             int            tries;
 	private             int            pointsPerUnit;
 	private             double         negativeFactor;

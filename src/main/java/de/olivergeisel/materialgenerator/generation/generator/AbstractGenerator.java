@@ -52,6 +52,7 @@ public abstract class AbstractGenerator implements Generator {
 	}
 
 	protected AbstractGenerator(GeneratorInput input) {
+		this();
 		this.templateSet = input.getTemplates();
 		this.model = input.getModel();
 		this.plan = input.getPlan();
@@ -74,6 +75,8 @@ public abstract class AbstractGenerator implements Generator {
 		}
 		return name;
 	}
+
+	//region KnowledgeNode getter
 
 	/**
 	 * Find a {@link Term} in a {@link KnowledgeNode} that fits the masterKeyword or one of the topics.
@@ -100,7 +103,7 @@ public abstract class AbstractGenerator implements Generator {
 	 * @return Term that fits the masterKeyword or one of the topics of the node
 	 * @throws NoSuchElementException if no KnowledgeNode fits the masterKeyword or one of the topics.
 	 */
-	protected static KnowledgeNode getMainKnowledge(Set<KnowledgeNode> knowledge, KnowledgeNode node)
+	protected static KnowledgeNode getTermNode(Set<KnowledgeNode> knowledge, KnowledgeNode node)
 			throws NoSuchElementException {
 		return getMainKnowledge(knowledge, node.getMasterKeyWord().orElseThrow(), node.getTopics(), KnowledgeType.TERM);
 	}
@@ -173,7 +176,6 @@ public abstract class AbstractGenerator implements Generator {
 						.findFirst().orElseThrow();
 	}
 
-
 	/**
 	 * Collect all Elements with a given id from a Set of Relations.
 	 * Compares the toId with given id
@@ -213,6 +215,53 @@ public abstract class AbstractGenerator implements Generator {
 		}
 		return back;
 	}
+	//endregion
+
+	/**
+	 * Load all {@link KnowledgeNode}s for a given structureId.
+	 *
+	 * @param structureId structureId to load the KnowledgeNodes for
+	 * @return Set of KnowledgeNodes for the given structureId. If no KnowledgeNode is found, an empty unmodifiable
+	 * Set is returned.
+	 */
+	protected Set<KnowledgeNode> loadKnowledgeForStructure(String structureId) {
+		if (structureId == null) {
+			return Collections.emptySet();
+		}
+		return model.getKnowledgeNodesIncludingSimilarFor(structureId);
+	}
+
+	/**
+	 * Load all {@link KnowledgeNode}s for a given structureId. But the order of the structureIds is important.
+	 * The first structureId that has a KnowledgeNode is used.
+	 *
+	 * @param structureIds structureIds to load the KnowledgeNodes for
+	 * @return a Set of KnowledgeNodes for the given structureIds. If no KnowledgeNode is found, an empty unmodifiable
+	 */
+	protected Set<KnowledgeNode> loadKnowledgeForStructureComplete(List<String> structureIds) {
+		if (structureIds == null) {
+			return Collections.emptySet();
+		}
+		var back = new HashSet<KnowledgeNode>();
+		for (var structureId : structureIds) {
+			var result = loadKnowledgeForStructure(structureId);
+			back.addAll(result);
+		}
+		return back;
+	}
+
+	protected Set<KnowledgeNode> loadKnowledgeForStructureFirstMatch(List<String> structureIds) {
+		if (structureIds == null) {
+			return Collections.emptySet();
+		}
+		for (var structureId : structureIds) {
+			var result = loadKnowledgeForStructure(structureId);
+			if (!result.isEmpty()) {
+				return result;
+			}
+		}
+		return Collections.emptySet();
+	}
 
 	public void input(TemplateSet templates, KnowledgeModel model, CoursePlan plan) {
 		this.templateSet = templates;
@@ -233,11 +282,12 @@ public abstract class AbstractGenerator implements Generator {
 	 */
 	@Override
 	public boolean update() {
-		if (!isReady()) {
+		if (!isReady() || isUnchanged()) {
 			logger.error("Generator is not ready to start the generation process.");
 			return false;
 		}
 		process();
+		setUnchanged(true);
 		return true;
 	}
 
@@ -287,40 +337,6 @@ public abstract class AbstractGenerator implements Generator {
 	}
 
 	/**
-	 * Load all {@link KnowledgeNode}s for a given structureId.
-	 *
-	 * @param structureId structureId to load the KnowledgeNodes for
-	 * @return Set of KnowledgeNodes for the given structureId. If no KnowledgeNode is found, an empty unmodifiable
-	 * Set is returned.
-	 */
-	protected Set<KnowledgeNode> loadKnowledgeForStructure(String structureId) {
-		if (structureId == null) {
-			return Collections.emptySet();
-		}
-		return model.getKnowledgeNodesIncludingSimilarFor(structureId);
-	}
-
-	/**
-	 * Load all {@link KnowledgeNode}s for a given structureId. But the order of the structureIds is important.
-	 * The first structureId that has a KnowledgeNode is used.
-	 *
-	 * @param structureIds structureIds to load the KnowledgeNodes for
-	 * @return a Set of KnowledgeNodes for the given structureIds. If no KnowledgeNode is found, an empty unmodifiable
-	 */
-	protected Set<KnowledgeNode> loadKnowledgeForStructure(List<String> structureIds) {
-		if (structureIds == null) {
-			return Collections.emptySet();
-		}
-		for (var structureId : structureIds) {
-			var result = loadKnowledgeForStructure(structureId);
-			if (!result.isEmpty()) {
-				return result;
-			}
-		}
-		return Collections.emptySet();
-	}
-
-	/**
 	 * Create the materials for a given list of {@link ContentTarget}s.
 	 * <p>
 	 * Every topic has a mapping to the related {@link StructureElement}s in the {@link CoursePlan}.
@@ -330,7 +346,40 @@ public abstract class AbstractGenerator implements Generator {
 	 * @param targets List of {@link ContentTarget}s to create {@link Material} for
 	 * @throws IllegalStateException if the targets have different {@link ContentGoal}s.
 	 */
-	protected abstract void processTargets(List<ContentTarget> targets) throws IllegalStateException;
+	protected void processTargets(List<ContentTarget> targets) throws IllegalStateException {
+		if (targets.isEmpty()) {
+			logger.warn("No targets found. This should not happen.");
+			return;
+		}
+		var goal = targets.stream().findFirst().orElseThrow().getRelatedGoal();
+		if (goal == null || targets.stream().anyMatch(it -> !it.getRelatedGoal().equals(goal)))
+			throw new IllegalStateException(
+					"Targets with different goals found. This should not happen. Ignoring all targets.");
+		int emptyTargetCount = 0;
+		for (var target : targets) {
+			var expression = goal.getExpression();
+			var aliases = target.getAliases().complete();
+			var topicKnowledge = loadKnowledgeForStructureComplete(aliases);
+			if (topicKnowledge.isEmpty()) {
+				logger.info("No knowledge found for Topic {}", target);
+				emptyTargetCount++;
+				continue;
+			}
+			var topic = target.getTopic();
+			topicKnowledge.forEach(it -> {
+				it.setGoal(goal);
+				it.addTopic(topic);
+			});
+			try {
+				createMaterialFor(expression, topicKnowledge);
+			} catch (NoSuchElementException e) {
+				logger.info("No knowledge found for Target {}", target);
+			}
+		}
+		if (emptyTargetCount == targets.size()) {
+			logger.warn("No knowledge found for any target. Goal: {} has no materials", goal);
+		}
+	}
 
 	protected abstract List<MaterialAndMapping> materialForComment(Set<KnowledgeNode> knowledge);
 
@@ -367,7 +416,7 @@ public abstract class AbstractGenerator implements Generator {
 	}
 
 
-//region setter/getter
+	//region setter/getter
 
 	/**
 	 * {@inheritDoc}
@@ -375,7 +424,11 @@ public abstract class AbstractGenerator implements Generator {
 	 * @return {@inheritDoc}
 	 */
 	public boolean isReady() {
-		return templateSet != null && model != null && plan != null;
+		var isNull = templateSet == null || model == null || plan == null;
+		if (isNull) {
+			return false;
+		}
+		return plan.isValid();
 	}
 
 	/**

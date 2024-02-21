@@ -1,7 +1,11 @@
 package de.olivergeisel.materialgenerator.generation.generator;
 
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.KnowledgeModel;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModel;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Item;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.TrueFalseItem;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationType;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeObject;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
 import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
 import de.olivergeisel.materialgenerator.generation.configuration.TestConfiguration;
@@ -60,43 +64,6 @@ public class AssessmentGenerator extends AbstractGenerator {
 		super(input);
 	}
 
-
-	@Override
-	protected void processTargets(List<ContentTarget> targets) throws IllegalStateException {
-		if (targets.isEmpty()) {
-			logger.warn("No targets found. This should not happen.");
-			return;
-		}
-		var goal = targets.stream().findFirst().orElseThrow().getRelatedGoal();
-		if (goal == null || targets.stream().anyMatch(it -> !it.getRelatedGoal().equals(goal)))
-			throw new IllegalStateException("Targets with different goals found. This should not happen. Ignoring all"
-											+ " targets.");
-		int emptyCount = 0;
-		for (var target : targets) {
-			var expression = goal.getExpression();
-			var aliases = target.getAliases();
-			var topic = target.getTopic();
-			try {
-				var topicKnowledge = loadKnowledgeForStructure(aliases.complete());
-				if (topicKnowledge.isEmpty()) {
-					logger.info("No knowledge found for Topic {}", target);
-					emptyCount++;
-					continue;
-				}
-				topicKnowledge.forEach(it -> {
-					it.setGoal(goal);
-					it.addTopic(topic);
-				});
-				createMaterialFor(expression, topicKnowledge);
-			} catch (NoSuchElementException e) {
-				logger.info("No knowledge found for Target {}", target);
-			}
-		}
-		if (emptyCount == targets.size()) {
-			logger.warn("No knowledge found for any target. Goal: {} has no materials", goal);
-		}
-	}
-
 	@Override
 	protected List<MaterialAndMapping> materialForComment(Set<KnowledgeNode> knowledge) {
 		return materialForCreate(knowledge);
@@ -132,7 +99,12 @@ public class AssessmentGenerator extends AbstractGenerator {
 	protected List<MaterialAndMapping> materialForFirstLook(Set<KnowledgeNode> knowledge)
 			throws NoSuchElementException {
 
-		return new LinkedList<MaterialAndMapping>(createTrueFalse(knowledge));
+		var materials = new LinkedList<>(createTrueFalse(knowledge));
+
+		// tests
+		var tests = createTests(knowledge, materials, plan.getTestConfiguration());
+		materials.addAll(tests);
+		return materials;
 	}
 
 	/**
@@ -171,14 +143,75 @@ public class AssessmentGenerator extends AbstractGenerator {
 	 */
 	public List<MaterialAndMapping> createTrueFalse(Set<KnowledgeNode> knowledge) {
 		var materials = new LinkedList<MaterialAndMapping>();
-		var extractor = new TrueFalseExtractor();
+		// collect - get all questions from knowledge
 		final var templateInfo = TemplateType.ITEM;
+		var firstNode = knowledge.stream().findFirst().orElseThrow();
+		var termNode = getTermNode(knowledge, firstNode);
+		var structure = termNode.getStructurePoint();
+		var mainTerm = termNode.getMainElement();
+		// If a Item is not connected to a Term, then find here
+		var items = getLinkedItems(knowledge);
+		items = items.stream().filter(it -> it instanceof TrueFalseItem).collect(Collectors.toSet());
+		for (var item : items) {
+			createTrueFalseInner(materials, structure, mainTerm, item, mainTerm.getStructureId());
+		}
+		// Items in relations to the main term
+		var relationsWithQuestion = getWantedRelationsKnowledge(knowledge, RelationType.RELATED);
+		relationsWithQuestion.forEach(it -> {
+			if (!(it.getTo() instanceof Item item)) {
+				return;
+			}
+			var term = it.getFrom();
+			if (ItemType.TRUE_FALSE.equals(item.getItemType())) {
+				createTrueFalseInner(materials, structure, term, item, mainTerm.getStructureId());
+			}
+		});
+
+		// extraction - find extra questions
+		var extractor = new TrueFalseExtractor();
 		// todo get Tasks, that are stored in knowledge (added while aggregation)
 		for (var node : knowledge) {
 			var questions = extractor.extract(node, templateInfo);
 			materials.addAll(questions);
 		}
+
 		return materials;
+	}
+
+	/**
+	 * Create a True/False-Question for the given item and add it to the given materials.
+	 *
+	 * @param materials   The materials to add the question to.
+	 * @param structure   The structure of the knowledge.
+	 * @param mainTerm    Term the question is related to.
+	 * @param item        The item to create the question for.
+	 * @param structureId The id of the structure.
+	 */
+	private void createTrueFalseInner(LinkedList<MaterialAndMapping> materials, KnowledgeObject structure,
+			KnowledgeElement mainTerm, Item item, String structureId) {
+		try {
+			String name = getUniqueMaterialName(materials, STR."Frage zu \{mainTerm.getContent()}",
+					item.getId());
+			var trueFalseItem = (TrueFalseItem) item;
+			var question = trueFalseItem.getQuestion();
+			var isTrue = trueFalseItem.isCorrect();
+			var material = new TrueFalseItemMaterial(question, isTrue);
+			material.setStructureId(structure.getId());
+			var mappingEntry = new MaterialMappingEntry(material, item, mainTerm);
+			var mapping = new MaterialAndMapping(material, mappingEntry);
+			mapping.material().setStructureId(structureId);
+			materials.add(mapping);
+		} catch (Exception e) {
+			logger.error("Error while creating material for term {}", mainTerm.getContent(), e);
+		}
+	}
+
+	private Set<Item> getLinkedItems(Set<KnowledgeNode> knowledge) {
+		return knowledge.stream()
+						.flatMap(it -> Arrays.stream(it.getLinkedElements()))
+						.filter(it -> it instanceof Item)
+						.map(it -> (Item) it)
+						.collect(Collectors.toSet());
 	}
 
 	public List<MaterialAndMapping> createSingleChoice(Set<KnowledgeNode> knowledge) {
@@ -196,20 +229,30 @@ public class AssessmentGenerator extends AbstractGenerator {
 	/**
 	 * Creates a test for the given knowledge. The test contains the following materials:
 	 *
-	 * @param knowledge
-	 * @param relatedMaterials
-	 * @return
+	 * @param knowledge        The knowledge to create the test for.
+	 * @param relatedMaterials The related materials to the knowledge.
+	 * @return A list of tests.
 	 */
 	public List<MaterialAndMapping> createTests(Set<KnowledgeNode> knowledge,
-			List<MaterialAndMapping> relatedMaterials) {
-		var materials = new LinkedList<MaterialAndMapping>();
-		// Todo implement
-		return materials;
+			LinkedList<MaterialAndMapping> relatedMaterials, TestConfiguration testConfiguration) {
+		var assembler = new TestAssembler<>(knowledge.stream().findFirst().get(), relatedMaterials, testConfiguration);
+		List<MaterialAndMapping<TestMaterial>> tests = assembler.assemble();
+		return new LinkedList<>(tests);
 	}
 
 
 	@Override
 	public void input(TemplateSet templates, KnowledgeModel model, CoursePlan plan) {
 		super.input(templates, model, plan);
+	}
+
+	@Override
+	public boolean createSimpleMaterial() {
+		return false;
+	}
+
+	@Override
+	public boolean createComplexMaterial() {
+		return false;
 	}
 }

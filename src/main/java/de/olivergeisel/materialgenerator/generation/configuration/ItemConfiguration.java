@@ -6,6 +6,7 @@ import de.olivergeisel.materialgenerator.generation.material.assessment.ItemMate
 import de.olivergeisel.materialgenerator.generation.material.assessment.ItemType;
 import de.olivergeisel.materialgenerator.generation.material.assessment.TestMaterial;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 
 /**
  * A Configuration for a {@link ItemMaterial}. the ItemType say which {@link Item} is used.
@@ -19,9 +20,10 @@ import jakarta.persistence.Embeddable;
  * @since 1.1.0
  */
 @Embeddable
-public abstract class ItemConfiguration {
+public class ItemConfiguration {
 
 	private ItemType forItemType;
+	@Embedded
 	private TestParameters testParameters = TestParameters.DEFAULT;
 
 	protected ItemConfiguration(ItemType forItemType) {

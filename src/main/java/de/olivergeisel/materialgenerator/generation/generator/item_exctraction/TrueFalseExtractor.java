@@ -3,9 +3,10 @@ package de.olivergeisel.materialgenerator.generation.generator.item_exctraction;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeType;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationType;
 import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
+import de.olivergeisel.materialgenerator.generation.generator.Extractor;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
 import de.olivergeisel.materialgenerator.generation.material.MaterialMappingEntry;
-import de.olivergeisel.materialgenerator.generation.material.assessment.TrueFalseQuestion;
+import de.olivergeisel.materialgenerator.generation.material.assessment.TrueFalseItemMaterial;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 
 import java.util.Arrays;
@@ -15,23 +16,23 @@ import java.util.Random;
 
 
 /**
- * Extract {@link TrueFalseQuestion}s from a {@link KnowledgeNode}.
+ * Extract {@link TrueFalseItemMaterial}s from a {@link KnowledgeNode}.
  *
  * @author Oliver Geisel
  * @version 1.1.0
  * @see KnowledgeNode
- * @see TrueFalseQuestion
+ * @see TrueFalseItemMaterial
  * @see Extractor
  * @since 1.1.0
  */
-public class TrueFalseExtractor extends Extractor<TrueFalseQuestion> {
+public class TrueFalseExtractor implements Extractor<TrueFalseItemMaterial> {
 
 	@Override
-	public List<MaterialAndMapping<TrueFalseQuestion>> extract(KnowledgeNode knowledgeNode,
+	public List<MaterialAndMapping<TrueFalseItemMaterial>> extract(KnowledgeNode knowledgeNode,
 			final TemplateType templateType) {
 		var mainElement = knowledgeNode.getMainElement();
 		knowledgeNode.getMasterKeyWord();
-		var back = new LinkedList<MaterialAndMapping<TrueFalseQuestion>>();
+		var back = new LinkedList<MaterialAndMapping<TrueFalseItemMaterial>>();
 
 		var allIsRelations = knowledgeNode.getWantedRelationsFrom(RelationType.IS);
 		Random random = new Random();
@@ -43,10 +44,14 @@ public class TrueFalseExtractor extends Extractor<TrueFalseQuestion> {
 			String subject = correctSubject.getContent();
 			String predicate = correctPredicate.getContent();
 			var newStatementParts = createStatementParts(trueStatement, subject, predicate, knowledgeNode);
+			if (newStatementParts == null) {
+				continue;
+			}
 			final var statement = STR."Ein(e) \{newStatementParts.subject} ist \{newStatementParts.predicate}.";
 			var reason = createReason(knowledgeNode, RelationType.IS, trueStatement, newStatementParts,
 					new StatementParts(correctSubject.getContent(), correctPredicate.getContent()));
-			var question = new TrueFalseQuestion(statement, trueStatement, reason, templateType);
+			var question = new TrueFalseItemMaterial(statement, true);
+			question.setStructureId(knowledgeNode.getStructurePoint().getId());
 			var mappingEntry = new MaterialMappingEntry(question, correctSubject, correctPredicate);
 			var mapping = new MaterialAndMapping<>(question, mappingEntry);
 			back.add(mapping);
@@ -73,6 +78,9 @@ public class TrueFalseExtractor extends Extractor<TrueFalseQuestion> {
 		var terms = Arrays.stream(knowledgeNode.getRelatedElements())
 						  .filter(it -> it.hasType(KnowledgeType.TERM) && !it.getContent().equals(predicate))
 						  .toList();
+		if (terms.isEmpty()) {
+			return null;
+		}
 		var termSize = terms.size();
 		var random = new Random();
 		var randomTerm = terms.get(random.nextInt(termSize));

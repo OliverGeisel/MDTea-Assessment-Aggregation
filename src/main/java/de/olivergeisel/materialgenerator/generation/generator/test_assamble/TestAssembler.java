@@ -3,6 +3,7 @@ package de.olivergeisel.materialgenerator.generation.generator.test_assamble;
 import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
 import de.olivergeisel.materialgenerator.generation.configuration.TestConfiguration;
 import de.olivergeisel.materialgenerator.generation.configuration.TestPer;
+import de.olivergeisel.materialgenerator.generation.generator.Assembler;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
 import de.olivergeisel.materialgenerator.generation.material.assessment.TestMaterial;
 
@@ -21,11 +22,11 @@ import java.util.List;
  * @see MaterialAndMapping
  * @since 1.1.0
  */
-public class TestAssembler {
+public class TestAssembler<T extends TestMaterial> implements Assembler<T> {
 
-	private KnowledgeNode            knowledgeNode;
+	private KnowledgeNode     knowledgeNode;
 	private List<MaterialAndMapping> relatedMaterials;
-	private TestConfiguration        configuration;
+	private TestConfiguration configuration;
 
 	public TestAssembler(KnowledgeNode knowledgeNode, List<MaterialAndMapping> relatedMaterials,
 			TestConfiguration configuration) {
@@ -35,32 +36,29 @@ public class TestAssembler {
 
 	}
 
-	private static AssemblerStrategy getStrategy(TestPer level) {
+	private static <T extends TestMaterial> AssemblerStrategy<T> getStrategy(TestPer level) {
 		return switch (level) {
-			case MATERIAL -> new MaterialStrategy();
-			case SUB_GROUP -> new SubGroupStrategy();
-			case GROUP -> new GroupStrategy();
-			case CHAPTER -> new ChapterStrategy();
-			case ALL -> new AllStrategy();
+			case TASK -> new TaskStrategy<T>();
+			case SUB_GROUP -> new SubGroupStrategy<T>();
+			case GROUP -> new GroupStrategy<T>();
+			case CHAPTER -> new ChapterStrategy<T>();
+			case ALL -> new AllStrategy<T>();
 		};
 	}
 
-	public List<TestMaterial> assemble() {
+	public List<MaterialAndMapping<T>> assemble() {
 		if (knowledgeNode == null || relatedMaterials == null || configuration == null) {
 			throw new IllegalStateException("Assembler not configured correctly. Please check your configuration.");
 		}
-		var back = new LinkedList<TestMaterial>();
+		var back = new LinkedList<MaterialAndMapping<T>>();
 		// load assemble strategy by configuration
-		var taskPerLevel = configuration.level();
+		var taskPerLevel = configuration.getLevel();
 		for (var level : taskPerLevel) {
-			var strategy = getStrategy(level);
+			AssemblerStrategy<TestMaterial> strategy = getStrategy(level);
 			var materials = strategy.assemble(knowledgeNode, relatedMaterials, configuration);
-			back.addAll(materials);
+			var casted = materials.stream().map(m -> (MaterialAndMapping<T>) m).toList();
+			back.addAll(casted);
 		}
-		// todo order;
-
-
-		// TODO: Think if something is missing. Check duplicate etc...
 		return back;
 	}
 

@@ -2,13 +2,18 @@ package de.olivergeisel.materialgenerator.generation.generator.test_assamble;
 
 import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
 import de.olivergeisel.materialgenerator.generation.configuration.TestConfiguration;
+import de.olivergeisel.materialgenerator.generation.material.ComplexMaterial;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
-import de.olivergeisel.materialgenerator.generation.material.assessment.TestMaterial;
 
 import java.util.List;
 
-public abstract class AssemblerStrategy {
+/**
+ * Interface for the strategy pattern to assemble materials
+ *
+ * @param <T> the type of the material to be assembled
+ */
+public interface AssemblerStrategy<T extends ComplexMaterial> {
 
-	public abstract List<TestMaterial> assemble(KnowledgeNode knowledgeNode, List<MaterialAndMapping> relatedMaterials,
+	List<MaterialAndMapping<T>> assemble(KnowledgeNode knowledgeNode, List<MaterialAndMapping> relatedMaterials,
 			TestConfiguration configuration);
 }

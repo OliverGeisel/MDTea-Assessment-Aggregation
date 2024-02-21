@@ -1,7 +1,9 @@
 package de.olivergeisel.materialgenerator.generation.configuration;
 
 import de.olivergeisel.materialgenerator.generation.material.assessment.ItemType;
+import jakarta.persistence.Embeddable;
 
+@Embeddable
 public class MultipleChoiceConfiguration extends ItemConfiguration {
 	private final int numberOfCorrectChoices;
 	private final int numberOfChoices;

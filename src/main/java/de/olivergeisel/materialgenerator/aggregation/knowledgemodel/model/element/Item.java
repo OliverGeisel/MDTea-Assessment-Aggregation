@@ -8,8 +8,8 @@ import java.util.Collection;
 
 /**
  * Represents a task in the knowledge base.
- * A {@link Item} is the base class for all tasks in the knowledge base. It contains the task type. Every subclass
- * has as KnowledgeType {@link KnowledgeType#TASK}. But the itemType is different.
+ * A {@link Item} is the base class for all items (Questions or similar) in the knowledge base. It contains the task
+ * type. Every subclass has as KnowledgeType {@link KnowledgeType#ITEM}. But the itemType is different.
  *
  * @author Oliver Geisel
  * @version 1.1.0
@@ -21,20 +21,30 @@ import java.util.Collection;
 @Node
 public abstract class Item extends KnowledgeElement {
 
-	private final ItemType itemType;
+	private ItemType itemType;
 
-	protected Item(String content, String id, String taskType) {
-		super(content, id, KnowledgeType.TASK.name());
-		this.itemType = ItemType.valueOf(taskType.toUpperCase());
+	protected Item() {
+		super();
+		this.itemType = ItemType.UNDEFINED;
 	}
 
-	protected Item(String content, String id, String taskType, Collection<Relation> relations) {
+	protected Item(String itemType) {
+		super();
+		this.itemType = ItemType.valueOf(itemType.toUpperCase());
+	}
+
+	protected Item(String content, String id, String itemType) {
+		super(content, id, KnowledgeType.ITEM.name());
+		this.itemType = ItemType.valueOf(itemType.toUpperCase());
+	}
+
+	protected Item(String content, String id, String itemType, Collection<Relation> relations) {
 		super(content, id, KnowledgeType.TEXT.name(), relations);
-		this.itemType = ItemType.valueOf(taskType.toUpperCase());
+		this.itemType = ItemType.valueOf(itemType.toUpperCase());
 	}
 
 	//region setter/getter
-	public ItemType getTaskType() {
+	public ItemType getItemType() {
 		return itemType;
 	}
 //endregion

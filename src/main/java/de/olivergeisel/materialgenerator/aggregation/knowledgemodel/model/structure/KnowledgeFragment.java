@@ -154,7 +154,28 @@ public class KnowledgeFragment extends KnowledgeObject {
 		return false;
 	}
 
-	//region setter/getter
+	/**
+	 * Returns all linked elements of this object and its children. Depth 0 returns only the elements of this object, depth 1 returns the elements of this object and its children, etc.
+	 * If depth is negative, only this object's elements are returned.
+	 *
+	 * @param depth the depth of the search (0 for this object only, 1 for this object and its children, etc.)
+	 * @return all linked elements of this object and its children
+	 */
+	public Set<KnowledgeElement> getLinkedElements(int depth) {
+		var ownElements = super.getLinkedElements();
+		if (depth <= 0) {
+			return super.getLinkedElements();
+		}
+		var back = new HashSet<>(ownElements);
+		for (KnowledgeObject child : children) {
+			if (child instanceof KnowledgeFragment fragment) {
+				back.addAll(fragment.getLinkedElements(depth - 1));
+			} else {
+				back.addAll(child.getLinkedElements());
+			}
+		}
+		return back;
+	}
 
 	public boolean removeObject(KnowledgeObject object) {
 		if (!children.contains(object)) {
@@ -166,14 +187,11 @@ public class KnowledgeFragment extends KnowledgeObject {
 		this.children.clear();
 		this.children.addAll(children);
 	}
+
+	//region setter/getter
 	@Override
 	public Set<KnowledgeElement> getLinkedElements() {
-		var ownElements = super.getLinkedElements();
-		var back = new HashSet<>(ownElements);
-		for (KnowledgeObject child : children) {
-			back.addAll(child.getLinkedElements());
-		}
-		return back;
+		return getLinkedElements(0);
 	}
 
 	public List<KnowledgeObject> getChildren() {
@@ -189,4 +207,9 @@ public class KnowledgeFragment extends KnowledgeObject {
 		this.name = name;
 	}
 //endregion
+
+	@Override
+	public String toString() {
+		return STR."KnowledgeFragment{name='\{name}', children=\{children}}";
+	}
 }

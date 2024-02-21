@@ -4,13 +4,16 @@ import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.forms.AddEle
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeType;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationType;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeFragment;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeLeaf;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeObject;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -66,8 +69,9 @@ public class KnowledgeModelEditController {
 	}
 
 	@PostMapping("/elements/add")
-	public String addElementPost(@Valid AddElementForm form, Errors errors, Model model) {
+	public String addElementPost(@Valid AddElementForm form, RedirectAttributes redirectAttributes) {
 		knowledgeModelService.addElement(form);
+		redirectAttributes.addFlashAttribute("added", "Element added successfully!");
 		return "redirect:/knowledge-model/elements";
 	}
 
@@ -108,6 +112,26 @@ public class KnowledgeModelEditController {
 	public String getStructure(Model model) {
 		model.addAttribute("structure", knowledgeModelService.getAllStructureElements());
 		return "knowledgeModel/structure";
+	}
+
+	@PostMapping("/structure/add")
+	public String addStructureObject(@RequestParam("id") String newStructureId,
+			@RequestParam("parent") String parentId,
+			@RequestParam(value = "leaf", defaultValue = "true") boolean leaf,
+			@RequestParam("withTerm") boolean withTerm) {
+
+		var parent = knowledgeModelService.findStructureById(parentId).orElseThrow();
+
+		if (!(parent instanceof KnowledgeFragment fragment)) {
+			throw new IllegalArgumentException("Cannot add a structure to a leaf");
+		}
+		KnowledgeObject newObject = leaf ? new KnowledgeLeaf(newStructureId) : new KnowledgeFragment(newStructureId);
+		knowledgeModelService.addStructureTo(fragment, newObject);
+		if (withTerm) {
+			var form = new AddElementForm(newStructureId, "", newStructureId, KnowledgeType.TERM, null, "false");
+			knowledgeModelService.addElement(form);
+		}
+		return "redirect:/knowledge-model/structure";
 	}
 
 }

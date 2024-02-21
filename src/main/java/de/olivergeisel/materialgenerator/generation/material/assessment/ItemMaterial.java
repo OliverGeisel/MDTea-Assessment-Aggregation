@@ -1,6 +1,7 @@
 package de.olivergeisel.materialgenerator.generation.material.assessment;
 
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.KnowledgeModel;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModel;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Item;
 import de.olivergeisel.materialgenerator.generation.configuration.ItemConfiguration;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.MaterialType;

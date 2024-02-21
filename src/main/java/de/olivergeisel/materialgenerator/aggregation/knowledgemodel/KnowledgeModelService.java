@@ -306,7 +306,6 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	}
 
 
-
 	/**
 	 * change a {@link KnowledgeLeaf} to a {@link KnowledgeFragment}. The leaf will be removed from the database and the
 	 * fragment will be added. The linked elements will be moved to the new fragment.
@@ -383,6 +382,7 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 			case TEXT -> newElement =
 					new Text(form.getHeadline(), form.getContent(), createId(STR."\{form.getContent()}-TEXT"));
 			case FACT -> newElement = new Fact(form.getContent(), createId(STR."\{form.getContent()}-FACT"));
+			case ITEM -> newElement = createItem(form);
 			default -> throw new IllegalStateException(STR."Unexpected value: \{form.getType()}");
 		}
 		newElement.setStructureId(structureId);
@@ -391,6 +391,24 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 			structureRepository.save(it);
 		});
 		elementRepository.save(newElement);
+	}
+
+	private Item createItem(AddElementForm form) {
+		switch (form.getItemType()) {
+			case TRUE_FALSE -> {
+				var item = new TrueFalseItem(form.getContent(), form.isTrue(),
+						createId(STR."\{form.getHeadline()}-TRUE_FALSE_ITEM"));
+				item.setStructureId(form.getStructureId());
+				return item;
+			}
+			case SINGLE_CHOICE -> {
+				return null;
+			}
+			case MULTIPLE_CHOICE -> {
+				return null;
+			}
+			default -> throw new IllegalStateException(STR."Unexpected value: \{form.getItemType()}");
+		}
 	}
 
 	private String createId(String name) {
