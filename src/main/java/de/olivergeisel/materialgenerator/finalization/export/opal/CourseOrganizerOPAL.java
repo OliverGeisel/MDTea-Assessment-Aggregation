@@ -3,6 +3,7 @@ package de.olivergeisel.materialgenerator.finalization.export.opal;
 import de.olivergeisel.materialgenerator.core.course.Course;
 import de.olivergeisel.materialgenerator.core.course.Meta;
 import de.olivergeisel.materialgenerator.finalization.parts.ChapterOrder;
+import de.olivergeisel.materialgenerator.finalization.parts.CourseMetadataFinalization;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourse;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourseOrder;
 import lombok.AccessLevel;
@@ -33,6 +34,12 @@ public class CourseOrganizerOPAL extends Course {
 	private boolean materialCreated = false;
 	private long    runId           = nodeId + 1;
 
+	public CourseOrganizerOPAL() {
+		originalCourse = null;
+		templateEngine = createTemplateEngine("color");
+		order = new OpalOrderRaw();
+	}
+
 	public CourseOrganizerOPAL(RawCourse course) {
 		originalCourse = course;
 		var templateSet = course.getTemplateName();
@@ -58,8 +65,17 @@ public class CourseOrganizerOPAL extends Course {
 	}
 
 	//region setter/getter
+
+	/**
+	 * Returns the meta information of the course or a new empty one if the course is not set.
+	 *
+	 * @return meta information of the course.
+	 */
 	@Override
 	public Meta getMeta() {
+		if (originalCourse == null) {
+			return new CourseMetadataFinalization("", "", "", "", "",Map.of());
+		}
 		return originalCourse.getMeta();
 	}
 
@@ -81,6 +97,9 @@ public class CourseOrganizerOPAL extends Course {
 	static class OpalOrderRaw extends RawCourseOrder {
 
 		private final List<OPALChapterInfo> chapters = new ArrayList<>();
+
+		public OpalOrderRaw() {
+		}
 
 		public OpalOrderRaw(RawCourseOrder order, CourseOrganizerOPAL courseOrganizer) {
 			for (var chapter : order.getChapterOrder()) {

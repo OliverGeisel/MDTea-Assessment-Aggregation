@@ -3,7 +3,9 @@ package de.olivergeisel.materialgenerator.finalization.export.opal;
 import de.olivergeisel.materialgenerator.finalization.export.DownloadManager;
 import de.olivergeisel.materialgenerator.finalization.export.Exporter;
 import de.olivergeisel.materialgenerator.finalization.export.ImageService;
+import de.olivergeisel.materialgenerator.finalization.export.opal.test.OPALTestExport;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourse;
+import de.olivergeisel.materialgenerator.generation.material.assessment.TestMaterial;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -52,9 +54,11 @@ import static de.olivergeisel.materialgenerator.finalization.export.opal.BasicEl
 public class OPAL_Exporter extends Exporter {
 
 	private static final Logger logger = LoggerFactory.getLogger(OPAL_Exporter.class);
+	private final OPALTestExport testExport;
 
-	public OPAL_Exporter(ImageService imageService) {
+	public OPAL_Exporter(ImageService imageService, OPALTestExport testExport) {
 		super(imageService);
+		this.testExport = testExport;
 	}
 
 	/**
@@ -95,6 +99,18 @@ public class OPAL_Exporter extends Exporter {
 		createExportFile(exportDirectory, "learninggroupexport");
 		createExportFile(exportDirectory, "rightgroupexport");
 		createRepoFile(exportDirectory, rawCourse);
+	}
+
+	/**
+	 * Exports the test to the desired format.
+	 *
+	 * @param testMaterial the test to be exported
+	 * @param tempDir      the directory where the test should be exported to. Normally a temporary directory.
+	 * @return the zip file containing the test
+	 */
+	public void exportTest(TestMaterial testMaterial, File tempDir) {
+		var testInfo = new OPAlTestMaterialInfo(testMaterial);
+		testExport.createTestSingle(testInfo, tempDir);
 	}
 
 	private void writeBasicDirectories(File directory) {

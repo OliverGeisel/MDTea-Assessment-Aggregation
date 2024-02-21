@@ -31,7 +31,7 @@ class OPALGroupInfo extends GroupOrder
 	}
 
 	public void createMaterials(File targetDirectory) {
-		// todo change inner parts to a collection (tasks and groups)
+		// todo change inner parts to a collection (itemConfigurations and groups)
 			/*var groupDirectory = new File(targetDirectory, groupName);
 			if (!groupDirectory.exists()) {
 				groupDirectory.mkdirs();

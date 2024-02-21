@@ -23,7 +23,7 @@ import static de.olivergeisel.materialgenerator.finalization.export.ExportUtils.
  * @since 1.1.0
  */
 @Getter
-class OPALMaterialInfo extends Material {
+public class OPALMaterialInfo extends Material {
 
 	private static final String FILE_ENDING = ".html";
 

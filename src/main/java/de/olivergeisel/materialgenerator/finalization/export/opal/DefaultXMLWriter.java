@@ -36,7 +36,7 @@ public class DefaultXMLWriter {
 		} catch (TransformerException e) {
 			logger.error("Error while creating XML!");
 		}
-		logger.info("XML-File created!");
+		logger.info(STR."XML-File \{fileName}.xml created!");
 		return result;
 	}
 }

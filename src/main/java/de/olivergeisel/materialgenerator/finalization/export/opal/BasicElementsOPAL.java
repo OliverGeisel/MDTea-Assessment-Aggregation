@@ -94,6 +94,13 @@ public class BasicElementsOPAL {
 		return moduleConfig;
 	}
 
+	public static Element createElementWithAttribute(Document doc, String name, String attributeName,
+			String attributeValue) {
+		var element = doc.createElement(name);
+		element.setAttribute(attributeName, attributeValue);
+		return element;
+	}
+
 	public static String escapeTags(String text) {
 		return text.replace("<", "&lt;").replace(">", "&gt;");
 	}

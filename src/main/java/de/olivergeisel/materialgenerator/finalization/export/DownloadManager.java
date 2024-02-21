@@ -80,6 +80,27 @@ public class DownloadManager {
 	}
 
 
+	private void createTestInZip(TestMaterial testMaterial, HttpServletResponse response, OPAL_Exporter exporter) {
+		File tempDir = null;
+		File zipFile = null;
+		var name = testMaterial.getName();
+		try {
+			tempDir = zipService.createTempDirectory();
+			exporter.exportTest(testMaterial, tempDir);
+			zipFile = zipService.createZipArchive(name, tempDir);
+			writeZipFileToResponse(name, zipFile, response);
+		} catch (IOException e) {
+			logger.error(e.toString());
+		} finally {
+			try {
+				zipService.cleanupTemporaryFiles(tempDir, zipFile);
+			} catch (IOException e) {
+				logger.error(e.toString());
+			}
+		}
+	}
+
+
 	/**
 	 * Final step to write the zip file to the (http-)response
 	 *
@@ -146,6 +167,14 @@ public class DownloadManager {
 		};
 		createCourseInZip(name, templateSetName, course, response, exporter);
 	}
+
+	public void downloadTest(Material material, HttpServletResponse response) throws IllegalArgumentException {
+		if (!(material instanceof TestMaterial testMaterial)) {
+			throw new IllegalArgumentException("Material is not a TestMaterial");
+		}
+		createTestInZip(testMaterial, response, opalExporter);
+	}
+
 
 	/**
 	 * The supported export formats for the course. The matching exporter is used to create the zip file.
