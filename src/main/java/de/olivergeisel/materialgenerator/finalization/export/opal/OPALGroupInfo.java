@@ -32,7 +32,12 @@ class OPALGroupInfo extends GroupOrder
 			tasks.add(newTask);
 		}
 		for (var complex : group.getComplexMaterials()) {
-			complexMaterialInfos.add(new OPALComplexMaterialInfo<>(complex, courseOrganizer));
+			if (complex instanceof TestMaterial testMaterial) {
+				var testInfo = new OPAlTestMaterialInfo(testMaterial, courseOrganizer);
+				complexMaterialInfos.add(testInfo);
+			} else {
+				complexMaterialInfos.add(new OPALComplexMaterialInfo<>(complex, courseOrganizer));
+			}
 		}
 	}
 

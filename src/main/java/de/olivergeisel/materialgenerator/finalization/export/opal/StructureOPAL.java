@@ -49,6 +49,15 @@ public class StructureOPAL {
 				children.appendChild(xmlTask);
 			}
 		}
+		if (collection instanceof OPALGroupInfo group) {
+			for (var complex : group.getComplexMaterialInfos()) {
+				if (complex instanceof OPAlTestMaterialInfo testMaterial) {
+					var testOPAL = new TestOPAL();
+					var testXML = testOPAL.createTreeTestOPAL(testMaterial, TREE_PARENT, doc);
+					children.appendChild(testXML);
+				}
+			}
+		}
 		root.appendChild(children);
 		root.appendChild(elementWithText(doc, "accessible", true));
 		root.appendChild(elementWithText(doc, "selected", false));
@@ -101,6 +110,15 @@ public class StructureOPAL {
 					var xmlTask = page.createRunStructureOPAL(material, RUN_TYPE, doc);
 					// Todo change to a file that is linked with the task
 					children.appendChild(xmlTask);
+				}
+			}
+			if (collection instanceof OPALGroupInfo group) {
+				for (var complex : group.getComplexMaterialInfos()) {
+					if (complex instanceof OPAlTestMaterialInfo testMaterial) {
+						var testOPAL = new TestOPAL();
+						var testXML = testOPAL.createRunTestOPAL(testMaterial, RUN_TYPE, doc);
+						children.appendChild(testXML);
+					}
 				}
 			}
 		}
