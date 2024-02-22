@@ -106,7 +106,6 @@ public class OPAL_Exporter extends Exporter {
 	 *
 	 * @param testMaterial the test to be exported
 	 * @param tempDir      the directory where the test should be exported to. Normally a temporary directory.
-	 * @return the zip file containing the test
 	 */
 	public void exportTest(TestMaterial testMaterial, File tempDir) {
 		var testInfo = new OPAlTestMaterialInfo(testMaterial);

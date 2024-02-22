@@ -6,6 +6,8 @@ import de.olivergeisel.materialgenerator.finalization.export.opal.DefaultXMLWrit
 import de.olivergeisel.materialgenerator.finalization.export.opal.OPALComplexMaterialInfo;
 import de.olivergeisel.materialgenerator.finalization.export.opal.OPALMaterialInfo;
 import de.olivergeisel.materialgenerator.generation.material.assessment.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -28,11 +30,21 @@ import static de.olivergeisel.materialgenerator.finalization.export.opal.BasicEl
 @Service
 public class OPALTestExport {
 
+	private static final Logger logger = LoggerFactory.getLogger(OPALTestExport.class);
+
 	private final ZipService zipService;
 
+	public OPALTestExport() {this.zipService = new ZipService();}
 
 	public OPALTestExport(ZipService zipService) {this.zipService = zipService;}
 
+	public void completeExport(OPALComplexMaterialInfo<TestMaterial, OPALItemMaterialInfo> test, File targetDirectory) {
+		var zipFile = createZip(test);
+		var targetZipFile = new File(targetDirectory, "repo.zip");
+		zipService.writeTo(zipFile, targetZipFile);
+		// write zip to correct directory
+		createRepoXml(test, targetDirectory);
+	}
 
 	/**
 	 * Writes the test to the file system.
@@ -55,25 +67,27 @@ public class OPALTestExport {
 		}
 	}
 
-	private void createZip(OPALComplexMaterialInfo<TestMaterial, OPALItemMaterialInfo> test, File directory) {
-		File dir;
+	private File createZip(OPALComplexMaterialInfo<TestMaterial, OPALItemMaterialInfo> test) {
+		File tempDir;
 		try {
-			dir = Files.createTempDirectory("repo").toFile();
+			tempDir = Files.createTempDirectory("repo").toFile();
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			logger.error("Error while creating temporary directory");
+			throw new RuntimeException("Error while creating temporary directory");
 		}
 		// manifest
-		writeManifest(test, dir);
+		writeManifest(test, tempDir);
 		// write mainFile xml (test-xml)
-		writeTestXml(test, dir);
+		writeTestXml(test, tempDir);
 		// items
 		for (var item : test.getMaterialInfos()) {
-			writeItemXml(item, dir);
+			writeItemXml(item, tempDir);
 		}
 		try {
-			var zipFile = zipService.createZipArchive("repo.zip", directory);
+			return zipService.createZipArchive("repo.zip", tempDir);
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			logger.error(STR."Error while creating zip file for test \{test.getName()}");
+			throw new RuntimeException(STR."Error while creating zip file for test \{test.getName()}");
 		}
 	}
 
@@ -126,7 +140,7 @@ public class OPALTestExport {
 		itemSessionControl.setAttribute("maxAttempts", "1");
 		itemSessionControl.setAttribute("allowComment", "false");
 		testPart.appendChild(itemSessionControl);
-		// assessmentSection parts - TOdo is alway only one section in this state of the project
+		// assessmentSection parts - TOdo is always only one section in this state of the project
 		var assessmentSection = document.createElement("assessmentSection");
 		testPart.appendChild(assessmentSection);
 		var sectionId = UUID.randomUUID().toString();
@@ -308,7 +322,7 @@ public class OPALTestExport {
 	private void createRepoXml(OPALComplexMaterialInfo test, File targetDirectory) {
 		var document = newDocument();
 		var filePath = new File(targetDirectory, "repo.xml").getAbsolutePath();
-		var fileName = STR."\{test.getNodeId()}.zip";
+		var fileName = STR."Test.zip";
 		var root = document.createElement("RepositoryEntryProperties");
 		document.appendChild(root);
 		root.appendChild(elementWithText(document, "Softkey", "myolat_1_123456789"));
@@ -488,5 +502,4 @@ public class OPALTestExport {
 				</org.olat.repository.MetaDataElement>
 				</list>""";
 	}
-
 }

@@ -34,7 +34,7 @@ public class DefaultXMLWriter {
 		try {
 			transformer.transform(source, result);
 		} catch (TransformerException e) {
-			logger.error("Error while creating XML!");
+			logger.error(STR."Error while creating XML for \{fileName}!");
 		}
 		logger.info(STR."XML-File \{fileName}.xml created!");
 		return result;
