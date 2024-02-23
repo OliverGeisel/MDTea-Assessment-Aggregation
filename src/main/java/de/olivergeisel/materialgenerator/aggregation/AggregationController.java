@@ -382,7 +382,7 @@ public class AggregationController {
 
 	@PostMapping("top-level-scan/tasks")
 	String topLevelScanTasksPost(Model model, @ModelAttribute("process") AggregationProcess process,
-			TaskRequestForm form) {
+			ItemRequestForm form) {
 		if (process.getStepNumber() != 5) {
 			return "redirect:/aggregation/top-level-scan";
 		}
