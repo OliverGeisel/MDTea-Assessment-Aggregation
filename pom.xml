@@ -10,14 +10,15 @@
     </parent>
 
     <groupId>de.oliver-geisel</groupId>
-    <artifactId>MDTea-Assesment-Aggregation</artifactId>
+    <artifactId>MDTea-Assessment-Aggregation</artifactId>
     <version>1.1.0-SNAPSHOT</version>
     <name>MDTea - Assessment and Aggregation</name>
     <description>MDTea with a basic version of Aggregation, Generation and Finalization.
+        In 'Aggregation' you extract knowledge from different sources and bind into a knowledge model.
         The generator creates a material for a given plan.
         By selecting a TemplateSet and a plan the generator creates materials for the plan and build a raw course.
         You can edit the course. Reorder the chapters, groups or tasks. Or delete them.
-        If you finished editing the course you can be exported.
+        If you finished editing the course you can be exported. Supported formats are HTML and OPAL (OpenOLAT).
     </description>
     <developers>
         <developer>
@@ -28,7 +29,7 @@
             </roles>
         </developer>
     </developers>
-    <inceptionYear>2023</inceptionYear>
+    <inceptionYear>2024</inceptionYear>
 
     <properties>
         <java.version>21</java.version>
