@@ -3,7 +3,7 @@ package de.olivergeisel.materialgenerator.finalization.export.opal;
 import de.olivergeisel.materialgenerator.finalization.export.DownloadManager;
 import de.olivergeisel.materialgenerator.finalization.export.Exporter;
 import de.olivergeisel.materialgenerator.finalization.export.ImageService;
-import de.olivergeisel.materialgenerator.finalization.export.opal.test.OPALTestExport;
+import de.olivergeisel.materialgenerator.finalization.export.opal.test.OPALTestExporter;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourse;
 import de.olivergeisel.materialgenerator.generation.material.assessment.TestMaterial;
 import org.slf4j.Logger;
@@ -53,10 +53,10 @@ import static de.olivergeisel.materialgenerator.finalization.export.opal.BasicEl
 @Service
 public class OPAL_Exporter extends Exporter {
 
-	private static final Logger logger = LoggerFactory.getLogger(OPAL_Exporter.class);
-	private final OPALTestExport testExport;
+	private static final Logger           logger = LoggerFactory.getLogger(OPAL_Exporter.class);
+	private final        OPALTestExporter testExport;
 
-	public OPAL_Exporter(ImageService imageService, OPALTestExport testExport) {
+	public OPAL_Exporter(ImageService imageService, OPALTestExporter testExport) {
 		super(imageService);
 		this.testExport = testExport;
 	}

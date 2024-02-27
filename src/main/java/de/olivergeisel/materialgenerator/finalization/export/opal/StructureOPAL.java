@@ -99,6 +99,7 @@ public class StructureOPAL {
 			var children = doc.createElement("children");
 			children.setAttribute(CLASS, "linked-list");
 			root.appendChild(children);
+			// todo disable loop if nothing should be visible
 			for (var part : collection.getMaterialOrder()) {
 				if (part instanceof MaterialCollectionOPAL materialOrderCollection) {
 					var xmlGroup =

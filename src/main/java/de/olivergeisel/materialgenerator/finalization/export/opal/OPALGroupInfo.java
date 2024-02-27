@@ -1,6 +1,6 @@
 package de.olivergeisel.materialgenerator.finalization.export.opal;
 
-import de.olivergeisel.materialgenerator.finalization.export.opal.test.OPALTestExport;
+import de.olivergeisel.materialgenerator.finalization.export.opal.test.OPALTestExporter;
 import de.olivergeisel.materialgenerator.finalization.parts.GroupOrder;
 import de.olivergeisel.materialgenerator.finalization.parts.TaskOrder;
 import de.olivergeisel.materialgenerator.generation.material.assessment.TestMaterial;
@@ -50,7 +50,7 @@ class OPALGroupInfo extends GroupOrder
 		for (var task : tasks) {
 			task.createMaterials(targetDirectory);
 		}
-		var testExporter = new OPALTestExport();
+		var testExporter = new OPALTestExporter();
 		for (var complex : complexMaterialInfos) {
 			if (complex.getOriginalMaterial() instanceof TestMaterial) {
 				var dir = new File(targetDirectory, STR."../export/\{Long.toString(complex.getNodeId())}");

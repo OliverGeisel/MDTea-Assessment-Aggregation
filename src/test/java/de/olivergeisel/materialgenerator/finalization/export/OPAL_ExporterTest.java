@@ -1,7 +1,7 @@
 package de.olivergeisel.materialgenerator.finalization.export;
 
 import de.olivergeisel.materialgenerator.finalization.export.opal.OPAL_Exporter;
-import de.olivergeisel.materialgenerator.finalization.export.opal.test.OPALTestExport;
+import de.olivergeisel.materialgenerator.finalization.export.opal.test.OPALTestExporter;
 import de.olivergeisel.materialgenerator.finalization.parts.CourseMetadataFinalization;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourse;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourseOrder;
@@ -27,7 +27,7 @@ class OPAL_ExporterTest {
 	@BeforeEach
 	void setUp() {
 		var imageService = mock(ImageService.class);
-		var testExport = mock(OPALTestExport.class);
+		var testExport = mock(OPALTestExporter.class);
 		opalExporter = new OPAL_Exporter(imageService, testExport);
 	}
 

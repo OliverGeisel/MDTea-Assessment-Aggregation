@@ -5,6 +5,7 @@ import de.olivergeisel.materialgenerator.finalization.export.ZipService;
 import de.olivergeisel.materialgenerator.finalization.export.opal.DefaultXMLWriter;
 import de.olivergeisel.materialgenerator.finalization.export.opal.OPALComplexMaterialInfo;
 import de.olivergeisel.materialgenerator.finalization.export.opal.OPALMaterialInfo;
+import de.olivergeisel.materialgenerator.finalization.parts.RawCourse;
 import de.olivergeisel.materialgenerator.generation.material.assessment.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,17 +27,33 @@ import static de.olivergeisel.materialgenerator.finalization.export.opal.BasicEl
 
 /**
  * Management for exporting a test to the OPAL platform.
+ *
+ * <p>
+ * There are two ways to export a test:
+ * <ul>
+ *     <li>Export the test without a course</li>
+ *     <li>Export the test with a course</li>
+ *     </ul>
+ *     The first option is used to export a test without a course. The second option is used to export a test with a course.
+ *
+ * @author Oliver Geisel
+ * @version 1.1.0
+ * @see OPALComplexMaterialInfo
+ * @see OPALMaterialInfo
+ * @see ZipService
+ * @see RawCourse
+ * @since 1.1.0
  */
 @Service
-public class OPALTestExport {
+public class OPALTestExporter {
 
-	private static final Logger logger = LoggerFactory.getLogger(OPALTestExport.class);
+	private static final Logger logger = LoggerFactory.getLogger(OPALTestExporter.class);
 
 	private final ZipService zipService;
 
-	public OPALTestExport() {this.zipService = new ZipService();}
+	public OPALTestExporter() {this.zipService = new ZipService();}
 
-	public OPALTestExport(ZipService zipService) {this.zipService = zipService;}
+	public OPALTestExporter(ZipService zipService) {this.zipService = zipService;}
 
 	public void completeExport(OPALComplexMaterialInfo<TestMaterial, OPALItemMaterialInfo> test, File targetDirectory) {
 		var zipFile = createZip(test);
@@ -325,7 +342,7 @@ public class OPALTestExport {
 		var fileName = STR."Test.zip";
 		var root = document.createElement("RepositoryEntryProperties");
 		document.appendChild(root);
-		root.appendChild(elementWithText(document, "Softkey", "myolat_1_123456789"));
+		root.appendChild(elementWithText(document, "Softkey", STR."myolat_\{test.getNodeId()}"));
 		root.appendChild(elementWithText(document, "ResourceName", fileName));
 		root.appendChild(elementWithText(document, "DisplayName", test.getName()));
 		var description = document.createElement("Description");
