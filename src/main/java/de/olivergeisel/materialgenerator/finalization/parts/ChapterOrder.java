@@ -109,6 +109,8 @@ public class ChapterOrder extends MaterialOrderCollection {
 		return groupOrder.stream().mapToInt(GroupOrder::materialCount).sum();
 	}
 
+	//region setter/getter
+
 	/**
 	 * Assigns a set of materials to the parts.
 	 *
@@ -172,8 +174,10 @@ public class ChapterOrder extends MaterialOrderCollection {
 	public Spliterator<MaterialOrderPart> spliterator() {
 		return groupOrder.stream().map(it -> (MaterialOrderPart) it).spliterator();
 	}
-
-	//region setter/getter
+	@Override
+	public List<Material> getMaterials() {
+		return groupOrder.stream().map(GroupOrder::getMaterials).flatMap(Collection::stream).toList();
+	}
 
 	/**
 	 * Get the relevance of the chapter.

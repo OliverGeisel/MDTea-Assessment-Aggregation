@@ -151,6 +151,8 @@ public class GroupOrder extends MaterialOrderCollection {
 		return taskOrder.stream().mapToInt(TaskOrder::materialCount).sum();
 	}
 
+	//region setter/getter
+
 	@Override
 	public boolean remove(UUID partId) {
 		if (taskOrder.stream().anyMatch(it -> it.getId().equals(partId))) {
@@ -182,8 +184,10 @@ public class GroupOrder extends MaterialOrderCollection {
 	public Spliterator<MaterialOrderPart> spliterator() {
 		return taskOrder.stream().map(it -> (MaterialOrderPart) it).spliterator();
 	}
-
-	//region setter/getter
+	@Override
+	public List<Material> getMaterials() {
+		return taskOrder.stream().map(TaskOrder::getMaterials).flatMap(Collection::stream).toList();
+	}
 
 	/**
 	 * Get the relevance of this part.

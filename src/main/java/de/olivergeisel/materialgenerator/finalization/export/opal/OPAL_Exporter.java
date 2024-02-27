@@ -6,6 +6,8 @@ import de.olivergeisel.materialgenerator.finalization.export.ImageService;
 import de.olivergeisel.materialgenerator.finalization.export.opal.test.OPALTestExporter;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourse;
 import de.olivergeisel.materialgenerator.generation.material.assessment.TestMaterial;
+import de.olivergeisel.materialgenerator.generation.material.transfer.ExampleMaterial;
+import de.olivergeisel.materialgenerator.generation.material.transfer.ImageMaterial;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -90,6 +92,23 @@ public class OPAL_Exporter extends Exporter {
 		// materials
 		var courseDir = new File(targetDirectory, "coursefolder");
 		organizer.creatMaterials(courseDir);
+		// write images
+		organizer.getOriginalCourse().getMaterials().stream()
+				 .filter(it -> it instanceof ImageMaterial)
+				 .forEach(material -> {
+					 var imageMaterial = (ImageMaterial) material;
+					 copyImage(imageMaterial.getImageName(), courseDir);
+				 });
+
+		organizer.getOriginalCourse().getMaterials().stream()
+				 .filter(it -> it instanceof ExampleMaterial)
+				 .forEach(material -> {
+					 var exampleMaterial = (ExampleMaterial) material;
+					 if (exampleMaterial.isImageExample()) {
+						 copyImage(exampleMaterial.getImageName(), courseDir);
+					 }
+				 });
+
 		// config
 		writeCourseConfig(targetDirectory);
 		writeEditorTreeModel(targetDirectory, organizer);

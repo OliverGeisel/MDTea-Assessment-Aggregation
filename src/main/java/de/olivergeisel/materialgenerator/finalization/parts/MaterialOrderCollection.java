@@ -30,11 +30,11 @@ import java.util.*;
 public abstract class MaterialOrderCollection extends MaterialOrderPart implements Iterable<MaterialOrderPart> {
 
 	@ElementCollection
-	private final List<String>          alias            = new ArrayList<>(); // KnowledgeObject (Structure) ids
-	@ManyToMany(cascade = CascadeType.ALL)
-	private       List<ComplexMaterial> complexMaterials = new ArrayList<>();
+	private List<String>          alias            = new ArrayList<>(); // KnowledgeObject (Structure) ids
+	@ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	private List<ComplexMaterial> complexMaterials = new ArrayList<>();
 	@ManyToOne(cascade = CascadeType.ALL)
-	private       Topic                 topic;
+	private Topic                 topic;
 
 	protected MaterialOrderCollection() {
 		super();
@@ -63,6 +63,11 @@ public abstract class MaterialOrderCollection extends MaterialOrderPart implemen
 
 	public abstract Relevance updateRelevance();
 
+	/**
+	 * Returns the number of materials that are assigned to this, and it's containing parts.
+	 *
+	 * @return number of materials
+	 */
 	public abstract int materialCount();
 
 	/**
@@ -256,6 +261,14 @@ public abstract class MaterialOrderCollection extends MaterialOrderPart implemen
 	public abstract Collection<NameAndId> collectionsNameAndId();
 
 	//region setter/getter
+
+	/**
+	 * Returns a List of all Materials that are assigned to this, and it's containing parts. The list is unmodifiable.
+	 *
+	 * @return list of materials
+	 */
+	public abstract List<Material> getMaterials();
+
 	public List<ComplexMaterial> getComplexMaterials() {
 		return complexMaterials;
 	}
@@ -266,16 +279,16 @@ public abstract class MaterialOrderCollection extends MaterialOrderPart implemen
 		return topic;
 	}
 
+	public void setTopic(Topic topic) {
+		this.topic = topic;
+	}
+
 	/**
 	 * Get all ids of the parts in the collection. First it returns its own id, then it returns the ids of all parts.
 	 *
 	 * @return list of ids
 	 */
 	public abstract List<UUID> getCollectionIds();
-
-	public void setTopic(Topic topic) {
-		this.topic = topic;
-	}
 
 	/**
 	 * Returns a list of all aliases of this part. The order of the list say what is the most important alias

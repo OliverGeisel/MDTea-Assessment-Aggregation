@@ -67,12 +67,16 @@ class MaterialOrderCollectionTest {
 				return null;
 			}
 
+//region setter/getter
+
 			@Override
 			public MaterialOrderPart find(UUID id) {
 				return null;
 			}
-
-//region setter/getter
+			@Override
+			public List<Material> getMaterials() {
+				return null;
+			}
 			@Override
 			public Relevance getRelevance() {
 				return null;

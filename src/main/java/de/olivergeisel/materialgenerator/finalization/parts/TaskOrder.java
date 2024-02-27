@@ -208,8 +208,14 @@ public class TaskOrder extends MaterialOrderCollection {
 		};
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @return {@inheritDoc}
+	 */
+	@Override
 	public List<Material> getMaterials() {
-		return materialOrder;
+		return Collections.unmodifiableList(materialOrder);
 	}
 //endregion
 

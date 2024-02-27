@@ -8,10 +8,7 @@ import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
 import de.olivergeisel.materialgenerator.generation.material.assessment.ItemMaterial;
 import jakarta.persistence.*;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -87,6 +84,8 @@ public class RawCourse extends Course {
 		return rawCourseOrder.materialCount();
 	}
 
+	//region setter/getter
+
 	/**
 	 * Change the plan. THis will also change the course order. Materials must be reassigned.
 	 */
@@ -94,8 +93,14 @@ public class RawCourse extends Course {
 		setPlanId(plan.getId());
 		// Todo change rawCourseOrder
 	}
-
-	//region setter/getter
+	/**
+	 * Get the materials that are assigned to this course.
+	 *
+	 * @return An unmodifiable materials that are assigned to this course
+	 */
+	public List<Material> getMaterials() {
+		return rawCourseOrder.getMaterials();
+	}
 	public Set<Material> getUnassignedMaterials() {return unassignedMaterials;}
 
 	/**

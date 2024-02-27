@@ -78,7 +78,14 @@ public abstract class Exporter {
 	 */
 	public abstract void export(RawCourse rawCourse, String templateSetName, File targetDirectory) throws IOException;
 
-	protected void loadImage(String image, File outputDir) {
+	/**
+	 * Copy an image from the {@link ImageService} to the output directory.
+	 * If the image does not exist, a warning is logged.
+	 *
+	 * @param image     the name of the image
+	 * @param outputDir the output directory
+	 */
+	protected void copyImage(String image, File outputDir) {
 		try {
 			var imageFile = getImage(image);
 			Files.copy(imageFile.getInputStream(), new File(outputDir, image).toPath(),
@@ -88,6 +95,12 @@ public abstract class Exporter {
 		}
 	}
 
+	/**
+	 * Get an image from the {@link ImageService}.
+	 * @param name the name of the image
+	 * @return the image
+	 * @throws StorageFileNotFoundException if the image does not exist
+	 */
 	protected Resource getImage(String name) throws StorageFileNotFoundException {
 		return imageService.loadAsResource(name);
 	}

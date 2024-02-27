@@ -141,6 +141,20 @@ public class RawCourseOrder extends CourseOrder {
 		}
 		return back;
 	}
+
+	/**
+	 * Get the materials that are assigned to this course.
+	 *
+	 * @return An unmodifiable materials that are assigned to this course
+	 */
+	public List<Material> getMaterials() {
+
+		var res = chapterOrder.stream().map(ChapterOrder::getMaterials).reduce(new LinkedList<>(), (a, b) -> {
+			a.addAll(b);
+			return a;
+		});
+		return Collections.unmodifiableList(res);
+	}
 //endregion
 
 	@Override
