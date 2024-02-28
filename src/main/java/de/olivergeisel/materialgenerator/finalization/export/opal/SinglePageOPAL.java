@@ -6,8 +6,7 @@ import org.w3c.dom.Element;
 
 import static de.olivergeisel.materialgenerator.finalization.export.opal.BasicElementsOPAL.FileCreationType.RUN;
 import static de.olivergeisel.materialgenerator.finalization.export.opal.BasicElementsOPAL.FileCreationType.TREE;
-import static de.olivergeisel.materialgenerator.finalization.export.opal.BasicElementsOPAL.createEntry;
-import static de.olivergeisel.materialgenerator.finalization.export.opal.BasicElementsOPAL.elementWithText;
+import static de.olivergeisel.materialgenerator.finalization.export.opal.BasicElementsOPAL.*;
 
 
 /**
@@ -21,7 +20,7 @@ import static de.olivergeisel.materialgenerator.finalization.export.opal.BasicEl
  */
 public class SinglePageOPAL {
 
-	private static final String RUN_TYPE     = "org.olat.course.nodes.STCourseNode";
+	private static final String RUN_TYPE = "org.olat.course.nodes.SPCourseNode";
 	private static final String TREE_TYPE    = "cn";
 	private static final String TREE_CLASS   = "org.olat.course.nodes.SPCourseNode";
 	private static final String TREE_ELEMENT = "org.olat.course.tree.CourseEditorTreeNode";
@@ -104,7 +103,11 @@ public class SinglePageOPAL {
 		title.setTextContent(material.getName());
 		root.appendChild(title);
 		root.appendChild(createModuleConfiguration(doc, material.completeFileName()));
-		// TODO Skip preconditions at moment. can be added later maybe
+		root.appendChild(createPreConditionVisibility(doc));
+		root.appendChild(createPreConditionAccess(doc));
+		root.appendChild(emptyElement(doc, "additionalConditions"));
+		root.appendChild(createPreConditionR(doc));
+		root.appendChild(createPreConditionRW(doc));
 		return root;
 	}
 

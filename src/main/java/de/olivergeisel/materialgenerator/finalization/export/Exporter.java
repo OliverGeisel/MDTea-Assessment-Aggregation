@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 
@@ -103,6 +105,42 @@ public abstract class Exporter {
 	 */
 	protected Resource getImage(String name) throws StorageFileNotFoundException {
 		return imageService.loadAsResource(name);
+	}
+
+	/**
+	 * Saves the include-folder of the template set to the output directory.
+	 *
+	 * @param outputDir   The directory to save the includes to.
+	 * @param templateSet Name of the template set.
+	 */
+	protected void saveIncludes(File outputDir, String templateSet) throws URISyntaxException {
+		var classloader = this.getClass().getClassLoader();
+		var classPathRoot = classloader.getResource("").toURI();
+		var includeURI = classPathRoot.resolve(STR."templateSets/\{templateSet}/include");
+		var outPath = outputDir.toPath();
+		File sourceCopy = new File(includeURI);
+		if (!sourceCopy.exists()) {
+			logger.info(STR."No includes found for template set \{templateSet}");
+			return;
+		}
+		var copyPath = sourceCopy.toPath();
+		var out = outPath.resolve(copyPath.relativize(copyPath));
+		try (var files = Files.walk(copyPath)) {
+			files.forEach(source -> {
+				try {
+					Path destination = out.resolve(copyPath.relativize(source));
+					if (Files.isDirectory(source)) {
+						Files.createDirectories(destination);
+					} else {
+						Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
+					}
+				} catch (IOException e) {
+					logger.warn(e.toString());
+				}
+			});
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

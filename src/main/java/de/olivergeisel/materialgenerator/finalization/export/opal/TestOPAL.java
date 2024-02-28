@@ -87,8 +87,10 @@ public class TestOPAL {
 		root.appendChild(elementWithText(doc, "learningObjectives", escapeTags(test.getDescription())));
 		root.appendChild(elementWithText(doc, "displayOption", "title+description+content"));
 		root.appendChild(createDefaultTestModuleConfiguration(STR."myolat_\{test.getNodeId()}", doc));
+		root.appendChild(createNoAccessExplanation(doc));
 		root.appendChild(createPreConditionVisibility(doc));
 		root.appendChild(createPreConditionAccess(doc));
+		root.appendChild(emptyElement(doc, "additionalConditions"));
 		root.appendChild(createPreConditionVisibilityTestRun(doc));
 		root.appendChild(createPreConditionVisibilityAssessment(doc));
 		root.appendChild(createPreConditionVisibilityResults(doc));

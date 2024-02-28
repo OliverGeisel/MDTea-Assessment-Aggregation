@@ -52,6 +52,7 @@ public class OPALMaterialInfo extends Material {
 		var context = courseOrganizer.getContext();
 		context.setVariable("material", originalMaterial);
 		context.setVariable("title", relatedTaskName);
+		context.setVariable("rootPath", ".");
 		String htmlString = courseOrganizer.getTemplateEngine().process(materialType(), context);
 		// todo think about using the node id
 		saveToFile(htmlString, targetDirectory, completeFileName());

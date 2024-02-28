@@ -113,9 +113,10 @@ public class OPALTestExporter {
 		var root = document.createElement("assessmentTest");
 		root.setAttribute("xmlns", "http://www.imsglobal.org/xsd/imsqti_v2p1");
 		root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-		root.setAttribute("xsi:schemaLocation",
-				"http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/qti/qtiv2p1/imsqti_v2p1p1.xsd");
-		root.setAttribute("identifier", Long.toString(test.getNodeId()));
+		root.setAttribute("xsi:schemaLocation", """
+				http://www.imsglobal.org/xsd/imsqti_v2p1
+				http://www.imsglobal.org/xsd/qti/qtiv2p1/imsqti_v2p1p1.xsd""");
+		root.setAttribute("identifier", STR."\{test.getNodeId()}");
 		root.setAttribute("title", test.getName());
 		document.appendChild(root);
 		// outcome score
@@ -185,7 +186,7 @@ public class OPALTestExporter {
 
 	private Element createAssessmentItemRef(Document document, OPALMaterialInfo item) {
 		var assessmentItemRef = document.createElement("assessmentItemRef");
-		assessmentItemRef.setAttribute("identifier", Long.toString(item.getNodeId()));
+		assessmentItemRef.setAttribute("identifier", STR."\{item.getNodeId()}");
 		assessmentItemRef.setAttribute("href", STR."\{item.getNodeId()}.xml");
 		assessmentItemRef.setAttribute("fixed", "false");
 		return assessmentItemRef;
@@ -199,11 +200,16 @@ public class OPALTestExporter {
 		root.setAttribute("xmlns", "http://www.imsglobal.org/xsd/imscp_v1p1");
 		root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
 		root.setAttribute("xsi:schemaLocation", """
-				http://www.imsglobal.org/xsd/imscp_v1p1 http://www.imsglobal.org/xsd/qti/qtiv2p1/qtiv2p1_imscpv1p2_v1p0.xsd
-				http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/qti/qtiv2p1/imsqti_v2p1p1.xsd
-				http://www.imsglobal.org/xsd/imsqti_metadata_v2p1 http://www.imsglobal.org/xsd/qti/qtiv2p1/imsqti_metadata_v2p1p1.xsd
-				http://ltsc.ieee.org/xsd/LOM http://www.imsglobal.org/xsd/imsmd_loose_v1p3p2.xsd
-				http://www.w3.org/1998/Math/MathML http://www.w3.org/Math/XMLSchema/mathml2/mathml2.xsd""");
+				http://www.imsglobal.org/xsd/imscp_v1p1
+				http://www.imsglobal.org/xsd/qti/qtiv2p1/qtiv2p1_imscpv1p2_v1p0.xsd
+				http://www.imsglobal.org/xsd/imsqti_v2p1
+				http://www.imsglobal.org/xsd/qti/qtiv2p1/imsqti_v2p1p1.xsd
+				http://www.imsglobal.org/xsd/imsqti_metadata_v2p1
+				http://www.imsglobal.org/xsd/qti/qtiv2p1/imsqti_metadata_v2p1p1.xsd
+				http://ltsc.ieee.org/xsd/LOM
+				http://www.imsglobal.org/xsd/imsmd_loose_v1p3p2.xsd
+				http://www.w3.org/1998/Math/MathML
+				http://www.w3.org/Math/XMLSchema/mathml2/mathml2.xsd""");
 		root.setAttribute("identifier", STR."\{test.getNodeId()}_mainfest");
 		var metadata = document.createElement("metadata");
 		root.appendChild(metadata);
@@ -216,7 +222,7 @@ public class OPALTestExporter {
 		var items = new LinkedList<Element>();
 		for (var item : test.getMaterialInfos()) {
 			var itemElement = document.createElement("resource");
-			itemElement.setAttribute("identifier", Long.toString(item.getNodeId()));
+			itemElement.setAttribute("identifier", STR."\{item.getNodeId()}");
 			itemElement.setAttribute("type", "imsqti_item_xmlv2p1");
 			itemElement.setAttribute("href", STR."\{item.getNodeId()}.xml");
 			itemElement.appendChild(
@@ -225,9 +231,9 @@ public class OPALTestExporter {
 		}
 		// main resource
 		var mainResource = document.createElement("resource");
-		mainResource.setAttribute("identifier", Long.toString(test.getNodeId()));
+		mainResource.setAttribute("identifier", STR."\{test.getNodeId()}");
 		mainResource.setAttribute("type", "imsqti_test_xmlv2p1");
-		mainResource.setAttribute("href", test.getNodeId() + ".xml");
+		mainResource.setAttribute("href", STR."\{test.getNodeId()}.xml");
 		metadata = document.createElement("metadata");
 		mainResource.appendChild(metadata);
 		// lom
@@ -235,7 +241,7 @@ public class OPALTestExporter {
 		metadata.appendChild(lom);
 		var general = document.createElement("general");
 		var identifier = document.createElement("identifier");
-		identifier.appendChild(elementWithText(document, "entry", test.getNodeId()));
+		identifier.appendChild(elementWithText(document, "entry", STR."\{test.getNodeId()}"));
 		general.appendChild(identifier);
 		var title = document.createElement("title");
 		title.appendChild(elementWithText(document, "string", test.getName()));
@@ -251,13 +257,14 @@ public class OPALTestExporter {
 		lom.appendChild(lifecycle);
 		var contribute = document.createElement("contribute");
 		lifecycle.appendChild(contribute);
+		// first entity
 		var entity = document.createElement("entity");
 		contribute.appendChild(entity);
 		var card = URLEncoder.encode(createVCardString(), StandardCharsets.UTF_8);
 		entity.appendChild(document.createCDATASection(card));
 		var date = document.createElement("date");
 		date.appendChild(elementWithText(document, "dateTime",
-				LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
+				LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))));
 		contribute.appendChild(date);
 		var role = document.createElement("role");
 		role.appendChild(elementWithText(document, "source", "LOMv1.0"));
@@ -265,12 +272,13 @@ public class OPALTestExporter {
 		contribute.appendChild(role);
 		var secondContribute = document.createElement("contribute");
 		lifecycle.appendChild(secondContribute);
+		// second entity
 		var secondEntity = document.createElement("entity");
 		secondContribute.appendChild(secondEntity);
 		secondEntity.appendChild(document.createCDATASection(card));
 		var secondDate = document.createElement("date");
 		secondDate.appendChild(elementWithText(document, "dateTime",
-				LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
+				LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))));
 		secondContribute.appendChild(secondDate);
 		var secondRole = document.createElement("role");
 		secondRole.appendChild(elementWithText(document, "source", "LOMv1.0"));
@@ -279,7 +287,7 @@ public class OPALTestExporter {
 		var educational = document.createElement("educational");
 		lom.appendChild(educational);
 		var learningResourceType = document.createElement("learningResourceType");
-		learningResourceType.appendChild(elementWithText(document, "source", "LOMv1.0"));
+		learningResourceType.appendChild(elementWithText(document, "source", "QTIv2.1"));
 		learningResourceType.appendChild(elementWithText(document, "value", "ExaminationTest"));
 		educational.appendChild(learningResourceType);
 		var qtiMeta = document.createElement("qtiMetadata");
@@ -287,7 +295,7 @@ public class OPALTestExporter {
 		qtiMeta.appendChild(elementWithText(document, "toolName", "MDTea-Prototype"));
 		qtiMeta.appendChild(elementWithText(document, "toolVersion", "1.1.0"));
 		qtiMeta.appendChild(elementWithText(document, "toolVendor", "MDTea"));
-		educational.appendChild(qtiMeta);
+		lom.appendChild(qtiMeta);
 		var technical = document.createElement("technical");
 		technical.appendChild(elementWithText(document, "location", ""));
 		lom.appendChild(technical);
@@ -297,7 +305,7 @@ public class OPALTestExporter {
 		for (var item : test.getMaterialInfos()) {
 			var dependency =
 					createElementWithAttribute(document, "dependency", "identifierref",
-							Long.toString(item.getNodeId()));
+							STR."\{item.getNodeId()}");
 			mainResource.appendChild(dependency);
 		}
 		// add to resources
@@ -339,15 +347,14 @@ public class OPALTestExporter {
 	private void createRepoXml(OPALComplexMaterialInfo test, File targetDirectory) {
 		var document = newDocument();
 		var filePath = new File(targetDirectory, "repo.xml").getAbsolutePath();
-		var fileName = STR."Test.zip";
+		var fileName = STR."\{test.getNodeId()}.zip";
 		var root = document.createElement("RepositoryEntryProperties");
 		document.appendChild(root);
 		root.appendChild(elementWithText(document, "Softkey", STR."myolat_\{test.getNodeId()}"));
 		root.appendChild(elementWithText(document, "ResourceName", fileName));
 		root.appendChild(elementWithText(document, "DisplayName", test.getName()));
 		var description = document.createElement("Description");
-		description.appendChild(
-				document.createCDATASection(test.getCourseOrganizer().getMeta().getDescription().orElse("")));
+		description.appendChild(document.createCDATASection(test.getOriginalMaterial().getDescription()));
 		root.appendChild(description);
 		root.appendChild(elementWithText(document, "InitialAuthor",
 				test.getCourseOrganizer().getMeta().getOtherInfos().getOrDefault("author", "")));
@@ -369,7 +376,6 @@ public class OPALTestExporter {
 	}
 
 	private String metaString(Document doc, OPALComplexMaterialInfo test) {
-		var metadata = doc.createElement("Metadata");
 		final var creationDate = LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 		var time = creationDate.format(formatter);
@@ -380,12 +386,13 @@ public class OPALTestExporter {
 		var version = otherInfos.getOrDefault("version", "0");
 		var author = otherInfos.getOrDefault("author", "");
 		var description = doc.createCDATASection(meta.getDescription().orElse(""));
-		var id = test.getNodeId();
+		var id = STR."\{test.getNodeId()}";
 		var testName = test.getName();
-		var fileName = STR."\{test.getNodeId()}.zip"; // todo normally Test.zip
+		var fileName = STR."\{test.getNodeId()}.zip"; // normally Test.zip
 		var license = "";
 		var link = "";
-		return STR."""
+		// Todo disabled while unknown bug for import with course
+		var t = STR."""
 				<list>
 				<org.olat.repository.MetaDataElement>
 				<creationDate class="sql-timestamp">\{time}</creationDate>
@@ -518,5 +525,6 @@ public class OPALTestExporter {
 				<metagroup>NAME</metagroup>
 				</org.olat.repository.MetaDataElement>
 				</list>""";
+		return "";
 	}
 }

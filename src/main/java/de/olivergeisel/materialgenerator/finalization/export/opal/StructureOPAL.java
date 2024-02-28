@@ -99,7 +99,7 @@ public class StructureOPAL {
 			var children = doc.createElement("children");
 			children.setAttribute(CLASS, "linked-list");
 			root.appendChild(children);
-			// todo disable loop if nothing should be visible
+			// todo disable loop if nothing should be visible in OPAL for public
 			for (var part : collection.getMaterialOrder()) {
 				if (part instanceof MaterialCollectionOPAL materialOrderCollection) {
 					var xmlGroup =
@@ -139,7 +139,9 @@ public class StructureOPAL {
 		displayOptions.setTextContent("title+desc+content");
 		}
 		root.appendChild(createDefaultModuleConfiguration(doc));
-		// Todo add other tags fo precondition
+		root.appendChild(createPreConditionVisibility(doc));
+		root.appendChild(createPreConditionAccess(doc));
+		root.appendChild(emptyElement(doc, "additionalConditions"));
 		var scoreCalc = doc.createElement("scoreCalculator");
 		root.appendChild(scoreCalc);
 		scoreCalc.appendChild(elementWithText(doc, "expertMode", false));

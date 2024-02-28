@@ -20,6 +20,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -108,6 +109,12 @@ public class OPAL_Exporter extends Exporter {
 						 copyImage(exampleMaterial.getImageName(), courseDir);
 					 }
 				 });
+		// copy include files
+		try {
+			saveIncludes(courseDir, organizer.getOriginalCourse().getTemplateName());
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
 
 		// config
 		writeCourseConfig(targetDirectory);

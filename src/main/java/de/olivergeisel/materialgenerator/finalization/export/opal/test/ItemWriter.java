@@ -10,7 +10,7 @@ import java.io.File;
 import static de.olivergeisel.materialgenerator.finalization.export.opal.BasicElementsOPAL.*;
 
 /**
- * This class is responsible for writing the item to the file system.
+ * This class is responsible for writing the item as a xml-file to the file system.
  *
  * @param <T> The type of the {@link ItemMaterial}.
  * @author Oliver Geisel
@@ -25,9 +25,11 @@ public abstract class ItemWriter<I extends ItemMaterial, T extends OPALItemMater
 		var root = document.createElement("assessmentItem");
 		root.setAttribute("xmlns", "http://www.imsglobal.org/xsd/imsqti_v2p1");
 		root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-		root.setAttribute("xsi:schemaLocation",
-				"http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/qti/qtiv2p1/imsqti_v2p1p1.xsd "
-				+ "http://www.w3.org/1998/Math/MathML http://www.w3.org/Math/XMLSchema/mathml2/mathml2.xsd");
+		root.setAttribute("xsi:schemaLocation", """
+				http://www.imsglobal.org/xsd/imsqti_v2p1
+				http://www.imsglobal.org/xsd/qti/qtiv2p1/imsqti_v2p1p1.xsd
+				http://www.w3.org/1998/Math/MathML
+				http://www.w3.org/Math/XMLSchema/mathml2/mathml2.xsd""");
 		root.setAttribute("identifier", Long.toString(item.getNodeId()));
 		root.setAttribute("title", item.getOriginalMaterial().getName());
 		root.setAttribute("adaptive", "false");
@@ -97,18 +99,20 @@ public abstract class ItemWriter<I extends ItemMaterial, T extends OPALItemMater
 		var isNull = document.createElement("isNull");
 		responseIf.appendChild(isNull);
 		var variable = document.createElement("variable");
+		variable.setAttribute("identifier", "RESPONSE_1");
 		responseIf.appendChild(variable);
 		var elseIf = document.createElement("responseElseIf");
 		responseCondition.appendChild(elseIf);
 		var match = document.createElement("match");
 		elseIf.appendChild(match);
 		var variable2 = document.createElement("variable");
-		match.setAttribute("identifier", "RESPONSE_1");
+		variable2.setAttribute("identifier", "RESPONSE_1");
 		match.appendChild(variable2);
 		var correct = document.createElement("correct");
 		correct.setAttribute("identifier", "RESPONSE_1");
 		match.appendChild(correct);
 		var setOutcomeValue = document.createElement("setOutcomeValue");
+		setOutcomeValue.setAttribute("identifier", "SCORE");
 		elseIf.appendChild(setOutcomeValue);
 		var sum = document.createElement("sum");
 		setOutcomeValue.appendChild(sum);
@@ -128,6 +132,7 @@ public abstract class ItemWriter<I extends ItemMaterial, T extends OPALItemMater
 		gt.appendChild(createElementWithAttribute(document, "variable", "identifier", "SCORE"));
 		gt.appendChild(createElementWithAttribute(document, "variable", "identifier", "MAXSCORE"));
 		var setOutcomeValue2 = document.createElement("setOutcomeValue");
+		setOutcomeValue2.setAttribute("identifier", "SCORE");
 		responseIf2.appendChild(setOutcomeValue2);
 		setOutcomeValue2.appendChild(createElementWithAttribute(document, "variable", "identifier", "MAXSCORE"));
 
@@ -140,11 +145,10 @@ public abstract class ItemWriter<I extends ItemMaterial, T extends OPALItemMater
 		lt.appendChild(createElementWithAttribute(document, "variable", "identifier", "SCORE"));
 		lt.appendChild(createElementWithAttribute(document, "variable", "identifier", "MINSCORE"));
 		var setOutcomeValue3 = document.createElement("setOutcomeValue");
+		setOutcomeValue3.setAttribute("identifier", "SCORE");
 		responseIf3.appendChild(setOutcomeValue3);
 		setOutcomeValue3.appendChild(createElementWithAttribute(document, "variable", "identifier", "MINSCORE"));
 
-
 		return responseProcessing;
-
 	}
 }

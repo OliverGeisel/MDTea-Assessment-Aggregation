@@ -205,11 +205,13 @@ public class AssessmentGenerator extends AbstractGenerator {
 	private void createTrueFalseInner(LinkedList<MaterialAndMapping> materials, KnowledgeObject structure,
 			KnowledgeElement mainTerm, TrueFalseItem item, String structureId) {
 		try {
-			String name = getUniqueMaterialName(materials, STR."Frage zu \{mainTerm.getContent()}", item.getId());
+			String name = getUniqueMaterialName(materials, STR."Wahr/Falsch-Frage zu \{mainTerm.getContent()}",
+					item.getId());
 			var question = item.getQuestion();
 			var isTrue = item.isCorrect();
 			var material = new TrueFalseItemMaterial(question, isTrue);
 			material.setStructureId(structure.getId());
+			material.setName(name);
 			var mappingEntry = new MaterialMappingEntry(material, item, mainTerm);
 			var mapping = new MaterialAndMapping(material, mappingEntry);
 			mapping.material().setStructureId(structureId);
@@ -281,11 +283,12 @@ public class AssessmentGenerator extends AbstractGenerator {
 			KnowledgeElement mainTerm, SingleChoiceItem item, String structureId,
 			SingleChoiceConfiguration configuration) {
 		try {
-			String name = getUniqueMaterialName(materials, STR."Frage zu \{mainTerm.getContent()}", item.getId());
+			String name = getUniqueMaterialName(materials, STR."Auswahl zu \{mainTerm.getContent()}", item.getId());
 			var question = item.getContent();
 			var correct = item.getCorrectAnswer();
 			var alternatives = item.getAlternativeAnswers();
 			var material = new SingleChoiceItemMaterial(question, correct, alternatives, configuration.clone());
+			material.setName(name);
 			material.setStructureId(structure.getId());
 			var mappingEntry = new MaterialMappingEntry(material, item, mainTerm);
 			var mapping = new MaterialAndMapping(material, mappingEntry);
@@ -345,6 +348,7 @@ public class AssessmentGenerator extends AbstractGenerator {
 			var alternatives = singleChoiceItem.getAlternativeAnswers();
 			var material = new MultipleChoiceItemMaterial(question, correct, alternatives,
 					multipleChoiceConfiguration.clone());
+			material.setName(name);
 			material.setStructureId(structure.getId());
 			var mappingEntry = new MaterialMappingEntry(material, singleChoiceItem, mainTerm);
 			var mapping = new MaterialAndMapping(material, mappingEntry);

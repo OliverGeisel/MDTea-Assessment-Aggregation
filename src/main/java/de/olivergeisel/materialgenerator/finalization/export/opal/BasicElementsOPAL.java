@@ -133,7 +133,7 @@ public class BasicElementsOPAL {
 		var root = doc.createElement("preConditionRW");
 		root.appendChild(elementWithText(doc, "conditionId", "readerswriters"));
 		root.appendChild(elementWithText(doc, "expertMode", false));
-		root.appendChild(elementWithText(doc, "condition", "( isCourseCouch() or isCourseAdministrator() )"));
+		root.appendChild(elementWithText(doc, "condition", "( isCourseCoach() or isCourseAdministrator() )"));
 		root.appendChild(emptyElement(doc, "easyModeBeginDates"));
 		root.appendChild(emptyElement(doc, "easyModeEndDates"));
 		root.appendChild(elementWithText(doc, "easyModeDisallowGuests", false));
