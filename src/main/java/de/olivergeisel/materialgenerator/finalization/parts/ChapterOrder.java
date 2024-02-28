@@ -95,6 +95,10 @@ public class ChapterOrder extends MaterialOrderCollection {
 
 	@Override
 	public Material findMaterial(UUID materialId) {
+		var filter = getComplexMaterials().stream().filter(m -> m.getId().equals(materialId)).findFirst();
+		if (filter.isPresent()) {
+			return filter.orElseThrow();
+		}
 		return groupOrder.stream().map(g -> g.findMaterial(materialId)).filter(Objects::nonNull).findFirst()
 						 .orElse(null);
 	}
@@ -108,8 +112,6 @@ public class ChapterOrder extends MaterialOrderCollection {
 	public int materialCount() {
 		return groupOrder.stream().mapToInt(GroupOrder::materialCount).sum();
 	}
-
-	//region setter/getter
 
 	/**
 	 * Assigns a set of materials to the parts.
@@ -149,6 +151,10 @@ public class ChapterOrder extends MaterialOrderCollection {
 			groupOrder.removeIf(it -> it.getId().equals(partId));
 			return true;
 		}
+		// complex material
+		if (getComplexMaterials().removeIf(it -> it.getId().equals(partId))) {
+			return true;
+		}
 		return groupOrder.stream().anyMatch(g -> g.remove(partId));
 	}
 
@@ -174,6 +180,8 @@ public class ChapterOrder extends MaterialOrderCollection {
 	public Spliterator<MaterialOrderPart> spliterator() {
 		return groupOrder.stream().map(it -> (MaterialOrderPart) it).spliterator();
 	}
+
+	//region setter/getter
 	@Override
 	public List<Material> getMaterials() {
 		return groupOrder.stream().map(GroupOrder::getMaterials).flatMap(Collection::stream).toList();

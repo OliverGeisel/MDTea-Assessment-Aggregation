@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css?family=Inter:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&amp;display=swap"
           rel="stylesheet">
 </head>
-
 <body>
 <nav th:replace="~{main :: navigation}">
 </nav>
@@ -43,7 +42,7 @@
         <header>
             <h3>Themen</h3>
         </header>
-        <datalist id="structuers">
+        <datalist id="structures">
             <option th:each="structure : ${collectionIds}" th:text="${structure.name}"
                     th:value="${structure.id}"></option>
         </datalist>
@@ -188,20 +187,22 @@
                                     <div class="col">
                                         <form method="get" th:action="@{${course.id}+'/viewComplex'}">
                                             <input name="materialId" th:value="${complex.id}" type="hidden">
-                                            <button class="btn badge bg-primary" type="submit">
-                                                <i class="bi bi-binoculars-fill"></i>
-                                            </button>
-                                        </form>
-                                        <form method="post" th:action="@{${course.id}+'/deleteComplex'}">
-                                            <button class="btn badge bg-danger" name="id" th:value="${complex.id}">
-                                                <i class="bi bi-trash-fill"></i>
-                                            </button>
+                                            <div class="btn-group">
+                                                <button class="btn badge bg-primary" type="submit">
+                                                    <i class="bi bi-binoculars-fill"></i>
+                                                </button>
+                                                <button class="btn badge bg-danger" name="id"
+                                                        th:formaction="@{${course.id}+'/unassignPart'}"
+                                                        th:value="${complex.id}">
+                                                    <i class="bi bi-slash-circle"></i>
+                                                </button>
+                                            </div>
                                         </form>
                                     </div>
-                                    <div th:if="${complex.templateType.type} == 'TEST'">
+                                    <div class="col" th:if="${complex.templateType.type} == 'TEST'">
                                         <form method="post" th:action="@{/edit/download-material}">
                                             <input name="materialId" th:value="${complex.id}" type="hidden">
-                                            <button class="btn badge bg-primary" type="submit">
+                                            <button class="btn badge bg-primary" title="Download" type="submit">
                                                 <i class="bi bi-download"></i>
                                             </button>
                                         </form>
@@ -224,9 +225,12 @@
                         <p class="col-sm order-first m-1 mt-2" th:text="${material.shortName}"></p>
                     </div>
                     <div class="card-body">
-                        <h5 class="card-text" th:text="${material.templateType.type}">Type</h5>
-                        <h5 class="card-text">Parts: <span th:remove="tag" th:text="${material.parts.size}"></span></h5>
-                        <h5 class="card-text" th:text="${material.structureId}">Type</h5>
+                        <h5 class="card-text">Material type: <span th:text="${material.templateType.type}">Type</span>
+                        </h5>
+                        <h5 class="card-text" th:if="${material.templateType.type=='TEST'}">Parts:
+                            <span th:remove="tag" th:text="${material.parts.size}"></span></h5>
+                        <h5 class="card-text">Structure-Id: <span th:text="${material.structureId}">Structure</span>
+                        </h5>
                     </div>
                     <div class="card-footer">
                         <div class="btn-group">
@@ -236,23 +240,25 @@
                                         type="submit">
                                     <i class="bi bi-binoculars-fill"></i>
                                 </button>
-                                <button class="btn badge bg-danger" disabled name="id"
+                                <button class="btn badge bg-danger" disabled name="id" title="delete"
                                         th:formaction="@{${course.id}+'/deleteUnassigned'}">
                                     <i class="bi bi-trash-fill"></i>
                                 </button>
                             </form>
                             <form method="post">
                                 <input name="id" th:value="${material.id}" type="hidden">
-                                <input list="structuers" name="collectionId" required>
+                                <label>Assign to:
+                                    <input list="structures" name="collectionId" required>
+                                </label>
                                 <button class="btn badge bg-primary" th:formaction="@{${course.id}+'/assignPart'}"
-                                        type="submit">
+                                        title="assign to part" type="submit">
                                     <i class="bi bi-plus"></i>
                                 </button>
                             </form>
                             <div th:if="${material.templateType.type} == 'TEST'">
                                 <form method="post" th:action="@{/edit/download-material}">
                                     <input name="materialId" th:value="${material.id}" type="hidden">
-                                    <button class="btn badge bg-primary" type="submit">
+                                    <button class="btn badge bg-primary" title="Download" type="submit">
                                         <i class="bi bi-download"></i>
                                     </button>
                                 </form>
@@ -287,73 +293,56 @@
     </section>
 </main>
 <footer th:replace="~{main :: footer}"></footer>
-</body>
-
 <!--/*@thymesVar id="material" type="de.olivergeisel.materialgenerator.generation.material.Material"*/-->
 <th:block th:fragment="material-fragment (material, stat)">
-    <p class="col-sm order-first m-1 mt-2" th:text="${material.shortName}"></p>
-    <div class="col-sm-3 order-last">
-        <div class="container">
+    <div class="row">
+        <div class="col">
+            <p class="col col-sm order-first m-1 mt-2" th:text="${material.shortName}"></p>
+        </div>
+        <div class="col-8 col-sm-8 col-auto col-sm-auto">
             <div class="row">
-                <div class="col">
+                <div class="col col-sm">
                     <form th:action="@{/view}">
-                        <input name="templateSet"
-                               th:value="${course.templateName}" type="hidden">
-                        <input name="materialId" th:value="${material.id}"
-                               type="hidden">
-                        <span class="col order-5">
-                            <button class="btn btn-dark" type="submit">
-                                <i class="bi bi-binoculars-fill"></i>
-                            </button>
-                        </span>
-                    </form>
-                </div>
-                <div class="col">
-                    <div class="col">
-                        <form method="post" th:unless="${stat.first}">
-                            <input name="task" th:value="${task.id}"
-                                   type="hidden">
-                            <button class="btn badge bg-primary" name="up"
-                                    th:value="${material.id}"><i
-                                    class="bi bi-arrow-up-circle"></i>
-                            </button>
-                        </form>
-                    </div>
-                    <div class="col">
-                        <form method="post" th:unless="${stat.last}">
-                            <input name="task" th:value="${task.id}"
-                                   type="hidden">
-                            <button class="btn badge bg-primary" name="down"
-                                    th:value="${material.id}">
-                                <i class="bi bi-arrow-down-circle"></i>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-                <div class="col">
-                    <form method="post"
-                          th:action="@{${course.id}+'/deletePart'}">
-                        <button class="btn badge bg-danger" name="id"
-                                th:value="${material.id}">
-                            <i class="bi bi-trash-fill"></i>
+                        <input name="templateSet" th:value="${course.templateName}" type="hidden">
+                        <input name="materialId" th:value="${material.id}" type="hidden">
+                        <button class="btn btn-dark btn-sm" type="submit">
+                            <i class="bi bi-binoculars-fill"></i>
                         </button>
                     </form>
                 </div>
-                <div class="row">
-                    <div class="col">
-                        <form method="post"
-                              th:action="@{${course.id}+'/unassignPart'}">
-                            <button class="btn badge bg-danger" name="id"
+                <div class="col-auto col-sm-auto">
+                    <form method="post" th:action="@{${course.id}+'/unassignPart'}">
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn bg-danger btn-sm" name="id" title="unassign"
                                     th:value="${material.id}">
                                 <i class="bi bi-slash-circle"></i>
                             </button>
-                        </form>
-                    </div>
+                            <button class="btn bg-danger btn-sm" name="id" th:formaction="@{${course.id}+'/deletePart'}"
+                                    th:value="${material.id}" title="delete">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-4 col-sm-4 order-last">
+                    <form method="post">
+                        <input name="task" th:value="${task.id}" type="hidden">
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn bg-primary" name="up" th:unless="${stat.first}"
+                                    th:value="${material.id}" title="move up">
+                                <i class="bi bi-arrow-up-circle"></i>
+                            </button>
+                            <button class="btn bg-primary" name="down" th:unless="${stat.last}"
+                                    th:value="${material.id}"
+                                    title="move down">
+                                <i class="bi bi-arrow-down-circle"></i>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 </th:block>
-
-
+</body>
 </html>

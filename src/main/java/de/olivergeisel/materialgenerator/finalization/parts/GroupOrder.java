@@ -104,6 +104,10 @@ public class GroupOrder extends MaterialOrderCollection {
 
 	@Override
 	public Material findMaterial(UUID materialId) {
+		var filter = getComplexMaterials().stream().filter(m -> m.getId().equals(materialId)).findFirst();
+		if (filter.isPresent()) {
+			return filter.orElseThrow();
+		}
 		return taskOrder.stream().map(t -> t.findMaterial(materialId)).filter(Objects::nonNull).findFirst()
 						.orElse(null);
 	}
@@ -151,16 +155,20 @@ public class GroupOrder extends MaterialOrderCollection {
 		return taskOrder.stream().mapToInt(TaskOrder::materialCount).sum();
 	}
 
-	//region setter/getter
-
 	@Override
 	public boolean remove(UUID partId) {
 		if (taskOrder.stream().anyMatch(it -> it.getId().equals(partId))) {
 			taskOrder.removeIf(it -> it.getId().equals(partId));
 			return true;
 		}
+		// complex material
+		if (getComplexMaterials().removeIf(it -> it.getId().equals(partId))) {
+			return true;
+		}
 		return taskOrder.stream().anyMatch(t -> t.remove(partId));
 	}
+
+	//region setter/getter
 
 	@Override
 	public Collection<NameAndId> collectionsNameAndId() {

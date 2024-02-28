@@ -86,6 +86,10 @@ public class TaskOrder extends MaterialOrderCollection {
 
 	@Override
 	public Material findMaterial(UUID materialId) {
+		var filter = getComplexMaterials().stream().filter(m -> m.getId().equals(materialId)).findFirst();
+		if (filter.isPresent()) {
+			return filter.orElseThrow();
+		}
 		return materialOrder.stream().filter(m -> m.getId().equals(materialId)).findFirst().orElse(null);
 	}
 
@@ -149,7 +153,10 @@ public class TaskOrder extends MaterialOrderCollection {
 
 	@Override
 	public boolean remove(UUID partId) {
-		return materialOrder.removeIf(m -> m.getId().equals(partId));
+		if (materialOrder.removeIf(m -> m.getId().equals(partId))) {
+			return true;
+		}
+		return getComplexMaterials().removeIf(m -> m.getId().equals(partId));
 	}
 
 	@Override

@@ -7,7 +7,6 @@ import de.olivergeisel.materialgenerator.finalization.parts.RawCourse;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourseRepository;
 import de.olivergeisel.materialgenerator.generation.material.MaterialRepository;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -77,7 +76,7 @@ public class FinalizationController {
 
 
 	@PostMapping({"edit/{id}/delete",})
-	public String deleteCourse(@PathVariable UUID id, HttpServletRequest request) {
+	public String deleteCourse(@PathVariable UUID id) {
 		repository.deleteById(id);
 		return REDIRECT_EDIT;
 	}
@@ -95,9 +94,11 @@ public class FinalizationController {
 	public String unassignCoursePart(@PathVariable UUID id, @RequestParam("id") UUID partId) {
 		repository.findById(id).ifPresent(course -> {
 			var material = course.getOrder().findMaterial(partId);
-			course.getUnassignedMaterials().add(material);
-			course.getOrder().remove(partId);
-			repository.save(course);
+			if (material != null) {
+				course.getUnassignedMaterials().add(material);
+				course.getOrder().remove(partId);
+				repository.save(course);
+			}
 		});
 		return REDIRECT_EDIT + id + THEMEN_SECTION;
 	}
