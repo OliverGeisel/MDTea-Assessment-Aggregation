@@ -1,8 +1,17 @@
 package de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_prompts;
 
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Task;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Item;
 
-public class TaskPrompt extends ElementPrompt<Task> {
+/**
+ * Prompt
+ *
+ * @author Oliver Geisel
+ * @version 1.1.0
+ * @see ElementPrompt
+ * @see Item
+ * @since 1.1.0
+ */
+public class ItemPrompt extends ElementPrompt<Item> {
 
 
 	private static final String DEFAULT_INSTRUCTION = """
@@ -26,11 +35,11 @@ public class TaskPrompt extends ElementPrompt<Task> {
 
 	private static final String DEFAULT_FORMAT = "+ [Type] | [Task] | [Answers]\\n";
 
-	public TaskPrompt(String fragment) {
+	public ItemPrompt(String fragment) {
 		super(DEFAULT_INSTRUCTION, DEFAULT_FORMAT, fragment, DeliverType.MULTIPLE);
 	}
 
-	protected TaskPrompt(String instruction, String wantedFormat, String fragment, DeliverType type) {
+	protected ItemPrompt(String instruction, String wantedFormat, String fragment, DeliverType type) {
 		super(instruction, wantedFormat, fragment, type);
 	}
 

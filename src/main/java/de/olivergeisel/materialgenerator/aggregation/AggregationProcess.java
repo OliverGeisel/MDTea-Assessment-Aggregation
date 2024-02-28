@@ -38,7 +38,7 @@ public class AggregationProcess {
 	private       ElementNegotiator<Definition> definitions     = new ElementNegotiator<>(null);
 	private       ElementNegotiator<Example>    examples        = new ElementNegotiator<>(null);
 	private ElementNegotiator<Code> codes = new ElementNegotiator<>(null);
-	private ElementNegotiator<Task> tasks = new ElementNegotiator<>(null);
+	private ElementNegotiator<Item> tasks = new ElementNegotiator<>(null);
 	private       List<Relation>                relations       = new LinkedList<>();
 	private       boolean                       complete        = false;
 	private       Step                          step            = Step.INITIAL;
@@ -106,8 +106,8 @@ public class AggregationProcess {
 			case DEFINITION -> definitions.addAll((Collection<Definition>) elements);
 			case EXAMPLE -> examples.addAll((Collection<Example>) elements);
 			case CODE -> codes.addAll((Collection<Code>) elements);
-			case TASK -> tasks.addAll((Collection<Task>) elements);
-			default -> throw new IllegalArgumentException("Unknown type: " + first.getType());
+			case ITEM -> tasks.addAll((Collection<Item>) elements);
+			default -> throw new IllegalArgumentException(STR."Unknown type: \{first.getType()}");
 		}
 	}
 
@@ -121,8 +121,8 @@ public class AggregationProcess {
 			case DEFINITION -> ((Collection<Definition>) elements).forEach(definitions::suggest);
 			case EXAMPLE -> ((Collection<Example>) elements).forEach(examples::suggest);
 			case CODE -> ((Collection<Code>) elements).forEach(codes::suggest);
-			case TASK -> ((Collection<Task>) elements).forEach(tasks::suggest);
-			default -> throw new IllegalArgumentException("Unknown type: " + first.getType());
+			case ITEM -> ((Collection<Item>) elements).forEach(tasks::suggest);
+			default -> throw new IllegalArgumentException(STR."Unknown type: \{first.getType()}");
 		}
 	}
 
@@ -344,7 +344,7 @@ public class AggregationProcess {
 		return codes;
 	}
 
-	public ElementNegotiator<Task> getTasks() {
+	public ElementNegotiator<Item> getTasks() {
 		return tasks;
 	}
 

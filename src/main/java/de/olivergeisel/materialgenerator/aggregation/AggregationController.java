@@ -388,11 +388,11 @@ public class AggregationController {
 		}
 		var location = setParamsToProcess(process, form.getFragment(), form.getApiKey(), form.getModelName(),
 				form.getConnectionType(), form.getModelParameters());
-		var prompt = new TaskPrompt(form.getFragment());
+		var prompt = new ItemPrompt(form.getFragment());
 		try {
 			var answer = gptManager.requestTasks(prompt, form.getUrl(),
 					modelListName.get(process.getModelName()), location, process.getModelParameters());
-			var extractor = new TaskElementExtractor();
+			var extractor = new ItemElementExtractor();
 			var tasks = extractor.extractAll(answer, process.getModelLocation());
 			tasks.forEach(it -> it.setStructureId(process.getAreaOfKnowledge()));
 			process.suggest(tasks);

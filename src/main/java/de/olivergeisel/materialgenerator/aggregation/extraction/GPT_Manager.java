@@ -60,17 +60,17 @@ public class GPT_Manager {
 				parameters.temperature(), parameters.topP(), 0.2, parameters.retries());
 	}
 
-	public TaskPromptAnswer requestTasks(TaskPrompt prompt, String url, String s, GPT_Request.ModelLocation location,
+	public ItemPromptAnswer requestTasks(ItemPrompt prompt, String url, String s, GPT_Request.ModelLocation location,
 			ModelParameters modelParameters) throws ServerNotAvailableException, TimeoutException {
 		return requestTasks(prompt, url, s, location, modelParameters.maxTokens(), modelParameters.temperature(),
 				modelParameters.topP(), 0.2, modelParameters.retries());
 	}
 
-	private TaskPromptAnswer requestTasks(TaskPrompt prompt, String url, String modelName,
+	private ItemPromptAnswer requestTasks(ItemPrompt prompt, String url, String modelName,
 			GPT_Request.ModelLocation location,
 			int maxTokens, double temperature, double topP, double frequencyPenalty, int retries)
 			throws ServerNotAvailableException, TimeoutException {
-		var answer = new TaskPromptAnswer(prompt);
+		var answer = new ItemPromptAnswer(prompt);
 		var newRequest = new GPT_Request<>(prompt, answer, url, modelName, location, maxTokens, temperature, topP,
 				frequencyPenalty, retries);
 		return session.request(newRequest);

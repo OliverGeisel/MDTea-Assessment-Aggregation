@@ -1,27 +1,30 @@
 package de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_prompts;
 
 import de.olivergeisel.materialgenerator.aggregation.extraction.GPT_Request;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Task;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Item;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.MultipleChoiceItem;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.SingleChoiceItem;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.TrueFalseItem;
 
 import java.util.LinkedList;
 import java.util.List;
 
 
 /**
- * The TaskElementExtractor is used to extract {@link Task} elements from {@link TaskPromptAnswer}s.
- * It is used to extract Task elements from {@link PromptAnswer}s that are of the type TaskPromptAnswer.
+ * The ItemElementExtractor is used to extract {@link Item} elements from {@link ItemPromptAnswer}s.
+ * It is used to extract Task elements from {@link PromptAnswer}s that are of the type ItemPromptAnswer.
  * <p>
- * This extractor should be able to extract <b>all</b> different Types of {@link Task} elements.
+ * This extractor should be able to extract <b>all</b> different Types of {@link Item} elements.
  * </p>
  *
  * @author Oliver Geisel
  * @version 1.1.0
- * @see Task
- * @see TaskPromptAnswer
+ * @see Item
+ * @see ItemPromptAnswer
  * @see PromptAnswer
  * @since 1.1.0
  */
-public class TaskElementExtractor extends ElementExtractor<Task, TaskPromptAnswer> {
+public class ItemElementExtractor extends ElementExtractor<Item, ItemPromptAnswer> {
 
 
 	/**
@@ -32,7 +35,7 @@ public class TaskElementExtractor extends ElementExtractor<Task, TaskPromptAnswe
 	 * @throws WrongExtractionMethodException if the PromptAnswer is not the right type for this method.
 	 */
 	@Override
-	public Task extract(TaskPromptAnswer answer) throws WrongExtractionMethodException {
+	public Item extract(ItemPromptAnswer answer) throws WrongExtractionMethodException {
 		if (answer.getDeliverType() != DeliverType.SINGLE) {
 			throw new WrongExtractionMethodException("The DeliverType of the PromptAnswer is not SINGLE");
 		}
@@ -48,14 +51,14 @@ public class TaskElementExtractor extends ElementExtractor<Task, TaskPromptAnswe
 	 * @throws WrongExtractionMethodException if the PromptAnswer is not the right type for this method.
 	 */
 	@Override
-	public List<Task> extractAll(TaskPromptAnswer answers, GPT_Request.ModelLocation modelLocation)
+	public List<Item> extractAll(ItemPromptAnswer answers, GPT_Request.ModelLocation modelLocation)
 			throws WrongExtractionMethodException {
 		if (answers.getDeliverType() != DeliverType.MULTIPLE) {
 			throw new WrongExtractionMethodException("The DeliverType of the PromptAnswer is not MULTIPLE");
 		}
 
 		final var format = answers.getPrompt().getWantedFormat();
-		List<Task> back = new LinkedList<>();
+		List<Item> back = new LinkedList<>();
 
 		final var rawPotentialTaskLines = getPossibleAnswers(answers, modelLocation);
 		for (var line : rawPotentialTaskLines) {
@@ -64,19 +67,20 @@ public class TaskElementExtractor extends ElementExtractor<Task, TaskPromptAnswe
 			String type = potentialTask[0].replaceAll(ElementPrompt.START_CHARS_STRING_REGEX, "").strip();
 			String task = potentialTask[1].strip();
 			String options = potentialTask[2].strip();
-			back.add(selectTaskType(type, task, options));
+			back.add(selectItemType(type, task, options));
 		}
 
 		return back;
 	}
 
 
-	private Task selectTaskType(String type, String task, String options) {
+	private Item selectItemType(String type, String task, String options) {
 		return switch (type) {
-			case "SINGLE_CHOICE" -> new Task("", task, options);
-			case "MULTIPLE_CHOICE" -> new Task("", task, options);
-			case "TRUE_FALSE" -> new Task("", task, options);
-			case "FILL_BLANK" -> new Task("", task, options);
+			// Todo implement correct
+			case "SINGLE_CHOICE" -> new SingleChoiceItem(task, List.of(options), "");
+			case "MULTIPLE_CHOICE" -> new MultipleChoiceItem(task, List.of(options), 1, "");
+			case "TRUE_FALSE" -> new TrueFalseItem(task, Boolean.parseBoolean(options), "");
+			case "FILL_BLANK" -> null;
 			default -> null;
 		};
 	}
