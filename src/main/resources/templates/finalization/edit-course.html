@@ -2,19 +2,28 @@
 <html data-bs-theme="dark" lang="de" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <title>Projects - MDTea-Gen</title>
+    <title th:text="'Edit Course - '+${course.meta.name.get}  "></title>
     <th:block th:replace="~{main :: head-tag}"></th:block>
     <link href="https://fonts.googleapis.com/css?family=Inter:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&amp;display=swap"
           rel="stylesheet">
 </head>
 <body>
+<script th:inline="javascript">
+    function addKeyValuePair() {
+        let pairsDiv = document.getElementById('extra-pairs');
+        let newPair = document.createElement('div');
+        newPair.innerHTML = '<input type="text" name="keys[]" placeholder="Key">:' +
+            '<input type="text" name="values[]" placeholder="Value">';
+        pairsDiv.appendChild(newPair);
+    }
+</script>
 <nav th:replace="~{main :: navigation}">
 </nav>
 <main class="container">
     <section class="py-5" id="metadata-section">
         <h3>Allgemeine Informationen</h3>
         <div class="p-3">
-            <form>
+            <form method="post" th:action="@{${course.id}/update-meta}">
                 <label class="form-label">Name: <input class="form-control" name="name"
                                                        th:value="${course.metadata.name.get}"></label>
                 <label class="form-label">Jahr: <input class="form-control" min="2000" name="year" step="1"
@@ -27,14 +36,20 @@
                                                                   cols="40" name="description" rows="5"
                                                                   th:text="${course.metadata.description.get}"></textarea>
                 </label>
-                <div class="container" id="more-fields" th:if="${course.metadata.otherInfos.size}!=0">
-                    <h4>Weitere Daten</h4>
-                    <th:block th:each="info : ${course.metadata.otherInfos}">
-                        <p class="m-1">
-                            <th:block th:text="${info.key}"></th:block>
-                            : <span th:text="${info.value}"></span></p>
-                    </th:block>
-                </div>
+                <label>
+                    <div class="container" id="extra-pairs" th:if="${course.metadata.otherInfos.size}!=0">
+                        <h4>Weitere Daten</h4>
+                        <th:block th:each="info : ${course.metadata.otherInfos}">
+                            <div class="m-1">
+                                <input name="key[]" th:value="${info.key}">
+                                : <input name="value[]" th:value="${info.value}"></div>
+                        </th:block>
+                    </div>
+                    <button class="btn btn-info" onclick="addKeyValuePair()" type="button">Weiteres Paar
+                        hinzufügen
+                    </button>
+                </label>
+                <button class="btn btn-primary" th:text="#{general.save}" type="submit">Speichern</button>
             </form>
         </div>
     </section>
