@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport">
-    <title>Export - MDTea-Gen</title>
+    <title>Export - MDTea</title>
     <th:block th:insert="~{main :: head-tag}"></th:block>
     <link href="https://fonts.googleapis.com/css?family=Inter:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&amp;display=swap"
           rel="stylesheet">
@@ -23,7 +23,7 @@
                 </div>
             </div>
             <div class="row g-0 row-cols-1 row-cols-md-2 row-cols-xl-3 d-flex align-items-md-center align-items-xl-center">
-                <div class="col mb-4" th:each="course:${courses}">
+                <div class="col mb-4" th:each="course : ${courses}">
                     <div class="card text-white bg-primary">
                         <div class="card-body p-4">
                             <div class="d-flex justify-content-between">
@@ -43,7 +43,7 @@
                             </div>
                             <div>
                                 <ul class="list-unstyled">
-                                    <li class="d-flex mb-2" th:each="chapter:${course.courseOrder.chapterOrder}">
+                                    <li class="d-flex mb-2" th:each="chapter : ${course.courseOrder.chapterOrder}">
                                         <span
                                                 class="bs-icon-xs bs-icon-rounded bs-icon-semi-white bs-icon bs-icon-xs me-2"><svg
                                                 class="bi bi-check-lg text-primary" fill="currentColor" height="1em"
@@ -54,17 +54,25 @@
                                         <span th:text="${chapter.name}">Kapitel X</span></li>
                                 </ul>
                             </div>
-                            <form method="post" th:action="@{/edit/{id}/export(id=${course.id})}">
-                                <button class="btn btn-warning d-block w-100 m-1" disabled name="export"
-                                        value="pdf">PDF
-                                </button>
-                                <button class="btn btn-info d-block w-100 m-1" name="export"
-                                        value="html">HTML
-                                </button>
-                                <button class="btn btn-danger d-block w-100 m-1" name="export"
-                                        value="opal">OPAL
-                                </button>
-                            </form>
+                            <div class="d-flex justify-content-between">
+                                <form method="post" th:action="@{/edit/{id}/export(id=${course.id})}">
+                                    <button class="btn btn-warning d-block w-100 m-1" disabled name="export"
+                                            value="pdf">PDF
+                                    </button>
+                                    <button class="btn btn-info d-block w-100 m-1" name="kind"
+                                            th:disabled="${course.valid}" value="html">HTML
+                                    </button>
+                                    <button class="btn btn-danger d-block w-100 m-1" name="kind"
+                                            th:disabled="${course.valid}" value="opal">OPAL
+                                    </button>
+                                </form>
+                                <p th:unless="${course.valid}">
+                                    Kurs ist nicht valide und kann nicht exportiert werden.
+                                    <a href="#" th:href="@{/edit/{id}(id=${course.id})}">
+                                        <button class="btn btn-primary d-block w-100 m-1">Bearbeiten</button>
+                                    </a>
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -8,6 +8,7 @@ import de.olivergeisel.materialgenerator.finalization.parts.RawCourseRepository;
 import de.olivergeisel.materialgenerator.generation.material.MaterialRepository;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -127,6 +128,12 @@ public class FinalizationController {
 			@RequestParam Relevance relevance) {
 		service.setRelevance(id, taskID, relevance);
 		return REDIRECT_EDIT + id + THEMEN_SECTION;
+	}
+
+	@PostMapping("edit/{id}/meta-update")
+	public String updateMeta(@PathVariable UUID id, @Valid MetaForm form) {
+		service.updateMeta(id, form);
+		return REDIRECT_EDIT + id;
 	}
 
 	@PostMapping({"edit/{id}",})

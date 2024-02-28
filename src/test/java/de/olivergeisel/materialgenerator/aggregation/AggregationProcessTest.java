@@ -30,7 +30,7 @@ class AggregationProcessTest {
 	@Mock
 	private Code       code;
 	@Mock
-	private Task       task;
+	private Item task;
 	@Mock
 	private Example    example;
 
@@ -41,7 +41,7 @@ class AggregationProcessTest {
 		lenient().when(term.getType()).thenReturn(KnowledgeType.TERM);
 		lenient().when(definition.getType()).thenReturn(KnowledgeType.DEFINITION);
 		lenient().when(code.getType()).thenReturn(KnowledgeType.CODE);
-		lenient().when(task.getType()).thenReturn(KnowledgeType.TASK);
+		lenient().when(task.getType()).thenReturn(KnowledgeType.ITEM);
 		lenient().when(example.getType()).thenReturn(KnowledgeType.EXAMPLE);
 		lenient().when(term.getId()).thenReturn("termId");
 		lenient().when(definition.getId()).thenReturn("definitionId");
