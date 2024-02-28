@@ -3,6 +3,18 @@ package de.olivergeisel.materialgenerator.aggregation.extraction;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * This class represents the parameters that can be used to prompt the model.
+ *
+ * @param retries     the number of retries to attempt
+ * @param maxTokens   the maximum number of tokens to generate
+ * @param temperature the temperature to use
+ * @param topP        the topP to use
+ * @author Oliver Geisel
+ * @version 1.1.0
+ * @see GPT_Request
+ * @since 1.1.0
+ */
 public record PromptParameters(int retries, int maxTokens, double temperature, double topP) {
 
 	public PromptParameters {

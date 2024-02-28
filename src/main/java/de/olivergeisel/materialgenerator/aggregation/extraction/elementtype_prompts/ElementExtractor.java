@@ -58,4 +58,16 @@ public abstract class ElementExtractor<T extends KnowledgeElement, A extends Pro
 			throw new RuntimeException(e);
 		}
 	}
+
+	protected String[] getPossibleAnswers(A answers, GPT_Request.ModelLocation modelLocation) {
+		String text;
+		if (modelLocation == GPT_Request.ModelLocation.LOCAL) {
+			text = answers.getAnswer();
+		} else {
+			var choices = getChoices(answers);
+			var firstChoice = choices.getFirst();
+			text = firstChoice.get("text").toString().replace("\\r", "");
+		}
+		return text.split("\\\\n");
+	}
 }

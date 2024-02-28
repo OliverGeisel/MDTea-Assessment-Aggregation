@@ -44,6 +44,18 @@ public class ElementNegotiator<T extends KnowledgeElement> implements Negotiator
 		return false;
 	}
 
+	/**
+	 * Check if the negotiator contains an element with the given id. It's not important if the element is suggested
+	 * or accepted.
+	 *
+	 * @param id the id to check
+	 * @return true if the negotiator contains an element with the given id, false if not.
+	 */
+	public boolean contains(String id) {
+		return suggestedElements.stream().anyMatch(it -> it.getId().equals(id))
+			   || acceptedElements.stream().anyMatch(it -> it.getId().equals(id));
+	}
+
 	public boolean hasElements() {
 		return !isEmpty();
 	}
@@ -60,7 +72,6 @@ public class ElementNegotiator<T extends KnowledgeElement> implements Negotiator
 		return acceptedElements.stream().filter(it -> it.getId().equals(id)).findFirst().orElse(null);
 	}
 
-	//region setter/getter
 
 	/**
 	 * Move an element from the list of suggested elements to the list of accepted elements.
@@ -181,9 +192,12 @@ public class ElementNegotiator<T extends KnowledgeElement> implements Negotiator
 	public List<KnowledgeElement> extract() {
 		return null;
 	}
+
+	//region setter/getter
 	public boolean isEmpty() {
 		return suggestedElements.isEmpty() && acceptedElements.isEmpty();
 	}
+
 	public KnowledgeFragment getFragment() {
 		return fragment;
 	}

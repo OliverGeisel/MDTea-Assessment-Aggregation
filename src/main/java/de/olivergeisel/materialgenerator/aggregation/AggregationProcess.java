@@ -3,10 +3,7 @@ package de.olivergeisel.materialgenerator.aggregation;
 import de.olivergeisel.materialgenerator.aggregation.extraction.ElementNegotiator;
 import de.olivergeisel.materialgenerator.aggregation.extraction.GPT_Request;
 import de.olivergeisel.materialgenerator.aggregation.extraction.ModelParameters;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Definition;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Example;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Term;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.*;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.BasicRelation;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.Relation;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationType;
@@ -40,6 +37,8 @@ public class AggregationProcess {
 	private       ElementNegotiator<Term>       terms           = new ElementNegotiator<>(null);
 	private       ElementNegotiator<Definition> definitions     = new ElementNegotiator<>(null);
 	private       ElementNegotiator<Example>    examples        = new ElementNegotiator<>(null);
+	private ElementNegotiator<Code> codes = new ElementNegotiator<>(null);
+	private ElementNegotiator<Task> tasks = new ElementNegotiator<>(null);
 	private       List<Relation>                relations       = new LinkedList<>();
 	private       boolean                       complete        = false;
 	private       Step                          step            = Step.INITIAL;
@@ -106,6 +105,8 @@ public class AggregationProcess {
 			case TERM -> terms.addAll((Collection<Term>) elements);
 			case DEFINITION -> definitions.addAll((Collection<Definition>) elements);
 			case EXAMPLE -> examples.addAll((Collection<Example>) elements);
+			case CODE -> codes.addAll((Collection<Code>) elements);
+			case TASK -> tasks.addAll((Collection<Task>) elements);
 			default -> throw new IllegalArgumentException("Unknown type: " + first.getType());
 		}
 	}
@@ -119,23 +120,43 @@ public class AggregationProcess {
 			case TERM -> ((Collection<Term>) elements).forEach(terms::suggest);
 			case DEFINITION -> ((Collection<Definition>) elements).forEach(definitions::suggest);
 			case EXAMPLE -> ((Collection<Example>) elements).forEach(examples::suggest);
+			case CODE -> ((Collection<Code>) elements).forEach(codes::suggest);
+			case TASK -> ((Collection<Task>) elements).forEach(tasks::suggest);
 			default -> throw new IllegalArgumentException("Unknown type: " + first.getType());
 		}
 	}
 
-	public KnowledgeElement findById(String id) throws IllegalArgumentException {
-		if (id == null) {
-			return null;
+	/**
+	 * Finds a KnowledgeElement by its id.
+	 *
+	 * @param id The id of the KnowledgeElement.
+	 * @return The KnowledgeElement with the given id or null if no element with the given id was found.
+	 */
+	public KnowledgeElement findById(String id) throws IllegalArgumentException, NoSuchElementException {
+		if (id == null || id.isBlank()) {
+			throw new IllegalArgumentException("The id must not be null or empty.");
 		}
 		var term = terms.findById(id);
-		if (term == null) {
-			var definition = definitions.findById(id);
-			if (definition == null) {
-				return examples.findById(id);
-			}
+		if (term != null) {
+			return term;
+		}
+		var definition = definitions.findById(id);
+		if (definition != null) {
 			return definition;
 		}
-		return term;
+		var example = examples.findById(id);
+		if (example != null) {
+			return example;
+		}
+		var code = codes.findById(id);
+		if (code != null) {
+			return code;
+		}
+		var task = tasks.findById(id);
+		if (task != null) {
+			return task;
+		}
+		throw new NoSuchElementException(STR."No element with id \{id} found.");
 	}
 
 	public boolean removeById(String id) {
@@ -145,6 +166,9 @@ public class AggregationProcess {
 		var removed = terms.removeById(id);
 		removed |= definitions.removeById(id);
 		removed |= examples.removeById(id);
+		removed |= codes.removeById(id);
+		removed |= tasks.removeById(id);
+		// Todo remove relations too
 		return removed;
 
 	}
@@ -156,6 +180,8 @@ public class AggregationProcess {
 		var accepted = terms.approveById(id);
 		accepted |= definitions.approveById(id);
 		accepted |= examples.approveById(id);
+		accepted |= codes.approveById(id);
+		accepted |= tasks.approveById(id);
 		return accepted;
 	}
 
@@ -166,6 +192,8 @@ public class AggregationProcess {
 		var rejected = terms.rejectById(id);
 		rejected |= definitions.rejectById(id);
 		rejected |= examples.rejectById(id);
+		rejected |= codes.rejectById(id);
+		rejected |= tasks.rejectById(id);
 		return rejected;
 	}
 
@@ -177,9 +205,54 @@ public class AggregationProcess {
 		return relations.stream().filter(it -> it.getTo().getId().equals(id)).toList();
 	}
 
-	public boolean linkTermsToDefinition(String id, Term mainTerm, List<Term> terms) {
+
+	/**
+	 * Links two {@link KnowledgeElement}s with a {@link Relation} of the given type.
+	 *
+	 * @param from The element that is the source of the relation.
+	 * @param to   The element that is the target of the relation.
+	 * @param type The type of the relation.
+	 * @return true if the relation was added, false if the relation already exists.
+	 */
+	public boolean link(KnowledgeElement from, KnowledgeElement to, RelationType type) {
+		if (from == null || to == null) {
+			return false;
+		}
+		if (!containsElement(from.getId()) || !containsElement(to.getId())) {
+			return false;
+		}
+		var relation = new BasicRelation(type, from, to);
+		if (!relations.contains(relation)) {
+			relations.add(relation);
+			from.addRelation(relation);
+			return true;
+		}
+		return false;
+	}
+
+	public boolean containsElement(String id) {
+		return terms.contains(id) || definitions.contains(id) || examples.contains(id) || codes.contains(id)
+			   || tasks.contains(id);
+	}
+
+	public boolean link(String fromId, String toId, RelationType type) {
+		var from = findById(fromId);
+		var to = findById(toId);
+		return link(from, to, type);
+	}
+
+	/**
+	 * Links a term given by its id to a definition given by its id.
+	 * The
+	 *
+	 * @param definitionId The id of the definition.
+	 * @param mainTerm     The id of the main term.
+	 * @param terms        The ids of the related terms to the definition.
+	 * @return true if the terms were linked, false if the definition or the terms were not found.
+	 */
+	public boolean linkTermsToDefinition(String definitionId, Term mainTerm, List<Term> terms) {
 		try {
-			var definition = definitions.findById(id);
+			var definition = definitions.findById(definitionId);
 			var relation = new BasicRelation(RelationType.DEFINED_BY, mainTerm, definition);
 			if (!relations.contains(relation)) {
 				var reverseRelation = new BasicRelation(RelationType.DEFINES, definition, mainTerm);
@@ -219,8 +292,14 @@ public class AggregationProcess {
 		}
 	}
 
+	/**
+	 * Checks if the process has elements in the accepted lists.
+	 *
+	 * @return true if the process has elements in the accepted lists, false if not.
+	 */
 	public boolean hasElements() {
 		return !terms.getAcceptedElements().isEmpty() || !definitions.getAcceptedElements().isEmpty() || !examples
+				.getAcceptedElements().isEmpty() || !codes.getAcceptedElements().isEmpty() || !tasks
 				.getAcceptedElements().isEmpty();
 	}
 
@@ -261,6 +340,17 @@ public class AggregationProcess {
 	public String getCurrentFragment() {
 		return currentFragment;
 	}
+	public ElementNegotiator<Code> getCodes() {
+		return codes;
+	}
+
+	public ElementNegotiator<Task> getTasks() {
+		return tasks;
+	}
+
+	public void setCurrentFragment(String currentFragment) {
+		this.currentFragment = currentFragment;
+	}
 
 	public ModelParameters getModelParameters() {
 		return modelParameters;
@@ -269,10 +359,6 @@ public class AggregationProcess {
 	public void setModelParameters(
 			ModelParameters modelParameters) {
 		this.modelParameters = modelParameters;
-	}
-
-	public void setCurrentFragment(String currentFragment) {
-		this.currentFragment = currentFragment;
 	}
 
 	public String getAreaOfKnowledge() {
@@ -349,7 +435,7 @@ public class AggregationProcess {
 		TERMS,
 		DEFINITIONS,
 		EXAMPLES,
-		PROOFS,
+		CODE,
 		QUESTIONS,
 		END;
 
@@ -359,8 +445,8 @@ public class AggregationProcess {
 				case INITIAL -> TERMS;
 				case TERMS -> DEFINITIONS;
 				case DEFINITIONS -> EXAMPLES;
-				case EXAMPLES -> PROOFS;
-				case PROOFS -> QUESTIONS;
+				case EXAMPLES -> CODE;
+				case CODE -> QUESTIONS;
 				case QUESTIONS, END -> END;
 			};
 		}

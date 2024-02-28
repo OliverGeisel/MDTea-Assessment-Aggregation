@@ -4,10 +4,7 @@ import de.olivergeisel.materialgenerator.aggregation.extraction.GPT_Manager;
 import de.olivergeisel.materialgenerator.aggregation.extraction.GPT_Request;
 import de.olivergeisel.materialgenerator.aggregation.extraction.ModelParameters;
 import de.olivergeisel.materialgenerator.aggregation.extraction.ServerNotAvailableException;
-import de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_prompts.DefinitionPrompt;
-import de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_prompts.DefinitonElementExtractor;
-import de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_prompts.TermElementExtractor;
-import de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_prompts.TermPrompt;
+import de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_prompts.*;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModelService;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Term;
@@ -184,6 +181,16 @@ public class AggregationController {
 		return "aggregation/terms-add";
 	}
 
+	@PostMapping("top-level-scan/terms/add")
+	String topLevelScanTermsAddPost(@ModelAttribute("process") AggregationProcess process,
+			@RequestParam("content") String content,
+			@RequestParam(value = "structureId", required = false) Optional<String> structureId) {
+		var newTerm = new Term(content, STR."\{content}-TERM", "term");
+		structureId.ifPresent(it -> {if (!it.strip().isBlank()) newTerm.setStructureId(it);});
+		process.add(List.of(newTerm));
+		return "redirect:/aggregation/top-level-scan/terms";
+	}
+
 	@GetMapping("top-level-scan/terms/edit")
 	String topLevelScanTermsEdit(Model model, @ModelAttribute("process") AggregationProcess process, @RequestParam(
 			"id") String id) {
@@ -208,16 +215,6 @@ public class AggregationController {
 		model.addAttribute("term", term);
 		model.addAttribute("structures", modelService.getStructureIds());
 		return "aggregation/terms-edit";
-	}
-
-	@PostMapping("top-level-scan/terms/add")
-	String topLevelScanTermsAddPost(@ModelAttribute("process") AggregationProcess process,
-			@RequestParam("content") String content,
-			@RequestParam(value = "structureId", required = false) Optional<String> structureId) {
-		var newTerm = new Term(content, STR."\{content}-TERM", "term");
-		structureId.ifPresent(it -> {if (!it.strip().isBlank()) newTerm.setStructureId(it);});
-		process.add(List.of(newTerm));
-		return "redirect:/aggregation/top-level-scan/terms";
 	}
 
 	@PostMapping("top-level-scan/terms/next")
@@ -367,6 +364,46 @@ public class AggregationController {
 			default -> throw new IllegalArgumentException(STR."Unknown action: \{action}");
 		}
 		return "redirect:/aggregation/top-level-scan/definitions";
+	}
+
+
+	@GetMapping("top-level-scan/tasks")
+	String topLevelScanTasks(Model model, @ModelAttribute("process") AggregationProcess process) {
+		if (process.getStepNumber() != 3) {
+			return "redirect:/aggregation/top-level-scan";
+		}
+		model.addAttribute("models", getModelNameList());
+		model.addAttribute("acceptedTerms", process.getTerms().getAcceptedElements());
+		model.addAttribute("acceptedTasks", process.getTasks().getAcceptedElements());
+		model.addAttribute("suggestedTasks", process.getTasks().getSuggestedElements());
+		model.addAttribute("structures", modelService.getStructureIds());
+		return "aggregation/tasks";
+	}
+
+	@PostMapping("top-level-scan/tasks")
+	String topLevelScanTasksPost(Model model, @ModelAttribute("process") AggregationProcess process,
+			ItemRequestForm form) {
+		if (process.getStepNumber() != 5) {
+			return "redirect:/aggregation/top-level-scan";
+		}
+		var location = setParamsToProcess(process, form.getFragment(), form.getApiKey(), form.getModelName(),
+				form.getConnectionType(), form.getModelParameters());
+		var prompt = new TaskPrompt(form.getFragment());
+		try {
+			var answer = gptManager.requestTasks(prompt, form.getUrl(),
+					modelListName.get(process.getModelName()), location, process.getModelParameters());
+			var extractor = new TaskElementExtractor();
+			var tasks = extractor.extractAll(answer, process.getModelLocation());
+			tasks.forEach(it -> it.setStructureId(process.getAreaOfKnowledge()));
+			process.suggest(tasks);
+		} catch (ServerNotAvailableException | TimeoutException e) {
+			model.addAttribute("error", e.getMessage());
+			model.addAttribute("models", getModelNameList());
+			model.addAttribute("form", form);
+			model.addAttribute("structures", modelService.getStructureIds());
+			return "aggregation/tasks";
+		}
+		return "redirect:/aggregation/top-level-scan/tasks";
 	}
 
 	@GetMapping("compile")

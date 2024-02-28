@@ -63,10 +63,17 @@ public abstract class KnowledgeElement {
 	}
 
 	public boolean addRelations(Set<Relation> relations) {
-		return this.relations.addAll(relations);
+		boolean result = false;
+		for (Relation relation : relations) {
+			result |= addRelation(relation);
+		}
+		return result;
 	}
 
 	public boolean addRelation(Relation relation) {
+		if (relations.stream().anyMatch(r -> r.isSameAs(relation))) {
+			return false;
+		}
 		return this.relations.add(relation);
 	}
 

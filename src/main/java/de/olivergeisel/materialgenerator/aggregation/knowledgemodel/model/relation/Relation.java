@@ -40,6 +40,7 @@ public abstract class Relation {
 		this.fromId = "";
 		this.toId = "";
 	}
+
 	protected Relation(String name, String fromId, String toId, RelationType type) {
 		if (fromId == null || toId == null || type == null || name == null) {
 			throw new IllegalArgumentException("Arguments must not be null");
@@ -81,6 +82,22 @@ public abstract class Relation {
 
 	public boolean hasType(RelationType type) {
 		return this.type.equals(type);
+	}
+
+	/**
+	 * Check if this relation is the same as another relation.
+	 * Ignores the id of the relation.
+	 *
+	 * @param relation the relation to compare
+	 * @return true if the relations are the same
+	 */
+	public boolean isSameAs(Relation relation) {
+		if (this == relation) return true;
+		if (relation == null) return false;
+		if (!type.equals(relation.type)) return false;
+		if (!name.equals(relation.name)) return false;
+		if (!toId.equals(relation.toId)) return false;
+		return fromId.equals(relation.fromId);
 	}
 
 	//region setter/getter
@@ -197,6 +214,6 @@ public abstract class Relation {
 
 	@Override
 	public String toString() {
-		return "Relation " + name + ": " + fromId + " → " + toId;
+		return STR."Relation \{name}: \{fromId} → \{toId}";
 	}
 }

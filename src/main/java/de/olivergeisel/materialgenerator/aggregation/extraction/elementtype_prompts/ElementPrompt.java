@@ -3,10 +3,16 @@ package de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_pro
 
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
 
+import java.util.List;
+
 /**
  * Represents a Prompt for a specific Element-Type.
  * <p>
- *
+ *  Every Prompt has an instruction, a wanted format, a fragment and a deliver type.
+ *  The instruction is a list of the commands/orders/instruction for the model. Its a list of rules to follow.
+ *  The wanted format is the format of the answer.
+ *  The fragment is the text that should be analyzed.
+ *  The deliver type is the type of the answer. It can be a single answer or multiple answers.
  * </p>
  *
  * @author Oliver Geisel
@@ -15,14 +21,21 @@ import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.elemen
  */
 public abstract class ElementPrompt<T extends KnowledgeElement> {
 
+	/**
+	 * Possible symbol for the start of a new element.
+	 */
+	public static final List<String> START_CHARS              = List.of("+", "-", "*", "#", "~");
+	public static final String       START_CHARS_STRING_REGEX = "[+-#*~]";
+
 	private String      instruction;
 	private String      wantedFormat;
 	private String      fragment;
 	private DeliverType deliverType;
 
-	protected ElementPrompt(String instruction, String wantedFormat, String fragment, DeliverType type) {
+	protected ElementPrompt(String instruction, String wantedFormat, String fragment, DeliverType type)
+			throws IllegalArgumentException {
 		if (instruction == null || wantedFormat == null || fragment == null || type == null) {
-			throw new NullPointerException("No argument can be null");
+			throw new IllegalArgumentException("No argument can be null");
 		}
 		this.instruction = instruction;
 		this.wantedFormat = wantedFormat;

@@ -6,6 +6,16 @@ import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.elemen
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * This class is used to store the parameters of a request to the GPT-Model.
+ * It is used to store the model location, model name, url, api key and prompt parameters.
+ *
+ * @param modelLocation
+ * @param modelName
+ * @param url
+ * @param apiKey
+ * @param promptParameters
+ */
 public record RequestParameters(GPT_Request.ModelLocation modelLocation, String modelName, String url, String apiKey,
 								PromptParameters promptParameters) {
 
