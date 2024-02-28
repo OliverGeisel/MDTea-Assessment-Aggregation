@@ -4,6 +4,7 @@ import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentGoal;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.Relevance;
 import de.olivergeisel.materialgenerator.finalization.export.DownloadManager;
+import de.olivergeisel.materialgenerator.finalization.export.Exporter;
 import de.olivergeisel.materialgenerator.finalization.parts.*;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
@@ -13,6 +14,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+/**
+ * The FinalizationService is a service that provides methods to edit a course.
+ * Additionally, it enables the export of a course.
+ *
+ * @author Oliver Geisel
+ * @version 1.1.0
+ * @see RawCourse
+ * @see Exporter
+ * @since 0.2.0
+ */
 @Service
 @Transactional
 public class FinalizationService {
@@ -157,5 +168,24 @@ public class FinalizationService {
 		} else {
 			throw new IllegalArgumentException("Task not found");
 		}
+	}
+
+	/**
+	 * Updates the metadata of a course
+	 * @param id the id of the course
+	 * @param form the form containing the new metadata
+	 * @throws NoSuchElementException if the course is not found
+	 */
+	public void updateMeta(UUID id, MetaForm form) throws NoSuchElementException {
+		var course = rawCourseRepository.findById(id).orElseThrow();
+		var metadata = course.getMetadata();
+		metadata.setName(form.getName());
+		metadata.setDescription(form.getDescription());
+		metadata.setYear(Integer.toString(form.getYear()));
+		metadata.setLevel(form.getLevel());
+		for (var entry : form.getExtras().entrySet()) {
+			metadata.addOtherInfo(entry.getKey(), entry.getValue());
+		}
+		saveMetadata(metadata);
 	}
 }
