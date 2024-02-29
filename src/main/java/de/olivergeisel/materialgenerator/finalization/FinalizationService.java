@@ -183,17 +183,24 @@ public class FinalizationService {
 	/**
 	 * Updates the metadata of a course
 	 * @param id the id of the course
-	 * @param form the form containing the new metadata
+	 * @param map the form containing the new metadata
 	 * @throws NoSuchElementException if the course is not found
 	 */
-	public void updateMeta(UUID id, MetaForm form) throws NoSuchElementException {
+	public void updateMeta(UUID id, Map<String, Object> map) throws NoSuchElementException {
+		var form = new MetaForm(map);
 		var course = rawCourseRepository.findById(id).orElseThrow();
 		var metadata = course.getMetadata();
 		metadata.setName(form.getName());
 		metadata.setDescription(form.getDescription());
 		metadata.setYear(Integer.toString(form.getYear()));
 		metadata.setLevel(form.getLevel());
-		for (var entry : form.getExtras().entrySet()) {
+		var keys = form.getExtras().get("key");
+		var values = form.getExtras().get("value");
+		var extras = new HashMap<String, String>();
+		for (int i = 0; i < keys.size(); i++) {
+			extras.put(keys.get(i), values.get(i));
+		}
+		for (var entry : extras.entrySet()) {
 			metadata.addOtherInfo(entry.getKey(), entry.getValue());
 		}
 		saveMetadata(metadata);

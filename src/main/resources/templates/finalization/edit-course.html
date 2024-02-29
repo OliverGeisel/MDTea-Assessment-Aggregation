@@ -9,13 +9,48 @@
 </head>
 <body>
 <script th:inline="javascript">
+
     function addKeyValuePair() {
-        let pairsDiv = document.getElementById('extra-pairs');
+        let pairsDiv = document.getElementById('extras');
         let newPair = document.createElement('div');
-        newPair.innerHTML = '<input type="text" name="keys[]" placeholder="Key">:' +
-            '<input type="text" name="values[]" placeholder="Value">';
+        newPair.classList.add('m-1');
+        newPair.innerHTML = '<input type="text" name="key" placeholder="Key"> : ' +
+            '<input type="text" name="value" placeholder="Value">';
         pairsDiv.appendChild(newPair);
     }
+
+    function submitForm() {
+        let formData = new FormData(document.getElementById("meta-form"));
+        let object = {};
+        object["extras"] = {};
+        formData.forEach(function (value, key) {
+            if (key === "key" || key === "value") {
+                if (object["extras"][key] === undefined) {
+                    object["extras"][key] = [];
+                }
+                object["extras"][key].push(value);
+                return;
+            }
+            object[key] = value;
+        });
+        let json = JSON.stringify(object);
+        let id = /*[[${course.id}]]*/ 0;
+        fetch(id + "/meta-update", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: json
+        })
+            .then(response => response.text())
+            .then(data => {
+                console.log(data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
+
 </script>
 <nav th:replace="~{main :: navigation}">
 </nav>
@@ -23,7 +58,7 @@
     <section class="py-5" id="metadata-section">
         <h3>Allgemeine Informationen</h3>
         <div class="p-3">
-            <form method="post" th:action="@{${course.id}/update-meta}">
+            <form id="meta-form">
                 <label class="form-label">Name: <input class="form-control" name="name"
                                                        th:value="${course.metadata.name.get}"></label>
                 <label class="form-label">Jahr: <input class="form-control" min="2000" name="year" step="1"
@@ -37,19 +72,20 @@
                                                                   th:text="${course.metadata.description.get}"></textarea>
                 </label>
                 <label>
-                    <div class="container" id="extra-pairs" th:if="${course.metadata.otherInfos.size}!=0">
+                    <div class="container" id="extras" th:if="${course.metadata.otherInfos.size} != 0">
                         <h4>Weitere Daten</h4>
                         <th:block th:each="info : ${course.metadata.otherInfos}">
                             <div class="m-1">
-                                <input name="key[]" th:value="${info.key}">
-                                : <input name="value[]" th:value="${info.value}"></div>
+                                <input name="key" th:value="${info.key}">
+                                : <input name="value" th:value="${info.value}"></div>
                         </th:block>
                     </div>
-                    <button class="btn btn-info" onclick="addKeyValuePair()" type="button">Weiteres Paar
-                        hinzufügen
+                    <button class="btn btn-info" onclick="addKeyValuePair()" type="button">
+                        Weiteres Paar hinzufügen
                     </button>
                 </label>
-                <button class="btn btn-primary" th:text="#{general.save}" type="submit">Speichern</button>
+                <button class="btn btn-primary" onclick="submitForm()" th:text="#{general.save}" type="button">Speichern
+                </button>
             </form>
         </div>
     </section>
