@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -69,8 +70,9 @@ public class KnowledgeModelEditController {
 	}
 
 	@PostMapping("/elements/add")
-	public String addElementPost(@Valid AddElementForm form, RedirectAttributes redirectAttributes) {
-		knowledgeModelService.addElement(form);
+	public String addElementPost(@Valid AddElementForm form, RedirectAttributes redirectAttributes,
+			@RequestParam(name = "image", required = false) MultipartFile image) {
+		knowledgeModelService.addElement(form, image);
 		redirectAttributes.addFlashAttribute("added", "Element added successfully!");
 		return "redirect:/knowledge-model/elements";
 	}
@@ -130,7 +132,7 @@ public class KnowledgeModelEditController {
 		if (withTerm) {
 			var form = new AddElementForm(newStructureId, "", newStructureId, KnowledgeType.TERM, null, "false",
 					List.of(), List.of());
-			knowledgeModelService.addElement(form);
+			knowledgeModelService.addElement(form, null);
 		}
 		return "redirect:/knowledge-model/structure";
 	}

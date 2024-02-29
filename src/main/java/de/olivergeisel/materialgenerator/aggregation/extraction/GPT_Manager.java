@@ -16,7 +16,7 @@ import java.util.concurrent.TimeoutException;
  *     <li>{@link Definition}</li>
  *     <li>{@link Example}</li>
  *     <li>{@link Code}</li>
- *     <li>{@link Task}</li>
+ *     <li>{@link Item}</li>
  * </ul>
  *
  * @author Oliver Geisel

@@ -9,12 +9,14 @@ import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relati
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationType;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.*;
 import de.olivergeisel.materialgenerator.aggregation.source.KnowledgeSource;
+import de.olivergeisel.materialgenerator.finalization.export.ImageService;
 import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
 import org.neo4j.driver.Driver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -44,15 +46,19 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 
 	private final KnowledgeStructureService structureService;
 
+	private final ImageService imageService;
+
 	private final Driver neo4jDriver;
 
 
 	public KnowledgeModelService(ElementRepository elementRepository, RelationRepository relationRepository,
-			StructureRepository structureRepository, KnowledgeStructureService structureService, Driver neo4jDriver) {
+			StructureRepository structureRepository, KnowledgeStructureService structureService,
+			ImageService imageService, Driver neo4jDriver) {
 		this.elementRepository = elementRepository;
 		this.relationRepository = relationRepository;
 		this.structureRepository = structureRepository;
 		this.structureService = structureService;
+		this.imageService = imageService;
 		this.neo4jDriver = neo4jDriver;
 	}
 
@@ -359,14 +365,17 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	 * Adds a new element to the knowledge model.
 	 * Links the new element to the structure point with the given id, if it exists.
 	 *
-	 * @param form the form with the data for the new element
+	 * @param form  the form with the data for the new element
+	 * @param image the image for the new element
+	 * @throws IllegalArgumentException if the form was null
 	 */
-	public void addElement(AddElementForm form) {
+	public void addElement(AddElementForm form, MultipartFile image) throws IllegalArgumentException {
 		var structureId = form.getStructureId();
 		var structureObject = structureRepository.findById(structureId);
 		if (structureObject.isEmpty()) {
 			return;
 		}
+
 		KnowledgeElement newElement = switch (form.getType()) {
 			case TERM -> new Term(form.getContent(), createId(STR."\{form.getContent()}-TERM"),
 					form.getType().name());
@@ -376,8 +385,23 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 					createId(STR."\{form.getContent()}-EXAMPLE"), form.getType().name());
 			case CODE -> new Code(form.getLanguage(), form.getHeadline(), form.getContent(),
 					createId(STR."\{form.getContent()}-CODE"));
-			case IMAGE -> new Image(form.getContent(), form.getDescription(), form.getHeadline(),
-					(STR."\{form.getContent()}-IMAGE"));
+			case IMAGE -> {
+				if (image == null) {
+					throw new IllegalArgumentException("Image was null!");
+				}
+				var name = image.getOriginalFilename();
+				int i = 1;
+				while (imageService.hasImage(name)) {
+					var names = image.getOriginalFilename().split(".");
+					name = STR."\{names[0]}\{i}.\{names[1]}";
+					i++;
+				}
+				var back = new Image(name, form.getContent(), form.getHeadline(),
+						createId(STR."\{name}-IMAGE"));
+				back.setStructureId(structureId);
+				imageService.store(image);
+				yield back;
+			}
 			case TEXT -> new Text(form.getHeadline(), form.getContent(), createId(STR."\{form.getContent()}-TEXT"));
 			case FACT -> new Fact(form.getContent(), createId(STR."\{form.getContent()}-FACT"));
 			case ITEM -> createItem(form);
@@ -465,6 +489,7 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	 * @throws NoSuchElementException   if the from or to element of the relation was not found
 	 */
 	public boolean addAndLink(Relation relation) throws IllegalArgumentException, NoSuchElementException {
+		// Todo rework this method this is pointless at moment
 		boolean hasFrom = false;
 		boolean hasTo = false;
 		if (relation == null) {
@@ -479,7 +504,7 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 		hasTo = true;
 		relation.setTo(toElement);
 		link(fromElement, toElement, relation.getType());
-		return relation != null;
+		return hasFrom && hasTo;
 	}
 
 	//region structure

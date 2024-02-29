@@ -268,6 +268,29 @@ function getItemInputs() {
     return result
 }
 
+function getImageInputs() {
+    let result = [];
+    result.push(createType("IMAGE"));
+    // content
+    const imageInput = document.createElement("label");
+    imageInput.classList.add("form-control", "mt-3");
+    let labelText = document.createTextNode("Bild hochladen: ");
+    imageInput.appendChild(labelText);
+    let input = document.createElement("input");
+    input.setAttribute("type", "file");
+    input.setAttribute("name", "image");
+    input.setAttribute("accept", "image/*");
+    imageInput.appendChild(input);
+    result.push(imageInput);
+    result.push(createHeadline());
+    result.push(createTextArea());
+    // structure
+    result.push(createStructureId());
+    // button
+    result.push(createSubmitButton("Bild erstellen"));
+    return result;
+}
+
 function loadElementMask(select) {
     const type = select.value;
     const form = document.getElementById("element-add-form");
@@ -292,6 +315,9 @@ function loadElementMask(select) {
         case "ITEM":
             result = getItemInputs();
             break;
+        case "IMAGE":
+            result = getImageInputs();
+            break
         default:
             form.innerHTML = "FALSCHER TYP";
     }

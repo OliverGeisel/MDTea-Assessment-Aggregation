@@ -81,6 +81,10 @@ public class ImageService implements StorageService {
 		}
 	}
 
+	public boolean hasImage(String filename) {
+		return Files.exists(getRootLocation().resolve(filename));
+	}
+
 	/**
 	 * Load all images.
 	 *
