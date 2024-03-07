@@ -2,14 +2,16 @@
 
 Dieses Dokument ist das Nutzerhandbuch für die Anwendung **MDTea-Aggregation-Assessment**, welche im Rahmen der
 Diplomarbeit von Oliver Geisel entstanden ist.
-<!-- TOC -->
 
+
+<!-- TOC -->
 * [MDTea-Aggregation-Assessment Benutzerhandbuch](#mdtea-aggregation-assessment-benutzerhandbuch)
     * [Über die Software](#über-die-software)
     * [Hardware-Anforderungen](#hardware-anforderungen)
         * [Minimal (wenn GPT4All genutzt)](#minimal-wenn-gpt4all-genutzt)
         * [Empfohlen](#empfohlen)
     * [Installation und Konfiguration](#installation-und-konfiguration)
+        * [Programmierumgebungen](#programmierumgebungen)
         * [Neo4J](#neo4j)
         * [GPT4All](#gpt4all)
             * [Remote Nutzung](#remote-nutzung)
@@ -39,7 +41,7 @@ Diplomarbeit von Oliver Geisel entstanden ist.
                 * [Export eines Kurses](#export-eines-kurses)
             * [Test-Export](#test-export)
             * [Export-Übersicht](#export-übersicht)
-
+    * [Technische Details](#technische-details)
 <!-- TOC -->
 
 ## Über die Software
@@ -50,8 +52,17 @@ Die zentrale Komponente ist dabei das Wissensmodell, welches das gesamte Wissen 
 In MDTea kann das Wissensmodell mit Wissen angereichert werden. Dies ist die Aggregation-Phase.
 In der Generation-Phase wird das Wissen genutzt, um Materialien mithilfe eines Kursplanes zu generieren.
 In der Finalization werden die generierten Materialien zu einem Kurs, welcher durch den Kursplan definiert wird,
-zusammengestellt. Ein Nutzer kann den Kurs dann bearbeiten und exportieren.
-Weitere Details zu den Phasen finden sich in der entsprechenden Arbeit [MDTea großer Beleg]()
+zusammengestellt.
+Ein Nutzer kann den Kurs dann bearbeiten und exportieren.
+Weitere Details zu den Phasen finden sich in der entsprechenden
+Arbeit [MDTea großer Beleg](https://nbn-resolving.org/urn:nbn:de:bsz:14-qucosa2-894079)
+
+Die Software ist in Java geschrieben und nutzt das Spring-Framework.
+Das Frontend wird mit Thymeleaf umgesetzt.
+Die Anwendung kann drei Phasen von MDTea umsetzen.
+Das sind die _Aggregation_, die _Generation_ und die _Finalization_.
+Die Anwendung ist in der Lage, das Wissensmodell zu bearbeiten, Materialien zu generieren und Kurse zu bearbeiten
+und zu exportieren.
 
 
 <hr>
@@ -70,10 +81,18 @@ Das System kann je nach Nutzung sehr hohe Anforderungen haben. Es sollte ein seh
 
 * 16GB oder mehr (je nach Modell für GPT4All)
 * 4 oder mehr Kerne (Je mehr, umso besser für GPT4All)
-* Grafikkarte mit Cuda Support
+* Grafikkarte mit Cuda Support - RAM ist wichtiger als die Leistung. Wenn das Modell zu groß ist, wird die Grafikkarte
+  nicht genutzt.
 * Docker
 
 ## Installation und Konfiguration
+
+### Programmierumgebungen
+
+Es werden sowohl Java als auch Python benötigt. Die Installation von Java und Python wird hier nicht erklärt.
+Die konkrete Version von Java ist wichtig. Es muss exakt die Version 21 sein.
+Der Grund sind die benutzten Preview-Features.
+Für Python wird mindestens die Version 3.10 benötigt.
 
 Das Projekt ist ein Maven-Projekt, deshalb ist die Anwendung mit ```mvn package``` compiliert und als jar
 einsatzbereit. Die Datei ist im erstellten target ordner als ```MDTea-Assessment-Aggregation.jar``` zu finden.
@@ -83,38 +102,41 @@ Zum einen ist das eine **Neo4j**-Datenbank, zum anderen eine Instanz von [**GPT4
 
 ### Neo4J
 
-Für Neo4j kann das ```docker-compose.yaml``` im root-Verzeichnis genutzt werden. Dazu einfach
+Für Neo4j kann das ```docker-compose.yaml``` im root-Verzeichnis genutzt werden.
+Dazu einfach
 
 ```bash
 docker compose
 ``` 
 
-im root-Verzeichnis ausführen. Alternativ kann auch eine eigene Neo4J-Datenbank genutzt werden.
+im root-Verzeichnis ausführen.
+
+Alternativ kann auch eine eigene Neo4J-Datenbank genutzt werden.
 Jedoch muss hier dann entsprechend die Datenbank-Verbindung in `src/main/resources/application.properties` eingestellt
 werden.
 
 ### GPT4All
 
-Es gibt 2 Möglichkeiten, wie die Anwendung mit GPT4All arbeiten kann. Entweder *Remote* oder *Lokal*.
+Es gibt 2 Möglichkeiten, wie die Anwendung mit GPT4All arbeiten kann.
+Entweder *Remote* oder *Lokal*.
 Für beide Varianten sind einige Python-Packages notwendig. Diese sind
-
 ```bash
 argparse
-openai
+openai 0.28.1
 pathlib
 requests
-sys
 gpt4all
 ```
 
-<span style="color: darkred">Achtung!</span> Diese Komponente ist sehr rechenintensiv. Sollte das System, auf die
-Komponente läuft, nicht moderne und gute Hardware besitzen (siehe [Anforderungen](#hardware-anforderungen)) kann es
+<span style="color: darkred">Achtung!</span> Diese Komponente ist sehr rechenintensiv.
+Sollte das System, auf die Komponente läuft, nicht moderne und gute Hardware besitzen (
+siehe [Anforderungen](#hardware-anforderungen)) kann es
 zu Verbindungsabbrüchen (nach 10 Minuten) oder gar zum Absturz der Komponente kommen!
 
 #### Remote Nutzung
 
-Für die Remote-Nutzung ist es am einfachsten den Client von der offiziellen Webseite von [GPT4All](https://gpt4all.
-io) herunterzuladen und zu installieren.
+Für die Remote-Nutzung ist es am einfachsten den Client von der offiziellen Webseite von [GPT4All](https://gpt4all.io)
+herunterzuladen und zu installieren.
 Für die Installation einfach den Anweisungen auf der Webseite folgen. <br>
 Nach erfolgreicher Installation muss mindestens ein Modell für den Client heruntergeladen werden.
 Die Anwendung kennt 5 Modelle:
@@ -125,11 +147,14 @@ Die Anwendung kennt 5 Modelle:
 + "nous-hermes-llama2-13b.Q4_0.gguf"
 + "em_german_mistral_v01.Q4_0.gguf"
 
-Weitere Modelle müssen diese in `src/main/java/de/olivergeisel/materialgenerator/aggregation/AggregationController.
-java` hinzugefügt werden. Sollte ein Modell nicht verfügbar sein, wird das Default-Modell des Clients genommen.
+**Mistral-7b-instruct-v0.1** ist die Empfehlung für die Nutzung mit der Anwendung, da mit diesem Modell auch alle
+Prompts getestet wurden.
 
-Der Sever muss allerdings noch in dem GPT4All-Client aktiviert werden. Dazu geht man in die
-Einstellungen. ![Server aktivieren](images/enable-server.png)
+Weitere Modelle müssen diese in `gpt-connection/model.json` hinzugefügt werden.
+Sollte ein Modell nicht verfügbar sein, wird das Default-Modell des Clients genommen.
+
+Der Sever muss allerdings noch in dem GPT4All-Client aktiviert werden.
+Dazu geht man in die Einstellungen. ![Server aktivieren](images/enable-server.png)
 
 #### Lokale Nutzung
 
@@ -162,7 +187,7 @@ Jedes Flag sollte mit bedacht gewählt werden und nur in Ausnahmen zum Einsatz k
 Nachdem die Anwendung mit
 
 ```bash
-java -jar MDTea-Assessment-Aggregation.jar
+java -jar MDTea-Assessment-Aggregation-1.1.0-SNAPSHOT.jar
 ```
 
 gestartet wurde, kann über [http://localhost:8080](http://localhost:8080) die Seite geöffnet werden.
@@ -189,9 +214,13 @@ Die Anwendung bietet folgende Möglichkeiten:
 
 Der Prototyp unterstützt zurzeit nur die Verarbeitung von Texten.
 Die Verarbeitung des Fragmentes geschieht in mehreren einzelnen Schritten.
+Um ein Fragment zu verarbeiten, muss der Nutzer auf den Button "Fragment hinzufügen" in der Navigation klicken.
+![Fragment hinzufügen](images/add-fragment.png)
+
+Danach müssen die folgenden Schritte durchgeführt werden:
 
 1. Fragmenteingabe und Konfiguration
-2. Extraktion von Termen
+2. Extraktion und Bearbeiten von Termen
 3. Extraktion und Bearbeiten von Definitionen
 4. Extraktion und Bearbeiten von Beispielen
 5. Extraktion und Bearbeiten von Code
@@ -202,6 +231,12 @@ Die Verarbeitung des Fragmentes geschieht in mehreren einzelnen Schritten.
 
 ![Eingabe eines Fragmentes und die Konfiguration für das GPT-Modell](images/aggregation-fragment.png)
 In der Abbildung ist der initiale Schritt für die Gewinnung von Wissen zu sehen.
+Hier muss der Nutzer das gewünschte Modell auswählen und die Parameter für das Modell einstellen.
+Die wichtigsten Parameter sind die Anzahl der Tokens und der Ort des Modells.
+Die Anzahl der Tokens bestimmt, wie viele Tokens das Modell maximal generieren soll.
+Der Ort des Modells gibt an, ob GPT4All lokal oder remote genutzt wird.
+Die weiteren Parameter sind nicht so wichtig und können so gelassen werden.
+Falls ein Modell auf einem anderen Server genutzt werden soll, muss der Server-Ort und der API-Key angegeben werden.
 
 ##### 2. Extraktion von Termen
 
@@ -238,7 +273,25 @@ Wenn alles bearbeitet wurde, kann der Nutzer auf den Button "Weiter" klicken.
 
 ##### 5. Extraktion und Bearbeiten von Code
 
+Dieser Schritt wird automatisch übersprungen, weil es zwar geplant war Code zu extrahieren, jedoch nicht umgesetzt
+wurde.
+
 ##### 6. Extraktion und Bearbeiten von Items (Fragen)
+
+Die letzte Art von Wissen, die extrahiert werden kann, sind Items.
+Allgemein sind Items Fragen, Aufgaben oder ähnliches.
+Diese Software unterstützt lediglich 4 Arten von Items:
+
+1. **True/False** - Eine Frage, die mit "Wahr" oder "Falsch" beantwortet werden kann.
+2. **Single Choice** - Eine Frage, die mit einer Antwort aus einer Auswahl beantwortet werden kann.
+3. **Multiple Choice** - Eine Frage, die mit mehreren Antworten aus einer Auswahl beantwortet werden kann.
+4. **Fill Out Blanks** - Eine Frage, bei der Lücken in einem Text ausgefüllt werden müssen.
+
+Die Extraktion läuft genauso ab wie bei den anderen Wissensarten.
+Der Nutzer kann die Fragen bearbeiten und entscheiden, welche Fragen behalten werden sollen und welche nicht
+angenommen.
+Zudem kann der Nutzer selbst eigene Fragen hinzufügen.
+![](images/item-add.png)
 
 ##### 7. Integration ins Wissensmodell
 
@@ -258,13 +311,13 @@ Daten eingetragen werden können.
 Jedes Element hat dabei eine eigene Maske, die spezifisch für das Element ist.
 Folgende Tabelle zeigt die Elemente und die entsprechenden Felder (Ohne Items):
 
-| **Term**    | **Definition** | **Code** | **Text** |
-|-------------|----------------|----------|----------|
-| Struktur-Id |                |          |          |
-| Term-Name   | Definition     |          |          |
-|             |                |          |          |
-|             |                |          |          |
-|             |                |          |          |
+| **Term**    | **Definition** | **Code** | **Text** | **Bild** |
+|-------------|----------------|----------|----------|----------|
+| Struktur-Id |                |          |          |          |
+| Term-Name   | Definition     |          |          |          |
+|             |                |          |          |          |
+|             |                |          |          |          |
+|             |                |          |          |          |
 
 Es gibt einen Typ bei Wissenselementen, der Aufgaben, Fragen und ähnliches zusammenfasst.
 Dieser Typ ist "Item".
@@ -286,8 +339,9 @@ hinzugefügt werden.
 
 ### Generation (Generierung von Material/Kursen)
 
-Die Generation ist die zweite Phase von MDTea. Hier wird das Wissen aus dem Wissensmodell genutzt, um Materialien zu
-generieren. In dem Prototypen werden
+Die Generation ist die zweite Phase von MDTea.
+Hier wird das Wissen aus dem Wissensmodell genutzt, um Materialien zu generieren.
+In dem Prototypen werden mit dem Wissen aus dem Wissensmodell, einem Kursplan und einer Vorlage Kurse generiert.
 
 #### Wahl der Vorlage
 
@@ -358,13 +412,13 @@ In der aktuellen Version gibt es nur 2 Arten von komplexen Materialien: Tests un
 Eine Übersicht ist eine Auflistung von Termen, die zu einer Zusammenfassung (Definition, Beispiele, etc.) zu dem
 jeweiligen Term führen.
 
-Ein Test ist eine Sammlung von Fragen, die zu einem Thema gestellt werden. Es gibt 5 Arten von Fragen:
+Ein Test ist eine Sammlung von Fragen, die zu einem Thema gestellt werden.
+Es gibt 4 Arten von Fragen:
 
 * True/False
 * Multiple Choice
 * Multiple Choice
 * Fill in the Blanks
-* Assignment
 
 Die letzte Sektion ganz unten auf der Seite listet alle Materiel auf, die zwar mit dem entsprechenden
 Kursplan generiert wurden, jedoch **nicht** dem Kurs zugeordnet sind.
@@ -410,9 +464,11 @@ Auch wenn in den Vorschlägen Kapitel auftauchen, so wird bei der Zuweisung nich
 ##### Export eines Kurses
 
 In der Ansicht eines Kurses gibt es die Möglichkeit, den Kurs zu exportieren.
-Hierzu muss jedoch ein Kurs gültig sein. Jedes Strukturelement (ausgenommen von Materialien) besitzt eine Relevanz.
+Hierzu muss jedoch ein Kurs gültig sein.
+Jedes Strukturelement (ausgenommen von Materialien) besitzt eine Relevanz.
 Die Relevanz berechnet sich immer aus dem maximalen Wert der Relevanz der Kinder.
-Es gibt folgende Relevanzwerte für die Strukturelemente. Die Werte sind in absteigender Reihenfolge:
+Es gibt folgende Relevanzwerte für die Strukturelemente.
+Die Werte sind in absteigender Reihenfolge:
 
 * Mandatory - Material muss vorhanden sein
 * Optional - Material kann vorhanden sein (kann leer sein)
@@ -425,7 +481,9 @@ exportiert werden kann.
 
 #### Test-Export
 
-Jeder Test kann separat heruntergeladen werden. Das Format ist dabei immer das OPAL-Format.
+Jeder Test kann separat heruntergeladen werden.
+Dafür muss lediglich aud dem Button mit dem Download-Symbol geklickt werden.
+Das Format ist dabei immer das OPAL-Format (OpenOlat).
 ![](images/test-export.png)
 
 #### Export-Übersicht
@@ -440,3 +498,7 @@ Bei der Wahl von "OPAL" wird der Kurs als eine ZIP-Datei exportiert, die in OPAL
 
 Alternativ kann das auch in der Bearbeitungsansicht des Kurses gemacht werden.
 Siehe dazu [Bearbeiten](#bearbeiten).
+
+## Technische Details
+
+Für eine genaue Beschreibung der technischen Details siehe [Entwicklerdokumentation](./dev-doc.md).
