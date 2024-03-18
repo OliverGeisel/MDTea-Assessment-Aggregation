@@ -1,0 +1,475 @@
+{
+  "meta": {
+    "name": "Einf\u00fchrung in Informatik",
+    "description": "Dieser Kurs ist ein Beispiel f\u00fcr die Generierung von Kurses mit der Hilfe von MDTea",
+    "year": 2024,
+    "type": "Universit\u00e4t",
+    "level": "Einf\u00fchrung",
+    "extra": [
+      {
+        "name": "Autor",
+        "value": "Oliver Geisel"
+      }
+    ]
+  },
+  "content": {
+    "goal-1": {
+      "key": "goal-1",
+      "expression": "Know",
+      "target": "Informatik",
+      "completeSentence": "Kennen der Wissenschaftsbereiche der Informatik",
+      "content": [
+        "\u00dcberblick Informatik",
+        "Theoretische Informatik",
+        "Technische Informatik",
+        "Praktische Informatik",
+        "Angewandte Informatik"
+      ]
+    },
+    "goal-2": {
+      "key": "goal-2",
+      "expression": "Know",
+      "target": "Algorithmen",
+      "completeSentence": "Kennen typischer Algorithmen und Verfahren",
+      "content": [
+        "Begriff Algorithmus",
+        "Sortieralgorithmen",
+        "Rekursion",
+        "Iteration"
+      ]
+    },
+    "goal-3": {
+      "key": "goal-3",
+      "expression": "Comment",
+      "target": "Effizienz von Algorithmen",
+      "completeSentence": "Beurteilen von Algorithmen bez\u00fcglich ihrer Effizienz",
+      "content": [
+        "Komplexit\u00e4t von Algorithmen",
+        "Nachweis der Zeitkomplexit\u00e4t von Algorithmen",
+        "Beispiele Algorithmen mit polynomialem Aufwand",
+        "Beispiele Algorithmen mit exponentiellem Aufwand"
+      ]
+    },
+    "goal-4": {
+      "key": "goal-4",
+      "expression": "Know",
+      "target": "Berechenbarkeit",
+      "completeSentence": "Kennen von Grenzen der Berechenbarkeit",
+      "content": [
+        "Grenzen Berechenbarkeit"
+      ]
+    },
+    "goal-5": {
+      "key": "goal-5",
+      "expression": "Control",
+      "target": "Implementierung",
+      "completeSentence": "Beherrschen der Implementierung ausgew\u00e4hlter Algorithmen in einer Programmierumgebung",
+      "content": [
+        "Implementierung von Algorithmen"
+      ]
+    },
+    "goal-6": {
+      "key": "goal-6",
+      "expression": "First-Look",
+      "target": "Anwendungsbereiche Informatik",
+      "completeSentence": "Einblick gewinnen in die Vielfalt der Anwendungsbereiche der Informatik",
+      "content": [
+        "Anwendungsbereiche Informatik"
+      ]
+    },
+    "goal-7": {
+      "key": "goal-7",
+      "expression": "Know",
+      "target": "Auswirkungen der Informatik",
+      "completeSentence": "Kennen gesellschaftlicher Auswirkungen der Informatik in einer digitalen und globalisierten Welt",
+      "content": [
+        "Auswirkungen Informatik"
+      ]
+    },
+    "goal-8": {
+      "key": "goal-8",
+      "expression": "Know",
+      "target": "Grundlagen Softwaretechnologie",
+      "completeSentence": "Kennen der Grundlagen der Softwaretechnologie",
+      "content": [
+        "Softwareentwicklung",
+        "Softwareentwicklungsprozess"
+      ]
+    },
+    "goal-9": {
+      "key": "goal-9",
+      "expression": "First-Look",
+      "target": "Tests",
+      "completeSentence": "Einblick gewinnen in die Grundlagen von Tests in der Softwareentwicklung",
+      "content": [
+        "Testmethoden"
+      ]
+    },
+    "goal-10": {
+      "key": "goal-10",
+      "expression": "Control",
+      "target": "Modellierung",
+      "completeSentence": "Beherrschen der Modellierung von Problemen mit Hilfe einer Modellierungssprache",
+      "content": [
+        "UML",
+        "Modellierung"
+      ]
+    },
+    "goal-11": {
+      "key": "goal-11",
+      "expression": "Know",
+      "target": "Objektorientierte Programmierung",
+      "completeSentence": "Kennen der Grundbegriffe und Prinzipien der objektorientierten Programmierung",
+      "content": [
+        "OOP Konzepte",
+        "Klasse und Objekt",
+        "Vererbung"
+      ]
+    }
+  },
+  "structure": [
+    {
+      "key": "chapter-1",
+      "name": "Wissenschaft Informatik",
+      "weight": 4.0,
+      "alternatives": [
+        "Informatik",
+        "Informatik-Begriff"
+      ],
+      "topic": "\u00dcberblick Informatik",
+      "groups": [
+        {
+          "key": "group-1-1",
+          "name": "Informatik als Wissenschaft",
+          "alternatives": [
+            "Wissenschaft Informatik",
+            "\u00dcberblick Informatik",
+            "Informatik",
+            "Informatik-Begriff"
+          ],
+          "topic": "\u00dcberblick Informatik",
+          "tasks": [
+            {
+              "key": "task-1-1-1",
+              "name": "Der Begriff Informatik",
+              "topic": "\u00dcberblick Informatik",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "Wissenschaft Informatik",
+                "Informatik",
+                "Informatik-Begriff",
+                "Begriff Informatik",
+                "Geschichte Informatik"
+              ]
+            },
+            {
+              "key": "task-1-1-2",
+              "name": "Theoretische Informatik",
+              "topic": "Theoretische Informatik",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "theoretische Informatik",
+                "Sprachen und Automaten",
+                "Probleme der Berechenbarkeit"
+              ]
+            },
+            {
+              "key": "task-1-1-3",
+              "name": "Technische Informatik",
+              "topic": "Technische Informatik",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "technische Informatik",
+                "Betriebsysteme",
+                "Rechnerarchitektur",
+                "Hardware"
+              ]
+            },
+            {
+              "key": "task-1-1-4",
+              "name": "Praktische Informatik",
+              "topic": "Praktische Informatik",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "praktische Informatik",
+                "Softwareentwicklung",
+                "Programmierung",
+                "Software Engineering"
+              ]
+            },
+            {
+              "key": "task-1-1-5",
+              "name": "Angewandte Informatik",
+              "topic": "Angewandte Informatik",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "angewandte Informatik"
+              ]
+            }
+          ]
+        },
+        {
+          "key": "group-1-2",
+          "name": "Anwendungsbereiche Informatik",
+          "alternatives": [
+            "Anwendungsbereich Informatik"
+          ],
+          "topic": "Anwendungsbereiche Informatik",
+          "tasks": [
+            {
+              "key": "task-1-2-1",
+              "name": "Auswirkungen der Informatik",
+              "topic": "Auswirkungen Informatik",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "Auswirkungen der Informatik",
+                "Informatik Gesellschaft",
+                "Gesellschaft Informatik",
+                "Informatik und Gesellschaft"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "chapter-2",
+      "name": "Algorithmus",
+      "weight": 16.0,
+      "alternatives": [
+        "Algorithmen",
+        "Algorithmus-Begriff"
+      ],
+      "topic": "Begriff Algorithmus",
+      "groups": [
+        {
+          "key": "group-2-1",
+          "name": "Algorithmen Arten",
+          "alternatives": [
+            "Algorithmen"
+          ],
+          "topic": "Begriff Algorithmus",
+          "tasks": [
+            {
+              "key": "task-2-1-1",
+              "name": "Begriff Algorithmus",
+              "topic": "Begriff Algorithmus",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "Algorithmen",
+                "Algorithmus-Begriff",
+                "Begriff Algorithmus"
+              ]
+            },
+            {
+              "key": "task-2-1-2",
+              "name": "Sortieralgorithmen",
+              "topic": "Sortieralgorithmen",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "Sortieralgorithmus",
+                "Sortierverfahren",
+                "Sortieren"
+              ]
+            },
+            {
+              "key": "task-2-1-3",
+              "name": "Rekursion",
+              "topic": "Rekursion",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "Rekursiv"
+              ]
+            }
+          ]
+        },
+        {
+          "key": "group-2-2",
+          "name": "Effizienz von Algorithmen",
+          "alternatives": [],
+          "topic": "Komplexit\u00e4t von Algorithmen",
+          "tasks": [
+            {
+              "key": "task-2-2-1",
+              "name": "Big O Notation",
+              "topic": "Komplexit\u00e4t von Algorithmen",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "Big O Notation",
+                "Big O",
+                "Landau Notation",
+                "Landau",
+                "Landau-Symbole"
+              ]
+            },
+            {
+              "key": "task-2-2-2",
+              "name": "Polynomiale Komplexit\u00e4t",
+              "topic": "Beispiele Algorithmen mit polynomialem Aufwand",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "polynomiale Komplexit\u00e4t",
+                "polynomiale Algorithmen",
+                "Polynomialzeit"
+              ]
+            },
+            {
+              "key": "task-2-2-2",
+              "name": "Exponentielle Komplexit\u00e4t",
+              "topic": "Beispiele Algorithmen mit exponentiellem Aufwand",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "exponentielle Komplexit\u00e4t",
+                "exponentielle Algorithmen",
+                "Exponentialzeit"
+              ]
+            }
+          ]
+        },
+        {
+          "key": "group-2-3",
+          "name": "Grenzen der Berechenbarkeit",
+          "alternatives": [],
+          "topic": "Grenzen Berechenbarkeit",
+          "tasks": [
+            {
+              "key": "task-2-3-1",
+              "name": "Technische Grenzen",
+              "topic": "Grenzen Berechenbarkeit",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "Technische Grenzen der Berechenbarkeit",
+                "Berechenbarkeit",
+                "Komplexit\u00e4t",
+                "Komplexitätstheorie"
+              ]
+            },
+            {
+              "key": "task-2-3-2",
+              "name": "Theoretische Grenzen",
+              "topic": "Grenzen Berechenbarkeit",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "Theoretische Grenzen der Berechenbarkeit"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "chapter-3",
+      "name": "Softwaretechnologie",
+      "weight": 4.0,
+      "alternatives": [],
+      "topic": "",
+      "groups": [
+        {
+          "key": "group-3-1",
+          "name": "Was ist Softwaretechnologie",
+          "alternatives": [
+            "Softwaretechnologie"
+          ],
+          "topic": "Grundlagen Softwaretechnologie",
+          "tasks": [
+            {
+              "key": "task-3-1-1",
+              "name": "Warum ist Softwaretechnologie wichtig",
+              "topic": "Grundlagen Softwaretechnologie",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "Softwareentwicklung"
+              ]
+            },
+            {
+              "key": "task-3-1-2",
+              "name": "Der Softwareentwicklungsprozess",
+              "topic": "Softwareentwicklungsprozess",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "Softwareentwicklungsprozess"
+              ]
+            }
+          ]
+        },
+        {
+          "key": "group-3-2",
+          "name": "Modellierung",
+          "alternatives": [],
+          "topic": "Modellierung",
+          "tasks": [
+            {
+              "key": "task-3-2-1",
+              "name": "Was ist ein Modell",
+              "topic": "Modellierung",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "Modell"
+              ]
+            },
+            {
+              "key": "task-3-2-2",
+              "name": "UML",
+              "topic": "UML",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "Unified Modeling Language"
+              ]
+            }
+          ]
+        },
+        {
+          "key": "group-3-3",
+          "name": "Objektorientierte Programmierung ",
+          "alternatives": [
+            "OOP Konzepte"
+          ],
+          "topic": "OOP",
+          "tasks": [
+            {
+              "key": "task-3-3-1",
+              "name": "Klasse und Objekt",
+              "topic": "Klasse und Objekt",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "Klassen",
+                "Objekte",
+                "Klassen und Objekte",
+                "Klasse",
+                "Objekt"
+              ]
+            },
+            {
+              "key": "task-3-3-2",
+              "name": "Vererbung",
+              "topic": "Vererbung",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "Generalisierung"
+              ]
+            }
+          ]
+        },
+        {
+          "key": "group-3-4",
+          "name": "Tests",
+          "alternatives": [
+            "Testmethoden"
+          ],
+          "topic": "Test",
+          "tasks": [
+            {
+              "key": "task-3-4-1",
+              "name": "Testmethoden",
+              "topic": "Testmethoden",
+              "relevance": "MANDATORY",
+              "alternatives": [
+                "Testmethode"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
