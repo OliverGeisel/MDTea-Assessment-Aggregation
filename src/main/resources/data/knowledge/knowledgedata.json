@@ -175,7 +175,7 @@
       "type": "DEFINITION",
       "id": "Informatik-Definition-2-DEFINITION",
       "structure": "Wissenschaft Informatik",
-      "content": "Informatik ist die Wissenschaft, Technik und Anwendung der maschinellen Verarbeiteung und \u00dcbermittling von Informationen.",
+      "content": "Informatik ist die Wissenschaft, Technik und Anwendung der maschinellen Verarbeitung und \u00dcbermittling von Informationen.",
       "relations": [
         {
           "relation_id": "Informatik-TERM",
@@ -328,7 +328,7 @@
       "type": "NODE",
       "id": "Eigenschaften-Information-NODE",
       "structure": "Wissenschaft Informatik",
-      "content": "Eigenschaften von Information\n\n- Information ist immer an einen stofflich(-energetischen) Tr\u00e4ger gebunden. Kristallgitter, DNS und Buch sind in den Beispielen jeweils Informationstr\u00e4ger\n- Information bewirkt etwas. \n- Information l\u00e4sst sich beliebig vervielf\u00e4ltigen (Das vorhandensein von Informationstr\u00e4gern vorarusgesetzt)",
+      "content": "Eigenschaften von Information\n\n- Information ist immer an einen stofflich(-energetischen) Tr\u00e4ger gebunden. Kristallgitter, DNS und Buch sind in den Beispielen jeweils Informationstr\u00e4ger\n- Information bewirkt etwas. \n- Information l\u00e4sst sich beliebig vervielf\u00e4ltigen (Das vorhandensein von Informationstr\u00e4gern vorausgesetzt)",
       "relations": [
         {
           "relation_id": "Information-TERM",
@@ -378,7 +378,7 @@
       "type": "DEFINITION",
       "id": "Signal-DEFINITION",
       "structure": "Wissenschaft Informatik",
-      "content": "Ein Signal ist eine duch Messger\u00e4te erfassbare physikalische Var\u00e4nderung. Signale dienen zur Darstellung von Zeichen.",
+      "content": "Ein Signal ist eine durch Messger\u00e4te erfassbare physikalische Var\u00e4nderung. Signale dienen zur Darstellung von Zeichen.",
       "relations": [
         {
           "relation_id": "Signal-TERM",
@@ -531,7 +531,7 @@
       "type": "TEXT",
       "id": "Informatik-Gesellschaft-TEXT",
       "structure": "Informatik Gesellschaft",
-      "content": "text: Die Informatik ist u.a. eine Ingenieurwissenschaft. Ihr Ziel ist die Konstruktion und Anwendung nutzbringender, k\u00fcnstlicher Systeme zur Verarbeitung von Informationen. Damit ist klar, dass Informatik nicht im wertneutralem Raum stattfindet. Es steht immer die Frage \"Nutzen f\u00fcr wen?\" und damit auch nach der sozialen Verantwortung der Informatiker.\n\nEtwa seit 1960 kann man von der Informatik als eigenst\u00e4ndige Wissenschaft sprechen. Sie hat inzwischen eine Vielzahl Untergliederungegn und Spezialdisziplinen hervorgebracht.",
+      "content": "text: Die Informatik ist u.a. eine Ingenieurwissenschaft. Ihr Ziel ist die Konstruktion und Anwendung nutzbringender, k\u00fcnstlicher Systeme zur Verarbeitung von Informationen. Damit ist klar, dass Informatik nicht im wertneutralem Raum stattfindet. Es steht immer die Frage \"Nutzen f\u00fcr wen?\" und damit auch nach der sozialen Verantwortung der Informatiker.\n\nEtwa seit 1960 kann man von der Informatik als eigenst\u00e4ndige Wissenschaft sprechen. Sie hat inzwischen eine Vielzahl Untergliederungen und Spezialdisziplinen hervorgebracht.",
       "relations": []
     },
     {
@@ -539,6 +539,18 @@
       "id": "Theoretische-Informatik-TERM",
       "structure": "Theoretische Informatik",
       "content": "Theoretische Informatik",
+      "relations": [
+        {
+          "relation_id": "Informatik-TERM",
+          "relation_type": "part-of"
+        }
+      ]
+    },
+    {
+      "type": "TERM",
+      "id": "Angewandte-Informatik-TERM",
+      "structure": "Angewandte Informatik",
+      "content": "Angewandte Informatik",
       "relations": [
         {
           "relation_id": "Informatik-TERM",
@@ -574,7 +586,7 @@
       "type": "DEFINITION",
       "id": "Technische-Informatik-DEFINITION",
       "structure": "Technische Informatik",
-      "content": "Die Technische Informatik befasst sich mit dem funktionalen Aufbau von Computern und dazugeh\u00f6rigen Peripherieger\u00e4ten einschlie\u00dfllichRechnernetze sowie dem logischen und terchnischen Entwurf von Schaltungen und Ger\u00e4ten.",
+      "content": "Die Technische Informatik befasst sich mit dem funktionalen Aufbau von Computern und dazugeh\u00f6rigen Peripherieger\u00e4ten einschlie\u00dflich Rechnernetze sowie dem logischen und technischen Entwurf von Schaltungen und Ger\u00e4ten.",
       "relations": [
         {
           "relation_id": "Technische-Informatik-TERM",
@@ -598,7 +610,7 @@
       "type": "DEFINITION",
       "id": "Theoretische-Informatik-DEFINITION",
       "structure": "Theoretische Informatik",
-      "content": "In der Theoretischen Informatik werden die grundlegenden Strukturen und Prozesse mit mathematischen Hilfsmitteln modelliert und untersucht. Die tehoretische Informatik zeigt prinzipielle Grenzen und schafft gleichzeitig Voraussetzungen f\u00fcr Neues.",
+      "content": "In der Theoretischen Informatik werden die grundlegenden Strukturen und Prozesse mit mathematischen Hilfsmitteln modelliert und untersucht. Die theoretische Informatik zeigt prinzipielle Grenzen und schafft gleichzeitig Voraussetzungen f\u00fcr Neues.",
       "relations": [
         {
           "relation_id": "Theoretische-Informatik-TERM",
@@ -610,7 +622,7 @@
       "type": "DEFINITION",
       "id": "Angewandte-Informatik-DEFINITION",
       "structure": "Angewandte Informatik",
-      "content": "Die Angewante Informatik ist eigentlich der Oberbegriff f\u00fcr die Verwendung in anderen Faqchgebieten, die ihre wesentliche Ergebnisse nur mit dem Computer erreichen k\u00f6nnen.",
+      "content": "Die Angewandte Informatik ist eigentlich der Oberbegriff f\u00fcr die Verwendung in anderen Fachgebieten, die ihre wesentliche Ergebnisse nur mit dem Computer erreichen k\u00f6nnen.",
       "relations": [
         {
           "relation_id": "Angewandte-Informatik-TERM",
@@ -641,7 +653,7 @@
       "type": "DEFINITION",
       "id": "Datenschutz-DEFINITION",
       "structure": "Datenschutz",
-      "content": "Gesamtheit der Standards der gesetzlichen und betrieblichen Regelungen zum Schutz der Rechte der Gemeinschaft sowie nat\u00fcrlicher und juristischer Personen vor Verltzung der Vertraulichkeit, der Integrit\u00e4t und der Sicherheit des Informationshasuhaltes bzw. der Informationsmenge.",
+      "content": "Gesamtheit der Standards der gesetzlichen und betrieblichen Regelungen zum Schutz der Rechte der Gemeinschaft sowie nat\u00fcrlicher und juristischer Personen vor Verltzung der Vertraulichkeit, der Integrit\u00e4t und der Sicherheit des Informationshaushaltes bzw. der Informationsmenge.",
       "relations": [
         {
           "relation_id": "Datenschutz-TERM",
@@ -724,7 +736,7 @@
       "type": "DEFINITION",
       "id": "Integrit\u00e4t-DEFINITION",
       "structure": "Datensicherheit",
-      "content": "Integit\u00e4t ist die Eigenschaft eines Systems, die besagt, dass es nur erlaubte und intendierte Ver\u00e4nderungegn der in ihm enthaltenen Informationen zul\u00e4sst. Eine Information ist dann integer, wenn an ihr nur zul\u00e4ssige Veranderungen vorgenommen wurden.",
+      "content": "Integit\u00e4t ist die Eigenschaft eines Systems, die besagt, dass es nur erlaubte und intendierte Ver\u00e4nderungegn der in ihm enthaltenen Informationen zul\u00e4sst. Eine Information ist dann integer, wenn an ihr nur zul\u00e4ssige Ver\u00e4nderungen vorgenommen wurden.",
       "relations": [
         {
           "relation_id": "Integrit\u00e4t-TERM",
@@ -856,7 +868,7 @@
       "type": "IMAGE",
       "id": "ZitatBSI-IMAGE",
       "structure": "Datensicherheit",
-      "content": "imageName:ZitatBSI.png;imageDescription:;headline:Zitat des BSI Präsedenten",
+      "content": "imageName:ZitatBSI.png;imageDescription:;headline:Zitat des BSI Präsidenten",
       "relations": []
     },
     {
