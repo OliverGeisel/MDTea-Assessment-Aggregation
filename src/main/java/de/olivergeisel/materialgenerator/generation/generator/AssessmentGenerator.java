@@ -6,10 +6,7 @@ import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relati
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeObject;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
 import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
-import de.olivergeisel.materialgenerator.generation.configuration.ItemConfiguration;
-import de.olivergeisel.materialgenerator.generation.configuration.MultipleChoiceConfiguration;
-import de.olivergeisel.materialgenerator.generation.configuration.SingleChoiceConfiguration;
-import de.olivergeisel.materialgenerator.generation.configuration.TestConfiguration;
+import de.olivergeisel.materialgenerator.generation.configuration.*;
 import de.olivergeisel.materialgenerator.generation.generator.item_exctraction.TrueFalseExtractor;
 import de.olivergeisel.materialgenerator.generation.generator.test_assamble.TestAssembler;
 import de.olivergeisel.materialgenerator.generation.material.Material;
@@ -111,10 +108,11 @@ public class AssessmentGenerator extends AbstractGenerator {
 				createSingleChoice(knowledge, plan.getTestConfiguration().getConfiguration(ItemType.SINGLE_CHOICE));
 		var multipleChoice =
 				createMultipleChoice(knowledge, plan.getTestConfiguration().getConfiguration(ItemType.MULTIPLE_CHOICE));
-		//var fillOut = createFillOut(knowledge, plan.getTestConfiguration());
+		var fillOut = createFillOut(knowledge, plan.getTestConfiguration().getConfiguration(ItemType.FILL_OUT_BLANKS));
 
 		materials.addAll(singleChoice);
 		materials.addAll(multipleChoice);
+		materials.addAll(fillOut);
 		// tests
 		var tests = createTests(knowledge, materials, plan.getTestConfiguration());
 		materials.addAll(tests);
@@ -134,12 +132,70 @@ public class AssessmentGenerator extends AbstractGenerator {
 	 * @param knowledge The knowledge to create the materials for.
 	 * @return A list of materials with the questions.
 	 */
-	public List<MaterialAndMapping> createFillOut(Set<KnowledgeNode> knowledge) {
+	public List<MaterialAndMapping> createFillOut(Set<KnowledgeNode> knowledge, ItemConfiguration configuration) {
+		if (configuration == null || !configuration.getForItemType().equals(ItemType.FILL_OUT_BLANKS)) {
+			throw new IllegalArgumentException("Configuration is not for FillOutBlanks");
+		}
+		var fillOutBlanksConfiguration = (FillOutBlanksConfiguration) configuration;
+
 		var materials = new LinkedList<MaterialAndMapping>();
+		// collect - get all questions from knowledge
+		final var templateInfo = TemplateType.ITEM;
+		var firstNode = knowledge.stream().findFirst().orElseThrow();
+		var termNode = getTermNode(knowledge, firstNode);
+		var structure = termNode.getStructurePoint();
+		var mainTerm = termNode.getMainElement();
+		// If an Item is not connected to a Term, then find here
+		var items = getLinkedItems(knowledge);
+		items = items.stream().filter(it -> it instanceof FillOutBlanksItem).collect(Collectors.toSet());
+		for (var item : items) {
+			var fillOutItem = (FillOutBlanksItem) item;
+			createFillOutInner(materials, structure, mainTerm, fillOutItem, mainTerm.getStructureId(),
+					fillOutBlanksConfiguration);
+		}
+		// Items in relations to the main term
+		var relationsWithQuestion = getWantedRelationsKnowledge(knowledge, RelationType.RELATED);
+		relationsWithQuestion.forEach(it -> {
+			if (!(it.getTo() instanceof FillOutBlanksItem item)) {
+				return;
+			}
+			var term = it.getFrom();
+			if (ItemType.FILL_OUT_BLANKS.equals(item.getItemType())) {
+				createFillOutInner(materials, structure, term, item, mainTerm.getStructureId(),
+						fillOutBlanksConfiguration);
+			}
+		});
 
-		// Todo implement
-
+		// extraction - find extra questions
+		var extractor = new TrueFalseExtractor();
+		// todo get Tasks, that are stored in knowledge (added while aggregation)
+		for (var node : knowledge) {
+			var questions = extractor.extract(node, templateInfo);
+			materials.addAll(questions);
+		}
 		return materials;
+	}
+
+	private void createFillOutInner(LinkedList<MaterialAndMapping> materials, KnowledgeObject structure,
+			KnowledgeElement mainTerm, FillOutBlanksItem item, String structureId,
+			FillOutBlanksConfiguration configuration) {
+		try {
+			String name = getUniqueMaterialName(materials, STR."Lückentext-Frage zu \{mainTerm.getContent()}",
+					item.getId());
+			var question = item.getText();
+			var blanks =
+					item.getBlanks().stream().map(it -> new FillOutBlanksItemMaterial.Blank(false, it, 0, List.of()))
+						.toList();
+			var material = new FillOutBlanksItemMaterial(question, blanks, configuration.clone());
+			material.setStructureId(structure.getId());
+			material.setName(name);
+			var mappingEntry = new MaterialMappingEntry(material, item, mainTerm);
+			var mapping = new MaterialAndMapping(material, mappingEntry);
+			mapping.material().setStructureId(structureId);
+			materials.add(mapping);
+		} catch (Exception e) {
+			logger.error("Error while creating material for term {}", mainTerm.getContent(), e);
+		}
 	}
 
 	/**
@@ -189,7 +245,6 @@ public class AssessmentGenerator extends AbstractGenerator {
 			var questions = extractor.extract(node, templateInfo);
 			materials.addAll(questions);
 		}
-
 		return materials;
 	}
 
@@ -287,13 +342,17 @@ public class AssessmentGenerator extends AbstractGenerator {
 			var question = item.getContent();
 			var correct = item.getCorrectAnswer();
 			var alternatives = item.getAlternativeAnswers();
-			var material = new SingleChoiceItemMaterial(question, correct, alternatives, configuration.clone());
-			material.setName(name);
-			material.setStructureId(structure.getId());
-			var mappingEntry = new MaterialMappingEntry(material, item, mainTerm);
-			var mapping = new MaterialAndMapping(material, mappingEntry);
-			mapping.material().setStructureId(structureId);
-			materials.add(mapping);
+			try {
+				var material = new SingleChoiceItemMaterial(question, correct, alternatives, configuration.clone());
+				material.setName(name);
+				material.setStructureId(structure.getId());
+				var mappingEntry = new MaterialMappingEntry(material, item, mainTerm);
+				var mapping = new MaterialAndMapping(material, mappingEntry);
+				mapping.material().setStructureId(structureId);
+				materials.add(mapping);
+			} catch (IllegalArgumentException e) {
+				logger.debug("Error while creating single choice material for term {}", mainTerm.getContent(), e);
+			}
 		} catch (Exception e) {
 			logger.error("Error while creating single choice material for term {}", mainTerm.getContent(), e);
 		}
@@ -346,14 +405,19 @@ public class AssessmentGenerator extends AbstractGenerator {
 			var question = singleChoiceItem.getContent();
 			var correct = singleChoiceItem.getCorrectAnswers();
 			var alternatives = singleChoiceItem.getAlternativeAnswers();
-			var material = new MultipleChoiceItemMaterial(question, correct, alternatives,
-					multipleChoiceConfiguration.clone());
-			material.setName(name);
-			material.setStructureId(structure.getId());
-			var mappingEntry = new MaterialMappingEntry(material, singleChoiceItem, mainTerm);
-			var mapping = new MaterialAndMapping(material, mappingEntry);
-			mapping.material().setStructureId(structureId);
-			materials.add(mapping);
+			try {
+				var material = new MultipleChoiceItemMaterial(question, correct, alternatives,
+						multipleChoiceConfiguration.clone());
+				material.setName(name);
+				material.setStructureId(structure.getId());
+				var mappingEntry = new MaterialMappingEntry(material, singleChoiceItem, mainTerm);
+				var mapping = new MaterialAndMapping(material, mappingEntry);
+				mapping.material().setStructureId(structureId);
+				materials.add(mapping);
+			} catch (IllegalArgumentException e) {
+				logger.debug("Error while creating multiple choice material for term {}", mainTerm.getContent(), e);
+			}
+
 		} catch (Exception e) {
 			logger.error("Error while creating single choice material for term {}", mainTerm.getContent(), e);
 		}
