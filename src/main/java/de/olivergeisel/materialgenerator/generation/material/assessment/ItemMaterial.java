@@ -19,7 +19,7 @@ public abstract class ItemMaterial extends Material {
 	private ItemType itemType;
 
 	protected ItemMaterial() {
-		super();
+		super(MaterialType.ITEM);
 	}
 
 	protected ItemMaterial(ItemConfiguration itemConfiguration, TemplateType templateType) {

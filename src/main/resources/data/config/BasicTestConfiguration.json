@@ -5,6 +5,7 @@
   "testPer": [
     "GROUP"
   ],
+  "shuffle": true,
   "defaultTestParameters": {
     "tries": 1,
     "pointsPerUnit": 1,

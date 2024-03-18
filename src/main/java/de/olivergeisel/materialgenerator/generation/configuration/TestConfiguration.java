@@ -40,10 +40,11 @@ public class TestConfiguration {
 	private List<ItemConfiguration> itemConfigurations;
 	@ElementCollection
 	private Set<TestPer>            level;
+	private boolean shuffle;
 
 	public TestConfiguration(String configurationName, String description, String version, int numberTasks,
 			ItemSorting ordering, String markSchema, List<String> marks, Map<String, Integer> markMappingPercentage,
-			List<ItemConfiguration> itemConfigurations, Set<TestPer> level) {
+			List<ItemConfiguration> itemConfigurations, Set<TestPer> level, boolean shuffle) {
 		this.configurationName = configurationName;
 		this.description = description;
 		this.version = version;
@@ -54,6 +55,7 @@ public class TestConfiguration {
 		this.markMappingPercentage = markMappingPercentage;
 		this.itemConfigurations = new ArrayList<>(itemConfigurations);
 		this.level = level;
+		this.shuffle = shuffle;
 	}
 
 	public TestConfiguration() {
@@ -81,14 +83,15 @@ public class TestConfiguration {
 		var marksCopy = new ArrayList<>(this.marks);
 		var markMappingPercentageCopy = new HashMap<>(this.markMappingPercentage);
 		return new TestConfiguration(configurationName, description, version, numberTasks, ordering, markSchema,
-				marksCopy,
-				markMappingPercentageCopy, itemConfigurationsCopy, levelCopy);
+				marksCopy, markMappingPercentageCopy, itemConfigurationsCopy, levelCopy, shuffle);
 	}
+
+	//region setter/getter
 	public Set<ItemType> getItemTypes() {
 		return itemConfigurations.stream().map(ItemConfiguration::getForItemType).collect(Collectors.toSet());
 	}
-	//region setter/getter
 //endregion
+
 	/**
 	 * The sorting of the items in the test
 	 */

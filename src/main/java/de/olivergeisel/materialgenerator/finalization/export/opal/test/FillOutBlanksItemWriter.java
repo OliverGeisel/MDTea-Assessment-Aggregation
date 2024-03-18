@@ -12,20 +12,21 @@ import static de.olivergeisel.materialgenerator.finalization.export.opal.BasicEl
 public class FillOutBlanksItemWriter
 		extends ItemWriter<FillOutBlanksItemMaterial, OPALItemMaterialInfo<FillOutBlanksItemMaterial>> {
 
+	private static final String BLANK = "<_____>";
 
 	private static List<String> splitWithPattern(String input) {
 		List<String> parts = new ArrayList<>();
 		int lastIndex = 0;
-		var pattern = "\\|_[0-9]+_\\|";
+
 		while (true) {
-			int startIndex = input.indexOf(pattern, lastIndex);
+			int startIndex = input.indexOf(BLANK, lastIndex);
 			if (startIndex == -1) {
 				parts.add(input.substring(lastIndex));
 				break;
 			}
 			parts.add(input.substring(lastIndex, startIndex));
-			parts.add(input.substring(startIndex, startIndex + pattern.length()));
-			lastIndex = startIndex + pattern.length();
+			parts.add(input.substring(startIndex, startIndex + BLANK.length())); // add blank
+			lastIndex = startIndex + BLANK.length();
 		}
 		return parts;
 	}
@@ -73,20 +74,14 @@ public class FillOutBlanksItemWriter
 		itemBody.appendChild(content);
 		int i = 1;
 		for (var part : parts) {
-			if (part.matches("\\|_[0-9]+_\\|")) { // blank
+			if (part.matches(BLANK)) { // blank replaced
 				var blank = document.createElement("textEntryInteraction");
 				blank.setAttribute("responseIdentifier", STR."RESPONSE_\{i++}");
-				blank.setAttribute("class", "ctest_l ctest_r"); // todo add placeholder
+				blank.setAttribute("class", "ctest_l ctest_r"); // todo add placeholder in blank
 				content.appendChild(blank);
 			} else {
-				content.appendChild(document.createTextNode(part));
+				content.appendChild(document.createTextNode(part)); // normal text
 			}
 		}
-		itemBody.appendChild(elementWithText(document, "p", item.getOriginalMaterial().getBody()));
-		var textEntryInteraction = document.createElement("textEntryInteraction");
-		textEntryInteraction.setAttribute("responseIdentifier", "RESPONSE_1");
-		textEntryInteraction.setAttribute("expectedLength", "20");
-		itemBody.appendChild(textEntryInteraction);
-		root.appendChild(itemBody);
 	}
 }

@@ -8,6 +8,21 @@ import jakarta.persistence.Entity;
 
 import java.util.List;
 
+/**
+ * A single choice item is an item where the user has to choose one correct answer from a list of alternatives.
+ * <p>
+ * The user has to choose the correct answer from a list of alternatives.
+ * </p>
+ * <p>
+ * The configuration of the item defines if the alternatives are shuffled or not and how many alternatives are shown.
+ * </p>
+ *
+ * @author Oliver Geisel
+ * @version 1.1.0
+ * @see ItemMaterial
+ * @see SingleChoiceConfiguration
+ * @since 1.1.0
+ */
 @Entity
 public class SingleChoiceItemMaterial extends ItemMaterial {
 
@@ -32,6 +47,9 @@ public class SingleChoiceItemMaterial extends ItemMaterial {
 		this.correctAnswer = correctAnswer;
 		this.alternativeAnswers = alternativeAnswers;
 		this.itemConfiguration = itemConfiguration;
+		while (alternativeAnswers.size() + 1 > itemConfiguration.getNumberOfChoices()) {
+			alternativeAnswers.removeLast();
+		}
 	}
 
 	//region setter/getter
@@ -39,6 +57,7 @@ public class SingleChoiceItemMaterial extends ItemMaterial {
 	public SingleChoiceConfiguration getItemConfiguration() {
 		return itemConfiguration;
 	}
+
 	public String getQuestion() {
 		return question;
 	}

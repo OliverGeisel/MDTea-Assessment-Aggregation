@@ -42,11 +42,17 @@ public class TestMaterial extends ComplexMaterial {
 	public TestMaterial(List<Material> parts, TestConfiguration testConfiguration) {
 		super(MaterialType.TEST, TemplateType.TEST, parts);
 		this.testConfiguration = testConfiguration;
+		while (getParts().size() > testConfiguration.getNumberTasks()) {
+			getParts().removeLast();
+		}
 	}
 
 	public TestMaterial(List<Material> parts, TestConfiguration testConfiguration, Term term) {
 		super(MaterialType.TEST, TemplateType.TEST, term, parts);
 		this.testConfiguration = testConfiguration;
+		while (getParts().size() > testConfiguration.getNumberTasks()) {
+			getParts().removeLast();
+		}
 	}
 
 	//region setter/getter

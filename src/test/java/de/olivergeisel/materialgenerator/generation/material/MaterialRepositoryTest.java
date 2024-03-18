@@ -48,7 +48,7 @@ class MaterialRepositoryTest {
 		var testConfiguration = new TestConfiguration("Test", "Test", "1.0.0",
 				1, de.olivergeisel.materialgenerator.generation.configuration.TestConfiguration.ItemSorting.RANDOM,
 				"1", List.of("1"), Map.of("1", 1),
-				List.of(new TrueFalseConfiguration(null)), Set.of(TestPer.GROUP));
+				List.of(new TrueFalseConfiguration(null)), Set.of(TestPer.GROUP), false);
 		var test = new TestMaterial(null, testConfiguration);
 		test = materialRepository.save(test);
 		var result = materialRepository.findById(test.getId());

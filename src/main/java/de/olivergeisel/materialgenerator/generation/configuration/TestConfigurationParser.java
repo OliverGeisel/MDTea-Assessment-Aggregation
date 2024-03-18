@@ -55,6 +55,12 @@ public class TestConfigurationParser {
 				logger.warn("testPer ist not a list. aborting.");
 				throw new IllegalArgumentException("testPer ist not a list. aborting.");
 			}
+			boolean shuffle = false;
+			try {
+				shuffle = Boolean.parseBoolean(rootObject.get("shuffle").toString());
+			} catch (RuntimeException e) {
+				// ignore
+			}
 			var jsonVersion = rootObject.get("version");
 			var version = !(jsonVersion instanceof String versionString) ? "" : versionString;
 
@@ -77,7 +83,7 @@ public class TestConfigurationParser {
 				fixedMapping.put(mark.getKey(), fixed);
 			}
 			return new TestConfiguration(name, description, version, numberOfTasks, ordering, jsonMarkSchema, marks,
-					fixedMapping, taskConfigs, concreteLevels);
+					fixedMapping, taskConfigs, concreteLevels, shuffle);
 		}
 		throw new IllegalArgumentException("root element must be a abject");
 	}

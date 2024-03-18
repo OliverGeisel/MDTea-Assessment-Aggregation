@@ -11,9 +11,11 @@ public class FillOutBlanksConfiguration extends ItemConfiguration {
 
 
 	public FillOutBlanksConfiguration() {
+		super(ItemType.FILL_OUT_BLANKS);
 	}
 
 	public FillOutBlanksConfiguration(int numberOfBlanks, FillOutBlanksType blankType) {
+		super(ItemType.FILL_OUT_BLANKS);
 		this.numberOfBlanks = numberOfBlanks;
 		this.blankType = blankType;
 	}
@@ -28,5 +30,10 @@ public class FillOutBlanksConfiguration extends ItemConfiguration {
 	public enum FillOutBlanksType {
 		RANDOM,
 		TERM,
+	}
+
+	@Override
+	public FillOutBlanksConfiguration clone() {
+		return new FillOutBlanksConfiguration(numberOfBlanks, blankType, getTestParameters().clone());
 	}
 }

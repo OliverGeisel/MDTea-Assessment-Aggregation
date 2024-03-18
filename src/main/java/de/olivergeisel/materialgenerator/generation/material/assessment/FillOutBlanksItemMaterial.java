@@ -7,6 +7,7 @@ import jakarta.persistence.Embeddable;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,7 +26,7 @@ import java.util.List;
 @Entity
 public class FillOutBlanksItemMaterial extends ItemMaterial {
 
-	public static final  String                     ESCAPE_PATTERN        = "\\|_N_\\|";
+	public static final String BLANK = "<_____>";
 	private static final FillOutBlanksConfiguration DEFAULT_CONFIGURATION = new FillOutBlanksConfiguration();
 
 
@@ -38,13 +39,21 @@ public class FillOutBlanksItemMaterial extends ItemMaterial {
 	protected FillOutBlanksItemMaterial() {
 		super(DEFAULT_CONFIGURATION, TemplateType.FILL_OUT_BLANKS);
 		itemConfiguration = DEFAULT_CONFIGURATION;
+		blanks = new ArrayList<>();
 	}
 
 	public FillOutBlanksItemMaterial(String body, List<Blank> blanks) {
-		super();
+		super(DEFAULT_CONFIGURATION, TemplateType.FILL_OUT_BLANKS);
 		this.body = body;
-		this.blanks = blanks;
+		this.blanks = new ArrayList<>(blanks);
 		this.itemConfiguration = DEFAULT_CONFIGURATION;
+	}
+
+	public FillOutBlanksItemMaterial(String body, List<Blank> blanks, FillOutBlanksConfiguration configuration) {
+		super(configuration, TemplateType.FILL_OUT_BLANKS);
+		this.body = body;
+		this.blanks = new ArrayList<>(blanks);
+		this.itemConfiguration = configuration;
 	}
 
 	//region setter/getter
@@ -52,6 +61,7 @@ public class FillOutBlanksItemMaterial extends ItemMaterial {
 	public FillOutBlanksConfiguration getItemConfiguration() {
 		return itemConfiguration;
 	}
+
 	public String getBody() {
 		return body;
 	}
@@ -70,6 +80,16 @@ public class FillOutBlanksItemMaterial extends ItemMaterial {
 		private String       correctAnswer;
 		private int          error;
 		private List<String> alternativeAnswers;
+
+		protected Blank() {
+		}
+
+		public Blank(boolean caseSensitive, String correctAnswer, int error, List<String> alternativeAnswers) {
+			this.caseSensitive = caseSensitive;
+			this.correctAnswer = correctAnswer;
+			this.error = error;
+			this.alternativeAnswers = alternativeAnswers;
+		}
 
 		//region setter/getter
 		public boolean isCaseSensitive() {
