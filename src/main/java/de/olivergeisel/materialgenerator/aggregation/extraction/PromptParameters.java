@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * This class represents the parameters that can be used to prompt the model.
+ * This class represents the parameters that can be used to configure a LLM.
  *
  * @param retries     the number of retries to attempt
  * @param maxTokens   the maximum number of tokens to generate

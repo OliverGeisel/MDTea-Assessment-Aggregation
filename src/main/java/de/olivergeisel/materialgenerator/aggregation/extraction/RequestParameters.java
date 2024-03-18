@@ -10,11 +10,19 @@ import java.util.List;
  * This class is used to store the parameters of a request to the GPT-Model.
  * It is used to store the model location, model name, url, api key and prompt parameters.
  *
- * @param modelLocation
- * @param modelName
- * @param url
- * @param apiKey
- * @param promptParameters
+ * @param modelLocation The location of the model. It can be either "local" or "remote".
+ * @param modelName The name of the model. It is used to identify the model that will be loaded.
+ * @param url The url of the server where the model is located. It is only used if the model location is "remote".
+ * @param apiKey The api key of the server where the model is located. It is only used if the model location is "remote".
+ * @param promptParameters The parameters of the prompt. It is used to generate the prompt for the model.
+ *
+ * @see PromptParameters
+ * @see GPT_Request
+ * @see GPT_Session
+ *
+ * @version 1.1.0
+ * @since 1.1.0
+ * @author Oliver Geisel
  */
 public record RequestParameters(GPT_Request.ModelLocation modelLocation, String modelName, String url, String apiKey,
 								PromptParameters promptParameters) {
