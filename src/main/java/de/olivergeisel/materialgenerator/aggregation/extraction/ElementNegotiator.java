@@ -11,8 +11,9 @@ import java.util.List;
 /**
  * A Negotiator is a class that extracts a list of {@link KnowledgeElement}s from a given source/{@link KnowledgeFragment}.
  * But the Elements <b>must not be</b> correct. The user must check the elements for correctness.
+ * This is done by approve (call {@link #approve}) the elements to the negotiator.
  * So the main purpose of a Negotiator is to extract the elements from a source/fragment and hold it until the user
- * is okay with it. Is all okay, the elements will be added to a {@link KnowledgeModel}.
+ * is okay with it. Is all okay, the elements can be added to a {@link KnowledgeModel}.
  *
  * @author Oliver Geisel
  * @version 1.1.0
@@ -188,9 +189,13 @@ public class ElementNegotiator<T extends KnowledgeElement> implements Negotiator
 			   || acceptedElements.removeIf(it -> it.getId().equals(id));
 	}
 
+	/**
+	 * Not supported yet. This method throws an {@link UnsupportedOperationException}.
+	 * The negotiator is used to only hold elements until the user is okay with it. The user must approve the elements.
+	 */
 	@Override
 	public List<KnowledgeElement> extract() {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	//region setter/getter

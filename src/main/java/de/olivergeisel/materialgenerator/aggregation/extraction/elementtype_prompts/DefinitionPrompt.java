@@ -5,7 +5,7 @@ import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.elemen
 import java.util.List;
 
 /**
- * Prompt for the extraction of definitions. The prompt is used to extract definitions from a text.
+ * Prompt for the extraction of {@link Definition}s from a Fragment.
  *
  * @author Oliver Geisel
  * @version 1.1.0
@@ -22,11 +22,14 @@ public class DefinitionPrompt extends ElementPrompt<Definition> {
 			- Definitions can be multiple sentences.
 			- Only the definitions in the query are used.
 			- No duplications of definitions.
-			- Ignore a term, if no matching definition is in the query.
+			- Skip a term in the answer, if no definition is found in the query.
 			- Follow the pattern:+ [Term] | [Definition]
+			- in example section you can see an example.
+
 						
 			example:
 			- terms: fish, animal, water, gill
+			- language: 'the language of the query is english; the language of the answer is english'
 			- query: 'A fish is an animal that lives in the water. It has shed, fins and gills. A fish use gills to breathe.'
 			+ fish | A fish is an animal that lives in the water. It has shed, fins and gills.
 			""";
@@ -40,6 +43,17 @@ public class DefinitionPrompt extends ElementPrompt<Definition> {
 		this.terms = terms;
 	}
 
+	public DefinitionPrompt(String fragment, List<String> terms, String fragmentLanguage, String targetLanguage) {
+		super(DEFAULT_INSTRUCTION, DEFAULT_FORMAT, fragment, DeliverType.MULTIPLE, fragmentLanguage, targetLanguage);
+		this.terms = terms;
+	}
+
+	public DefinitionPrompt(String fragment, String instruction, String format, DeliverType deliverType,
+			List<String> terms, String fragmentLanguage, String targetLanguage) {
+		super(instruction, format, fragment, deliverType, fragmentLanguage, targetLanguage);
+		this.terms = terms;
+	}
+
 	//region setter/getter
 	public List<String> getTerms() {
 		return terms;
@@ -48,6 +62,8 @@ public class DefinitionPrompt extends ElementPrompt<Definition> {
 	@Override
 	public String getPrompt() {
 		return STR."""
+		\{getLanguageString()}
+
 		\{getInstruction()}
 
 		terms:

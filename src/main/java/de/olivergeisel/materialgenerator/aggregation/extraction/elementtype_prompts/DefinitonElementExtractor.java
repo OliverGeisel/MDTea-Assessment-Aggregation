@@ -34,14 +34,13 @@ public class DefinitonElementExtractor extends ElementExtractor<Definition, Defi
 		}
 
 		final var format = answers.getPrompt().getWantedFormat();
-		String text;
 		List<Definition> back = new LinkedList<>();
 		final var rawPotentialDefinitenLines = getPossibleAnswers(answers, modelLocation);
 		for (var line : rawPotentialDefinitenLines) {
 			if (line.strip().length() < 4) continue;
 			final var potentialDefinition = line.split("\\|");
 			if (potentialDefinition.length < 2) continue;
-			String term = potentialDefinition[0].replace("+", "").strip();
+			String term = potentialDefinition[0].replaceAll(ElementPrompt.START_CHARS_STRING_REGEX, "").strip();
 			String definition = potentialDefinition[1].strip();
 			back.add(new Definition(definition, STR."\{term}-DEFINITION"));
 			termDefinitionMap.put(STR."\{term}-DEFINITION", term);

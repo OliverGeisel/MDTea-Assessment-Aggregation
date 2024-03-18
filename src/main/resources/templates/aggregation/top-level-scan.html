@@ -2,8 +2,26 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Aggregation - Konfiguration</title>
+    <title>Aggregation - Top-Level-Scan Konfiguration</title>
     <th:block th:replace="~{main::head-tag}"></th:block>
+    <script>
+
+        const fragments = [
+            `MDTea ist ein Prozess, der es ermöglicht, verschiedene Wissensquellen zu analysieren,
+das Wissen daraus zu extrahieren und in einem Modell zu speichern.
+Dieses Wissensmodell kann genutzt werden um Lernmaterialien zu generieren und zu einem Kurs zusammenzustellen.
+Zudem gibt es die Möglichkeit der Synchronisation. Dabei wird neues Wissen in das Modell hinzugefügt und Material aktualisiert.`,
+            `Die Informatik ist die Wissenschaft von der systematischen Darstellung, Speicherung, Verarbeitung und Übertragung von Informationen.
+Sie ist eine interdisziplinäre Wissenschaft, die in vielfältigen Anwendungsgebieten zum Einsatz kommt.
+Die Informatik ist eine junge Wissenschaft, die sich in den letzten Jahrzehnten rasant entwickelt hat.`,
+        ]
+
+        function randomFragment() {
+            const fragmentInput = document.getElementById("fragment-input");
+            const index = Math.floor(Math.random() * fragments.length);
+            fragmentInput.value = fragments[index];
+        }
+    </script>
 </head>
 <body class="d-flex flex-column min-vh-100">
 <div th:replace="~{main::navigation}"></div>
@@ -11,17 +29,18 @@
     <div th:replace="~{main::aggregationProgress}"></div>
     <header class="flex-header"><h1>Konfiguration für NLP</h1></header>
     <section class="container-fluid">
-        <form method="post" th:action="@{top-level-scan}">
+        <form method="post" th:action="@{/aggregation/top-level-scan}">
 
             <th:block th:replace="~{aggregation/fragments :: model-configs}"></th:block>
 
             <label class="form-control">Fragment (wenn notwendig):
-                <textarea class="form-control" cols="80" name="fragment" rows="10"
+                <textarea class="form-control" cols="80" id="fragment-input" name="fragment" rows="10"
                           th:if="${process.sources.isEmpty()}" th:text="${process.currentFragment}"></textarea>
+                <button class="btn btn-info" onclick="randomFragment()" type="button">Random fragment</button>
             </label>
             <div th:replace="~{aggregation/fragments :: area-of-knowledge-fragment}"></div>
             <div class="btn-group mt-2">
-                <input class="btn btn-primary" type="submit" value="Submit">
+                <button class="btn btn-primary" th:text="#{aggregation.top-level-scan.analyze}" type="submit"></button>
             </div>
         </form>
         <div class="alert alert-danger mt-2" role="alert" th:if="${error}">

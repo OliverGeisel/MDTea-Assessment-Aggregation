@@ -125,7 +125,7 @@ class AggregationProcessTest {
 	@Test
 	void addTask() {
 		aggregationProcess.add(List.of(task));
-		assertEquals(1, aggregationProcess.getTasks().getAcceptedElements().size());
+		assertEquals(1, aggregationProcess.getItems().getAcceptedElements().size());
 	}
 
 	@Test

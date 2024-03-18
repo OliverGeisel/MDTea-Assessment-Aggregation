@@ -59,6 +59,14 @@ public abstract class ElementExtractor<T extends KnowledgeElement, A extends Pro
 		}
 	}
 
+	/**
+	 * Extract all possible answers from a promptAnswer. At moment, it is only used for remote requests.
+	 * It will only get the first choice and extract the text from it.
+	 *
+	 * @param answers       the promptAnswer where the parts are extracted from.
+	 * @param modelLocation the location of the model that was used to generate the promptAnswer.
+	 * @return A List of all parts of the promptAnswer.
+	 */
 	protected String[] getPossibleAnswers(A answers, GPT_Request.ModelLocation modelLocation) {
 		String text;
 		if (modelLocation == GPT_Request.ModelLocation.LOCAL) {

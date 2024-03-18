@@ -3,6 +3,7 @@ package de.olivergeisel.materialgenerator.aggregation;
 import de.olivergeisel.materialgenerator.aggregation.extraction.ElementNegotiator;
 import de.olivergeisel.materialgenerator.aggregation.extraction.GPT_Request;
 import de.olivergeisel.materialgenerator.aggregation.extraction.ModelParameters;
+import de.olivergeisel.materialgenerator.aggregation.extraction.Negotiator;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.*;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.BasicRelation;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.Relation;
@@ -25,23 +26,25 @@ import java.util.NoSuchElementException;
  */
 public class AggregationProcess {
 
-	private final LocalDateTime                 start           = LocalDateTime.now();
-	private       List<MultipartFile>           sources;
-	private       GPT_Request.ModelLocation     modelLocation   = GPT_Request.ModelLocation.REMOTE;
-	private       String                        currentFragment;
-	private       String                        areaOfKnowledge = "";
-	private       String                        apiKey;
-	private       String                        url;
-	private       String                        modelName;
-	private       ModelParameters               modelParameters = new ModelParameters();
-	private       ElementNegotiator<Term>       terms           = new ElementNegotiator<>(null);
-	private       ElementNegotiator<Definition> definitions     = new ElementNegotiator<>(null);
-	private       ElementNegotiator<Example>    examples        = new ElementNegotiator<>(null);
-	private ElementNegotiator<Code> codes = new ElementNegotiator<>(null);
-	private ElementNegotiator<Item> tasks = new ElementNegotiator<>(null);
-	private       List<Relation>                relations       = new LinkedList<>();
-	private       boolean                       complete        = false;
-	private       Step                          step            = Step.INITIAL;
+	private LocalDateTime                 start           = LocalDateTime.now();
+	private List<MultipartFile>           sources;
+	private GPT_Request.ModelLocation     modelLocation   = GPT_Request.ModelLocation.REMOTE;
+	private String                        currentFragment;
+	private String                        areaOfKnowledge = "";
+	private String                        apiKey;
+	private String                        url;
+	private String                        modelName;
+	private ModelParameters               modelParameters = new ModelParameters();
+	private String                        targetLanguage;
+	private String                        fragmentLanguage;
+	private ElementNegotiator<Term>       terms           = new ElementNegotiator<>(null);
+	private ElementNegotiator<Definition> definitions     = new ElementNegotiator<>(null);
+	private ElementNegotiator<Example>    examples        = new ElementNegotiator<>(null);
+	private ElementNegotiator<Code>       codes           = new ElementNegotiator<>(null);
+	private ElementNegotiator<Item>       items           = new ElementNegotiator<>(null);
+	private List<Relation>                relations       = new LinkedList<>();
+	private boolean                       complete        = false;
+	private Step                          step            = Step.INITIAL;
 
 	public AggregationProcess() {
 		sources = new LinkedList<>();
@@ -88,9 +91,8 @@ public class AggregationProcess {
 		return sources.add(file);
 	}
 
-
 	/**
-	 * Add the given elements to the corresponding list.
+	 * Add the given elements as accepted to the corresponding list.
 	 *
 	 * @param elements The elements to add.
 	 * @param <T>      The type of the elements.
@@ -106,11 +108,19 @@ public class AggregationProcess {
 			case DEFINITION -> definitions.addAll((Collection<Definition>) elements);
 			case EXAMPLE -> examples.addAll((Collection<Example>) elements);
 			case CODE -> codes.addAll((Collection<Code>) elements);
-			case ITEM -> tasks.addAll((Collection<Item>) elements);
+			case ITEM -> items.addAll((Collection<Item>) elements);
 			default -> throw new IllegalArgumentException(STR."Unknown type: \{first.getType()}");
 		}
 	}
 
+	/**
+	 * Suggests the given elements to the corresponding list.
+	 *
+	 * @param elements The elements to suggest.
+	 * @param <T>      The type of the elements.
+	 * @throws IllegalArgumentException if the type of the elements is not supportet.
+	 * @see ElementNegotiator#suggest(KnowledgeElement)
+	 */
 	public <T extends KnowledgeElement> void suggest(List<T> elements) throws IllegalArgumentException {
 		if (elements == null || elements.isEmpty()) {
 			return;
@@ -121,7 +131,7 @@ public class AggregationProcess {
 			case DEFINITION -> ((Collection<Definition>) elements).forEach(definitions::suggest);
 			case EXAMPLE -> ((Collection<Example>) elements).forEach(examples::suggest);
 			case CODE -> ((Collection<Code>) elements).forEach(codes::suggest);
-			case ITEM -> ((Collection<Item>) elements).forEach(tasks::suggest);
+			case ITEM -> ((Collection<Item>) elements).forEach(items::suggest);
 			default -> throw new IllegalArgumentException(STR."Unknown type: \{first.getType()}");
 		}
 	}
@@ -152,25 +162,39 @@ public class AggregationProcess {
 		if (code != null) {
 			return code;
 		}
-		var task = tasks.findById(id);
+		var task = items.findById(id);
 		if (task != null) {
 			return task;
 		}
 		throw new NoSuchElementException(STR."No element with id \{id} found.");
 	}
 
+	/**
+	 * Removes the element with the given id from the process.
+	 * Also removes all relations with the element.
+	 *
+	 * @param id The id of the element to remove.
+	 * @return true if the element was removed, false if the element was not found.
+	 */
 	public boolean removeById(String id) {
 		if (id == null || id.isBlank()) {
+			return false;
+		}
+		var find = findById(id);
+		if (find == null) {
 			return false;
 		}
 		var removed = terms.removeById(id);
 		removed |= definitions.removeById(id);
 		removed |= examples.removeById(id);
 		removed |= codes.removeById(id);
-		removed |= tasks.removeById(id);
-		// Todo remove relations too
+		removed |= items.removeById(id);
+		var elementRelations = find.getRelations();
+		for (var rel : elementRelations) {
+			relations.remove(rel);
+			unlink(rel);
+		}
 		return removed;
-
 	}
 
 	public boolean approveById(String id) {
@@ -181,10 +205,17 @@ public class AggregationProcess {
 		accepted |= definitions.approveById(id);
 		accepted |= examples.approveById(id);
 		accepted |= codes.approveById(id);
-		accepted |= tasks.approveById(id);
+		accepted |= items.approveById(id);
 		return accepted;
 	}
 
+	/**
+	 * Rejects the element with the given id.
+	 *
+	 * @param id The id of the element to reject.
+	 * @return true if the element was rejected, false if the element was not found.
+	 * @see ElementNegotiator#rejectById(String)
+	 */
 	public boolean rejectById(String id) {
 		if (id == null || id.isBlank()) {
 			return false;
@@ -193,7 +224,7 @@ public class AggregationProcess {
 		rejected |= definitions.rejectById(id);
 		rejected |= examples.rejectById(id);
 		rejected |= codes.rejectById(id);
-		rejected |= tasks.rejectById(id);
+		rejected |= items.rejectById(id);
 		return rejected;
 	}
 
@@ -312,6 +343,21 @@ public class AggregationProcess {
 	}
 
 	//region setter/getter
+	public String getTargetLanguage() {
+		return targetLanguage;
+	}
+
+	public void setTargetLanguage(String targetLanguage) {
+		this.targetLanguage = targetLanguage;
+	}
+
+	public String getFragmentLanguage() {
+		return fragmentLanguage;
+	}
+
+	public void setFragmentLanguage(String fragmentLanguage) {
+		this.fragmentLanguage = fragmentLanguage;
+	}
 
 	/**
 	 * Number of the Step the process is currently in. Starts with 0.
@@ -340,16 +386,9 @@ public class AggregationProcess {
 	public String getCurrentFragment() {
 		return currentFragment;
 	}
-	public ElementNegotiator<Code> getCodes() {
-		return codes;
-	}
 
-	public ElementNegotiator<Item> getTasks() {
-		return tasks;
-	}
-
-	public void setCurrentFragment(String currentFragment) {
-		this.currentFragment = currentFragment;
+	public ElementNegotiator<Item> getItems() {
+		return items;
 	}
 
 	public ModelParameters getModelParameters() {

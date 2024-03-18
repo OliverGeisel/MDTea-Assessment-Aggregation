@@ -1,11 +1,11 @@
 package de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_prompts;
 
 import de.olivergeisel.materialgenerator.aggregation.extraction.GPT_Request;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Item;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.MultipleChoiceItem;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.SingleChoiceItem;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.TrueFalseItem;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,6 +26,7 @@ import java.util.List;
  */
 public class ItemElementExtractor extends ElementExtractor<Item, ItemPromptAnswer> {
 
+	private final static Logger LOGGER = LoggerFactory.getLogger(ItemElementExtractor.class);
 
 	/**
 	 * Extracts a KnowledgeElement from a PromptAnswer.
@@ -65,11 +66,19 @@ public class ItemElementExtractor extends ElementExtractor<Item, ItemPromptAnswe
 			final var potentialTask = line.split("\\|");
 			if (line.strip().length() < 4 || potentialTask.length < 3) continue;
 			String type = potentialTask[0].replaceAll(ElementPrompt.START_CHARS_STRING_REGEX, "").strip();
+			type = type.replace("\\", ""); // Remove a strange character that is sometimes added
 			String task = potentialTask[1].strip();
 			String options = potentialTask[2].strip();
-			back.add(selectItemType(type, task, options));
-		}
+			try {
+				var item = selectItemType(type, task, options);
+				if (item != null) {
+					back.add(item);
+				}
+			} catch (IllegalArgumentException e) {
+				LOGGER.debug("The Item could not be created. {}", e.getMessage());
+			}
 
+		}
 		return back;
 	}
 
@@ -77,10 +86,36 @@ public class ItemElementExtractor extends ElementExtractor<Item, ItemPromptAnswe
 	private Item selectItemType(String type, String task, String options) {
 		return switch (type) {
 			// Todo implement correct
-			case "SINGLE_CHOICE" -> new SingleChoiceItem(task, List.of(options), "");
-			case "MULTIPLE_CHOICE" -> new MultipleChoiceItem(task, List.of(options), 1, "");
+			case "SINGLE_CHOICE" -> {
+				var separatedOptions = Arrays.asList(options.split(";"));
+				yield new SingleChoiceItem(task, separatedOptions, "");
+			}
+			case "MULTIPLE_CHOICE" -> {
+				var separatedOptions = options.split(";");
+				var correctOptions = new LinkedList<String>();
+				var wrongOptions = new LinkedList<String>();
+				for (String separatedOption : separatedOptions) {
+					if (separatedOption.contains("(c)")) {
+						correctOptions.add(separatedOption.replace("(c)", "").strip());
+					} else {
+						wrongOptions.add(separatedOption.strip());
+					}
+				}
+				var complete = new LinkedList<>(correctOptions);
+				complete.addAll(wrongOptions);
+				yield new MultipleChoiceItem(task, complete, correctOptions.size(), "");
+			}
 			case "TRUE_FALSE" -> new TrueFalseItem(task, Boolean.parseBoolean(options), "");
-			case "FILL_BLANK" -> null;
+			case "FILL_OUT_BLANKS" -> {
+				var separatedOptions = options.split(";");
+				Item back = null;
+				try {
+					back = new FillOutBlanksItem(task, Arrays.asList(separatedOptions), "");
+				} catch (IllegalArgumentException e) {
+					LOGGER.info(STR."The FillOutBlanksItem could not be created. \{e.getMessage()}");
+				}
+				yield back;
+			}
 			default -> null;
 		};
 	}

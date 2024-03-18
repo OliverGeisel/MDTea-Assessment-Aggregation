@@ -30,7 +30,7 @@ public class TermElementExtractor extends ElementExtractor<Term, TermPromptAnswe
 		if (modelLocation == GPT_Request.ModelLocation.LOCAL) {
 			text = answers.getAnswer();
 		} else {
-			text = getChoices(answers).get(0).get("text").toString();
+			text = getChoices(answers).getFirst().get("text").toString();
 		}
 		List<Term> back = new LinkedList<>();
 		// Todo look after format
@@ -38,7 +38,7 @@ public class TermElementExtractor extends ElementExtractor<Term, TermPromptAnswe
 		for (var line : rawPotentialTermLines) {
 			if (line.strip().isBlank()) continue;
 			final var potentialTerm = line.split("\\|");
-			String term = potentialTerm[0].replace("+", "").strip();
+			String term = potentialTerm[0].replaceAll(ElementPrompt.START_CHARS_STRING_REGEX, "").strip();
 			back.add(new Term(term, STR."\{term}-TERM", "term"));
 		}
 		return back;

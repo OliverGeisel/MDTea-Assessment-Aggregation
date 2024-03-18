@@ -43,9 +43,16 @@ public class AggregationController {
 		this.modelService = modelService;
 	}
 
+	private static GPT_Request.ModelLocation setParamsToProcess(AggregationProcess process,
+			AggregationConfigForm form) {
+		return setParamsToProcess(process, form.getFragment(), form.getApiKey(), form.getModelName(),
+				form.getConnectionType(), form.getFragmentLanguage(), form.getTargetLanguage(),
+				form.getModelParameters());
+	}
+
 	private static GPT_Request.ModelLocation setParamsToProcess(AggregationProcess process, String fragment,
-			String apiKey,
-			String modelName, String locationString, ModelParameters modelParameters) {
+			String apiKey, String modelName, String locationString,
+			String fragmentLanguage, String targetLanguage, ModelParameters modelParameters) {
 		if (process.getSources().isEmpty() && !fragment.isBlank()) {
 			process.setCurrentFragment(fragment.strip());
 		}
@@ -56,6 +63,8 @@ public class AggregationController {
 		} else {
 			process.setModelName(modelName);
 		}
+		process.setFragmentLanguage(fragmentLanguage);
+		process.setTargetLanguage(targetLanguage);
 		process.setModelParameters(modelParameters);
 		var location = GPT_Request.ModelLocation.valueOf(locationString.toUpperCase());
 		process.setModelLocation(location);
@@ -134,9 +143,8 @@ public class AggregationController {
 	@PostMapping("top-level-scan")
 	String topLevelScanPost(Model model, AggregationConfigForm form,
 			@ModelAttribute("process") AggregationProcess process) {
-		var location = setParamsToProcess(process, form.getFragment(), form.getApiKey(), form.getModelName(),
-				form.getConnectionType(), form.getModelParameters());
-		var prompt = new TermPrompt(form.getFragment());
+		var location = setParamsToProcess(process, form);
+		var prompt = new TermPrompt(form.getFragment(), form.getFragmentLanguage(), form.getTargetLanguage());
 		try {
 			var answer = gptManager.requestTerms(prompt, form.getUrl(),
 					modelListName.get(process.getModelName()), location,
@@ -261,10 +269,12 @@ public class AggregationController {
 		if (process.getStepNumber() != 2) {
 			return "redirect:/aggregation/top-level-scan";
 		}
-		var location = setParamsToProcess(process, form.getFragment(), form.getApiKey(), form.getModelName(),
-				form.getConnectionType(), form.getModelParameters());
-		var terms = process.getTerms().getAcceptedElements().stream().map(KnowledgeElement::getContent).toList();
-		var prompt = new DefinitionPrompt(process.getCurrentFragment(), terms);
+		var location = setParamsToProcess(process, form);
+		var terms = process.getTerms().getAcceptedElements().stream().map(KnowledgeElement::getContent);
+		var allTerms = new LinkedList<>(form.getTerms());
+		allTerms.addAll(terms.toList());
+		var prompt = new DefinitionPrompt(process.getCurrentFragment(), allTerms,
+				form.getFragmentLanguage(), form.getTargetLanguage());
 		try {
 			var answer = gptManager.requestDefinitions(prompt, form.getUrl(),
 					modelListName.get(process.getModelName()), location, process.getModelParameters());
@@ -388,16 +398,15 @@ public class AggregationController {
 		if (process.getStepNumber() != 5) {
 			return "redirect:/aggregation/top-level-scan";
 		}
-		var location = setParamsToProcess(process, form.getFragment(), form.getApiKey(), form.getModelName(),
-				form.getConnectionType(), form.getModelParameters());
-		var prompt = new ItemPrompt(form.getFragment());
+		var location = setParamsToProcess(process, form);
+		var prompt = new ItemPrompt(form.getFragment(), form.getFragmentLanguage(), form.getTargetLanguage());
 		try {
-			var answer = gptManager.requestTasks(prompt, form.getUrl(),
-					modelListName.get(process.getModelName()), location, process.getModelParameters());
+			var answer = gptManager.requestItems(prompt, form.getUrl(), modelListName.get(process.getModelName()),
+					location, process.getModelParameters());
 			var extractor = new ItemElementExtractor();
-			var tasks = extractor.extractAll(answer, process.getModelLocation());
-			tasks.forEach(it -> it.setStructureId(process.getAreaOfKnowledge()));
-			process.suggest(tasks);
+			var items = extractor.extractAll(answer, process.getModelLocation());
+			items.forEach(it -> it.setStructureId(process.getAreaOfKnowledge()));
+			process.suggest(items);
 		} catch (ServerNotAvailableException | TimeoutException e) {
 			model.addAttribute("error", e.getMessage());
 			model.addAttribute("models", getModelNameList());
@@ -406,6 +415,10 @@ public class AggregationController {
 			return "aggregation/tasks";
 		}
 		return "redirect:/aggregation/top-level-scan/tasks";
+	}
+			return "aggregation/items";
+		}
+		return "redirect:/aggregation/top-level-scan/items";
 	}
 
 	@GetMapping("compile")
