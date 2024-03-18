@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{aggregation.items.add.title}"></title>
+    <th:block th:replace="~{main::head-tag}"></th:block>
+    <script src="/js/element-add.js"></script>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div th:replace="~{main::navigation}"></div>
+<main class="flex-grow-1 container">
+    <header><h1>Neues Item</h1></header>
+    <section>
+        <header><h3 th:text="#{aggregation.items.add.header}">Element Wahl</h3></header>
+        <article id="element-fields">
+            <form id="element-add-form" method="post">
+
+            </form>
+            <datalist id="structure-list">
+                <option th:each="structure: ${structures}" th:text="${structure}" th:value="${structure}"></option>
+            </datalist>
+        </article>
+    </section>
+</main>
+<script>
+    const form = document.getElementById("element-add-form");
+    elements = getItemInputs();
+    elements.forEach(element => form.appendChild(element));
+</script>
+<footer th:replace="~{main::footer}"></footer>
+</body>
+</html>

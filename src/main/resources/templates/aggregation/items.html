@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Top-Level-Scan - Items</title>
+    <th:block th:replace="~{main::head-tag}"></th:block>
+    <script>
+        function enableTextarea() {
+            document.getElementById("fragment-textarea").readOnly = false;
+        }
+    </script>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div th:replace="~{main::navigation}"></div>
+<main class="flex-grow-1">
+    <div th:replace="~{main::aggregationProgress}"></div>
+    <header class="flex-header"><h1>Konfiguration für NLP</h1></header>
+    <section class="container-fluid">
+        <form method="post">
+            <th:block th:replace="~{aggregation/fragments :: model-configs}"></th:block>
+            <label class="form-control">Fragment (wenn notwendig):
+                <textarea class="form-control" cols="80" id="fragment-textarea" name="fragment" readonly rows="10"
+                          th:text="${process.currentFragment}"></textarea>
+            </label>
+            <div class="btn-group mt-2">
+                <button class="btn btn-info" onclick="enableTextarea()" type="button">Edit Fragment</button>
+                <button class="btn btn-primary" type="submit">Fragen Suchen</button>
+            </div>
+            <div th:replace="~{aggregation/fragments :: area-of-knowledge-fragment}"></div>
+        </form>
+    </section>
+    <hr>
+    <section class="container-fluid" id="answers">
+        <div class="alert alert-danger" role="alert" th:if="${error}">
+            Error
+            <p th:text="${error}"></p>
+        </div>
+        <div th:unless="${error}">
+            <header>
+                <h3>Antwort</h3>
+            </header>
+            <form th:action="@{items/add}">
+                <button class="btn btn-primary" th:text="#{aggregation.items.add}">Add</button>
+            </form>
+            <!--/*@thymesVar id="item" type="de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Item"*/-->
+            <article class="mt-2">
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
+                    <div class="col-lg-6">
+                        <span th:text="#{aggregation.items.suggested}">Vorgeschlagen</span>: <span
+                            th:text="${process.items.suggestedElements.size}"></span>
+                        <div class="row">
+                            <div class="card col-sm-5 col-md-5 col-lg-5 m-2 text-bg-primary"
+                                 th:each="item:${suggestedItems}">
+                                <div class="card-header">
+                                    <span th:text="${item.content}"></span>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">Id: <span th:text="${item.id}"></span></p>
+                                    <p class="card-text">ItemType: <span th:text="${item.itemType}"></span></p>
+                                    <p class="card-text">Structure-Id: <span th:text="${item.structureId}"></span></p>
+                                    Answers:
+                                    <div th:if="${item.itemType.type == 'SINGLE_CHOICE'}">
+                                        <span style="color: #66fc72" th:text="${item.correctAnswer}"></span>
+                                        <p style="color: #800513" th:each="answer: ${item.alternativeAnswers}"
+                                           th:text="${answer}"></p>
+                                    </div>
+                                    <div th:if="${item.itemType.type == 'MULTIPLE_CHOICE'}">
+                                        <p style="color: #66fc72" th:each="answer: ${item.correctAnswers}"
+                                           th:text="${answer}"></p>
+                                        <p style="color: #800513" th:each="answer: ${item.alternativeAnswers}"
+                                           th:text="${answer}"></p>
+                                    </div>
+                                    <div th:if="${item.itemType.type == 'TRUE_FALSE'}">
+                                        <span style="color: #11a15e" th:if="${item.correct}">Wahr</span>
+                                        <span style="color: #dc0b1c" th:unless="${item.correct}">Falsch</span>
+                                    </div>
+                                    <div th:if="${item.itemType.type == 'FILL_OUT_BLANKS'}">
+                                        <p th:each="answer: ${item.blanks}" th:text="${answer}"></p>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <a th:href="@{/aggregation/item/{id}(id=${item.id})}">
+                                        <button class="btn btn-primary">Details</button>
+                                    </a>
+                                    <form method="post">
+                                        <input name="id" th:value="${item.id}" type="hidden">
+                                        <div class="btn-group btn-group-sm col">
+                                            <button class="btn btn-danger" th:formaction="@{items/remove#answers}"><i
+                                                    class="bi bi-trash ms-2"></i></button>
+                                            <button class="btn btn-success" th:formaction="@{items/accept#answers}"><i
+                                                    class="bi bi-plus-square"></i></button>
+                                            <button class="btn btn-info" formmethod="get" th:formaction="@{items/edit}">
+                                                <i class="bi bi-pen"></i></button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <span th:text="#{aggregation.items.accepted}">Angenommen</span>: <span
+                            th:text="${process.items.acceptedElements.size}"></span>
+                        <div class="row">
+                            <div class="card col-sm-5 col-md-5 col-lg-5 m-2 text-bg-success"
+                                 th:each="item:${acceptedItems}">
+                                <div class="card-header">
+                                    <span th:text="${item.content}"></span>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">Id: <span th:text="${item.id}"></span></p>
+                                    <p class="card-text">ItemType: <span th:text="${item.itemType}"></span></p>
+                                    <p class="card-text">Structure-Id: <span th:text="${item.structureId}"></span></p>
+                                    Answers:
+                                    <div th:if="${item.itemType.type == 'SINGLE_CHOICE'}">
+                                        <span style="color: #00342c" th:text="${item.correctAnswer}"></span>
+                                        <p style="color: #800513" th:each="answer: ${item.alternativeAnswers}"
+                                           th:text="${answer}"></p>
+                                    </div>
+                                    <div th:if="${item.itemType.type == 'TRUE_FALSE'}">
+                                        <span style="color: #00342c" th:if="${item.correct}">Wahr</span>
+                                        <span style="color: #dc0b1c" th:unless="${item.correct}">Falsch</span>
+                                    </div>
+                                    <div th:if="${item.itemType.type == 'MULTIPLE_CHOICE'}">
+                                        <p style="color: #025215" th:each="answer: ${item.correctAnswers}"
+                                           th:text="${answer}"></p>
+                                        <p style="color: #800513" th:each="answer: ${item.alternativeAnswers}"
+                                           th:text="${answer}"></p>
+                                    </div>
+                                    <div th:if="${item.itemType.type == 'FILL_OUT_BLANKS'}">
+                                        <p th:each="answer: ${item.blanks}" th:text="${answer}"></p>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <a>
+                                        <button class="btn btn-primary">Details</button>
+                                    </a>
+                                    <div class="btn-group btn-group-sm btn-group-lg">
+                                        <form method="post" th:action="@{items/remove#answers}">
+                                            <input name="id" th:value="${item.id}" type="hidden">
+                                            <div class="btn-group">
+
+                                                <button class="btn btn-danger"><i class="bi bi-trash ms-2"></i></button>
+                                                <button class="btn btn-warning" th:formaction="@{items/reject#answers}">
+                                                    <i class="bi bi-dash-square ms-2"></i>
+                                                </button>
+                                                <button class="btn btn-info" formmethod="get"
+                                                        th:formaction="@{items/edit}">
+                                                    <i class="bi bi-pen"></i></button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            <hr>
+            <article class="row mb-2" id="next-step">
+                <header><h4>Weiter zur Integration</h4></header>
+                <form method="post" th:action="@{items/next}">
+                    <button class="btn btn-primary">Weiter</button>
+                    <button class="btn btn-info" th:formaction="@{items/back}">Zurück</button>
+                </form>
+            </article>
+        </div>
+    </section>
+</main>
+<footer th:replace="~{main::footer}"></footer>
+</body>
+</html>

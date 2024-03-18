@@ -6,8 +6,6 @@ import de.olivergeisel.materialgenerator.aggregation.extraction.ModelParameters;
 import de.olivergeisel.materialgenerator.aggregation.extraction.ServerNotAvailableException;
 import de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_prompts.*;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModelService;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Term;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.ModelStatistic;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.forms.AddElementForm;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.*;
@@ -18,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.*;
 import java.util.concurrent.TimeoutException;
@@ -114,8 +113,8 @@ public class AggregationController {
 		if (fragment == null || fragment.isBlank()) {
 			return "redirect:/aggregation/collect?error=Fragment ist zu kurz";
 		}
+		process.reset();
 		process.setCurrentFragment(fragment);
-
 		return "redirect:/aggregation/top-level-scan";
 	}
 
@@ -136,7 +135,7 @@ public class AggregationController {
 		return "redirect:/aggregation/collect";
 	}
 
-	@GetMapping("top-level-scan")
+	@GetMapping({"top-level-scan", "top-level-scan/", "top-level-scan/initial"})
 	String topLevelScan(Model model, @ModelAttribute("process") AggregationProcess process,
 			@ModelAttribute("form") AggregationConfigForm form) {
 		model.addAttribute("models", getModelNameList());
@@ -170,6 +169,8 @@ public class AggregationController {
 		return "redirect:/aggregation/top-level-scan/terms";
 	}
 
+	//region terms
+
 	@GetMapping("top-level-scan/terms")
 	String topLevelScanTerms(Model model, @ModelAttribute("process") AggregationProcess process) {
 		if (process.getStepNumber() != 1) {
@@ -184,6 +185,13 @@ public class AggregationController {
 		model.addAttribute("suggestedTerms", process.getTerms().getSuggestedElements());
 		model.addAttribute("structures", modelService.getStructureIds());
 		return "aggregation/terms";
+	}
+
+	@GetMapping("top-level-scan/term")
+	String viewTerm(Model model, @ModelAttribute("process") AggregationProcess process, @RequestParam("id") String id) {
+		var term = process.getTerms().findById(id);
+		model.addAttribute("term", term);
+		return "aggregation/term-view";
 	}
 
 	@GetMapping("top-level-scan/terms/add")
@@ -219,16 +227,35 @@ public class AggregationController {
 
 	@PostMapping("top-level-scan/terms/edit")
 	String topLevelScanTermsEditPost(Model model, @ModelAttribute("process") AggregationProcess process,
-			@RequestParam("id") String id, @RequestParam("content") String content,
+			@RequestParam("id") String id, @RequestParam("content") String content, @RequestParam("newId") String newId,
 			@RequestParam(value = "structureId", required = false) String structureId) {
 		var term = process.getTerms().findById(id);
 		term.setContent(content);
+		if (!newId.equals(term.getId())) {
+			term.editId(newId);
+			// todo check if new id must be changed in relations
+		}
 		if (structureId != null && !structureId.isBlank()) {
 			term.setStructureId(structureId);
 		}
 		model.addAttribute("term", term);
 		model.addAttribute("structures", modelService.getStructureIds());
 		return "aggregation/terms-edit";
+	}
+
+	@PostMapping("top-level-scan/terms/{action}")
+	String topLevelScanTermsPost(@ModelAttribute("process") AggregationProcess process,
+			@PathVariable("action") String action, @RequestParam(value = "id", required = false) String id,
+			AggregationConfigForm form) {
+		if (DEFAULT_ACTIONS.contains(action)) {
+			doDefaultAction(process, action, id);
+		} else {
+			switch (action) {
+				case "update-config" -> setParamsToProcess(process, form);
+				default -> throw new IllegalArgumentException(STR."Unknown action: \{action}");
+			}
+		}
+		return "redirect:/aggregation/top-level-scan/terms";
 	}
 
 	@PostMapping("top-level-scan/terms/next")
@@ -239,27 +266,19 @@ public class AggregationController {
 		process.nextStep();
 		return "redirect:/aggregation/top-level-scan/definitions";
 	}
+	//endregion
 
-	@PostMapping("top-level-scan/terms/{action}")
-	String topLevelScanTermsPost(@ModelAttribute("process") AggregationProcess process,
-			@PathVariable("action") String action, @RequestParam("id") String id, AggregationConfigForm form) {
-		switch (action) {
-			case "remove" -> process.removeById(id);
-			case "reject" -> process.rejectById(id);
-			case "accept" -> process.approveById(id);
-			case "update-config" -> setParamsToProcess(process, form.getFragment(), form.getApiKey(),
-					form.getModelName(), form.getConnectionType(), form.getModelParameters());
-			default -> throw new IllegalArgumentException(STR."Unknown action: \{action}");
-		}
-		return "redirect:/aggregation/top-level-scan/terms";
-	}
-
+	//region definitions
 	@GetMapping("top-level-scan/definitions")
-	String topLevelScanDefinitions(Model model, @ModelAttribute("process") AggregationProcess process) {
+	String topLevelScanDefinitions(Model model, @ModelAttribute("process") AggregationProcess process,
+			DefinitionRequestForm form) {
 		if (process.getStepNumber() != 2) {
 			return "redirect:/aggregation/top-level-scan";
 		}
 		model.addAttribute("models", getModelNameList());
+		model.addAttribute("form", form);
+		model.addAttribute("terms", modelService.findElementByType(KnowledgeType.TERM)
+												.stream().map(KnowledgeElement::getContent).toList());
 		model.addAttribute("acceptedTerms", process.getTerms().getAcceptedElements());
 		model.addAttribute("acceptedDefinitions", process.getDefinitions().getAcceptedElements());
 		model.addAttribute("suggestedDefinitions", process.getDefinitions().getSuggestedElements());
@@ -298,6 +317,8 @@ public class AggregationController {
 			model.addAttribute("error", e.getMessage());
 			model.addAttribute("models", getModelNameList());
 			model.addAttribute("form", form);
+			model.addAttribute("terms", modelService.findElementByType(KnowledgeType.TERM)
+													.stream().map(KnowledgeElement::getContent).toList());
 			model.addAttribute("structures", modelService.getStructureIds());
 			return "aggregation/definitions";
 		}
@@ -307,8 +328,7 @@ public class AggregationController {
 	@GetMapping("top-level-scan/definitions/edit")
 	String topLevelScanDefinitionsEdit(Model model, @ModelAttribute("process") AggregationProcess process,
 			@RequestParam("id") String id) {
-		var definition = process.getDefinitions().getAcceptedElements().stream().filter(it -> it.getId().equals(id))
-								.findFirst().orElseThrow();
+		var definition = process.getDefinitions().findById(id);
 		process.getRelations().stream().filter(it -> it.getType().equals(RelationType.DEFINED_BY)
 													 && it.getTo().equals(definition))
 			   .findFirst().ifPresent(it -> model.addAttribute("mainTerm", it.getFrom()));
@@ -323,8 +343,7 @@ public class AggregationController {
 			@RequestParam("id") String id, @RequestParam("content") String content,
 			@RequestParam(value = "mainTerm", required = false) String mainTermId,
 			@RequestParam(value = "structureId", required = false) String structureId) {
-		var definition = process.getDefinitions().getAcceptedElements().stream().filter(it -> it.getId().equals(id))
-								.findFirst().orElseThrow();
+		var definition = process.getDefinitions().findById(id);
 		if (mainTermId != null && !mainTermId.isBlank()) {
 			// remove old relation
 			var mainTerm = process.getTerms().getAcceptedElements().stream().filter(it -> it.getId().equals(mainTermId))
@@ -356,50 +375,167 @@ public class AggregationController {
 			@RequestParam(value = "id", defaultValue = "NONE") String id,
 			@RequestParam(value = "terms", required = false) Set<String> termIds,
 			@RequestParam(value = "mainTerm", required = false) String mainTermId) {
-		switch (action) {
-			case "remove" -> process.removeById(id);
-			case "reject" -> process.rejectById(id);
-			case "accept" -> process.approveById(id);
-			case "link" -> {
-				var terms = process.getTerms().getAcceptedElements().stream().filter(it -> termIds.contains(it.getId()))
+		if (DEFAULT_ACTIONS.contains(action)) {
+			doDefaultAction(process, action, id);
+		} else {
+			switch (action) {
+				case "link" -> {
+					var terms =
+							process.getTerms().getAcceptedElements().stream().filter(it -> termIds.contains(it.getId()))
 								   .toList();
-				var mainTerm =
-						process.getTerms().getAcceptedElements().stream().filter(it -> it.getId().equals(mainTermId))
-							   .findFirst().orElseThrow();
-				process.linkTermsToDefinition(id, mainTerm, terms);
-			}
-			case "unlink" -> {
-				var terms = process.getTerms().getAcceptedElements().stream().filter(it -> termIds.contains(it.getId()))
+					var mainTerm =
+							process.getTerms().getAcceptedElements().stream()
+								   .filter(it -> it.getId().equals(mainTermId))
+								   .findFirst().orElseThrow();
+					process.linkTermsToDefinition(id, mainTerm, terms);
+				}
+				case "unlink" -> {
+					var terms =
+							process.getTerms().getAcceptedElements().stream().filter(it -> termIds.contains(it.getId()))
 								   .toList();
-				process.unlinkTermsFromDefinition(id, terms);
+					process.unlinkTermsFromDefinition(id, terms);
+				}
+				default -> throw new IllegalArgumentException(STR."Unknown action: \{action}");
 			}
-			case "next" -> {
-				process.nextStep();
-				return "redirect:/aggregation/top-level-scan/examples";
-			}
-			default -> throw new IllegalArgumentException(STR."Unknown action: \{action}");
 		}
 		return "redirect:/aggregation/top-level-scan/definitions";
 	}
 
+	@PostMapping("top-level-scan/definitions/next")
+	String topLevelScanDefinitionsNext(@ModelAttribute("process") AggregationProcess process) {
+		if (process.getStepNumber() != 2) {
+			return STR."redirect:/aggregation/top-level-scan/\{process.getStep().toLowerCase()}";
+		}
+		process.nextStep();
+		return "redirect:/aggregation/top-level-scan/examples";
+	}
 
-	@GetMapping("top-level-scan/tasks")
-	String topLevelScanTasks(Model model, @ModelAttribute("process") AggregationProcess process) {
+	@PostMapping("top-level-scan/definitions/back")
+	String topLevelScanDefinitionsBack(@ModelAttribute("process") AggregationProcess process) {
+		if (process.getStepNumber() != 2) {
+			return STR."redirect:/aggregation/top-level-scan/\{process.getStep().toLowerCase()}";
+		}
+		process.previousStep();
+		return "redirect:/aggregation/top-level-scan/terms";
+	}
+	//endregion
+
+	//region examples
+
+	@GetMapping("top-level-scan/examples")
+	String topLevelScanExamples(Model model, @ModelAttribute("process") AggregationProcess process) {
 		if (process.getStepNumber() != 3) {
+			return STR."redirect:/aggregation/top-level-scan/\{process.getStep().toLowerCase()}";
+		}
+		model.addAttribute("models", getModelNameList());
+		model.addAttribute("acceptedTerms", process.getTerms().getAcceptedElements());
+		model.addAttribute("acceptedExamples", process.getExamples().getAcceptedElements());
+		model.addAttribute("suggestedExamples", process.getExamples().getSuggestedElements());
+		model.addAttribute("exampleRelations",
+				process.getRelations().stream().filter(it -> it.getType().equals(RelationType.EXAMPLE_FOR)).toList());
+		model.addAttribute("structures", modelService.getStructureIds());
+		return "aggregation/examples";
+	}
+
+
+	@PostMapping("top-level-scan/examples")
+	String topLevelScanExamplesPost(Model model, @ModelAttribute("process") AggregationProcess process,
+			AggregationConfigForm form) {
+		if (process.getStepNumber() != 3) {
+			return "redirect:/aggregation/top-level-scan";
+		}
+		var location = setParamsToProcess(process, form);
+		var prompt = new ExamplePrompt(form.getFragment(),
+				form.getFragmentLanguage(), form.getTargetLanguage());
+		try {
+			var answer = gptManager.requestExamples(prompt, form.getUrl(),
+					modelListName.get(process.getModelName()), location, process.getModelParameters());
+			var allTerms = new ArrayList<>(
+					modelService.findElementByType(KnowledgeType.TERM).stream().map(it -> (Term) it).toList());
+			allTerms.addAll(process.getTerms().getAcceptedElements());
+			var extractor = new ExampleElementExtractor(allTerms);
+			var examples = extractor.extractAll(answer, process.getModelLocation());
+			examples.forEach(it -> it.setStructureId(process.getAreaOfKnowledge()));
+			process.suggest(examples);
+			for (var example : examples) {
+				var termName = extractor.getTermFor(example);
+				var term = process.getTerms().getAcceptedElements().stream()
+								  .filter(it -> it.getContent().equals(termName))
+								  .findFirst();
+				term.ifPresent(it -> process.link(example, it, RelationType.EXAMPLE_FOR));
+			}
+			process.getRelations().addAll(extractor.getRelations());
+			var newTerms = extractor.getNewTerms();
+			process.add(newTerms);
+			newTerms.forEach(it -> it.setStructureId(process.getAreaOfKnowledge()));
+
+		} catch (ServerNotAvailableException | TimeoutException e) {
+			model.addAttribute("error", e.getMessage());
+			model.addAttribute("models", getModelNameList());
+			model.addAttribute("acceptedTerms", process.getTerms().getAcceptedElements());
+			model.addAttribute("acceptedExamples", process.getExamples().getAcceptedElements());
+			model.addAttribute("suggestedExamples", process.getExamples().getSuggestedElements());
+			model.addAttribute("exampleRelations",
+					process.getRelations().stream().filter(it -> it.getType().equals(RelationType.EXAMPLE_FOR))
+						   .toList());
+			model.addAttribute("structures", modelService.getStructureIds());
+			return "aggregation/examples";
+		}
+		return "redirect:/aggregation/top-level-scan/examples";
+	}
+
+	@PostMapping("top-level-scan/examples/{action}")
+	String topLevelScanExampleActions(@ModelAttribute("process") AggregationProcess process,
+			@PathVariable("action") String action, @RequestParam(value = "id", defaultValue = "NONE") String id) {
+		return doDefaultAction(process, action, id);
+	}
+
+	@PostMapping("top-level-scan/examples/removeRelation")
+	String topLevelScanExampleRemoveRelation(@ModelAttribute("process") AggregationProcess process,
+			@RequestParam(value = "id", defaultValue = "NONE") UUID id) {
+		var relation = process.getRelations().stream().filter(it -> it.getId().equals(id)).findFirst();
+		relation.ifPresent(process::unlink);
+		return "redirect:/aggregation/top-level-scan/examples";
+	}
+
+	@PostMapping("top-level-scan/examples/next")
+	String topLevelScanExamplesNext(@ModelAttribute("process") AggregationProcess process) {
+		if (process.getStepNumber() != 3) {
+			return STR."redirect:/aggregation/top-level-scan/\{process.getStep().toLowerCase()}";
+		}
+		process.nextStep();
+		return "redirect:/aggregation/top-level-scan/items";
+	}
+
+	@PostMapping("top-level-scan/examples/back")
+	String topLevelScanExamplesBack(@ModelAttribute("process") AggregationProcess process) {
+		if (process.getStepNumber() != 3) {
+			return STR."redirect:/aggregation/top-level-scan/\{process.getStep().toLowerCase()}";
+		}
+		process.previousStep();
+		return "redirect:/aggregation/top-level-scan/definitions";
+	}
+	//endregion
+
+	//region items
+
+	@GetMapping("top-level-scan/items")
+	String topLevelScanTasks(Model model, @ModelAttribute("process") AggregationProcess process) {
+		if (process.getStepNumber() != 4) {
 			return "redirect:/aggregation/top-level-scan";
 		}
 		model.addAttribute("models", getModelNameList());
 		model.addAttribute("acceptedTerms", process.getTerms().getAcceptedElements());
-		model.addAttribute("acceptedTasks", process.getTasks().getAcceptedElements());
-		model.addAttribute("suggestedTasks", process.getTasks().getSuggestedElements());
+		model.addAttribute("acceptedItems", process.getItems().getAcceptedElements());
+		model.addAttribute("suggestedItems", process.getItems().getSuggestedElements());
 		model.addAttribute("structures", modelService.getStructureIds());
-		return "aggregation/tasks";
+		return "aggregation/items";
 	}
 
-	@PostMapping("top-level-scan/tasks")
-	String topLevelScanTasksPost(Model model, @ModelAttribute("process") AggregationProcess process,
+	@PostMapping("top-level-scan/items")
+	String topLevelScanItemsPost(Model model, @ModelAttribute("process") AggregationProcess process,
 			ItemRequestForm form) {
-		if (process.getStepNumber() != 5) {
+		if (process.getStepNumber() != 4) {
 			return "redirect:/aggregation/top-level-scan";
 		}
 		var location = setParamsToProcess(process, form);
@@ -416,14 +552,145 @@ public class AggregationController {
 			model.addAttribute("models", getModelNameList());
 			model.addAttribute("form", form);
 			model.addAttribute("structures", modelService.getStructureIds());
-			return "aggregation/tasks";
-		}
-		return "redirect:/aggregation/top-level-scan/tasks";
-	}
 			return "aggregation/items";
 		}
 		return "redirect:/aggregation/top-level-scan/items";
 	}
+
+	@GetMapping("top-level-scan/items/add")
+	String topLevelScanItemsAdd(Model model, @ModelAttribute("process") AggregationProcess process) {
+		if (process.getStepNumber() != 4) {
+			return "redirect:/aggregation/top-level-scan";
+		}
+		model.addAttribute("structures", modelService.getStructureIds());
+		return "aggregation/item-add";
+	}
+
+	@PostMapping("top-level-scan/items/add")
+	String topLevelScanItemsAddPost(@ModelAttribute("process") AggregationProcess process,
+			AddElementForm form) {
+		var item = createItem(form);
+		item.setStructureId(form.getStructureId());
+		process.add(List.of(item));
+		return "redirect:/aggregation/top-level-scan/items";
+	}
+
+
+	private Item createItem(AddElementForm form) {
+		// todo move to service to reduce complexity and duplication
+		return switch (form.getItemType()) {
+			case TRUE_FALSE -> new TrueFalseItem(form.getContent(), form.isTrue(),
+					STR."\{form.getHeadline()}-TRUE_FALSE_ITEM");
+			case SINGLE_CHOICE -> {
+				var answers = new LinkedList<String>();
+				answers.add(form.getCorrectAnswers().getFirst());
+				answers.addAll(form.getWrongAnswers().stream().filter(it -> !it.isBlank()).map(String::strip)
+								   .toList());
+				yield new SingleChoiceItem(form.getContent(), answers,
+						STR."\{form.getHeadline()}-SINGLE_CHOICE_ITEM");
+			}
+			case MULTIPLE_CHOICE -> {
+				var answers = new LinkedList<>(form.getCorrectAnswers().stream().filter(it -> !it.isBlank())
+												   .map(String::strip).toList());
+				var correct = answers.size();
+				answers.addAll(form.getWrongAnswers().stream().filter(it -> !it.isBlank()).toList());
+				yield new MultipleChoiceItem(form.getContent(), answers, correct,
+						STR."\{form.getHeadline()}-MULTIPLE_CHOICE_ITEM");
+			}
+			case FILL_OUT_BLANKS -> {
+				var blanks = form.getBlanks().stream().filter(it -> !it.isBlank()).map(String::strip).toList();
+				yield new FillOutBlanksItem(form.getContent(), blanks,
+						STR."\{form.getHeadline()}-FILL_OUT_BLANKS_ITEM");
+			}
+			default -> throw new IllegalStateException(STR."Unexpected value: \{form.getItemType()}");
+		};
+	}
+
+	@GetMapping("top-level-scan/items/edit")
+	String topLevelScanItemsEdit(Model model, @ModelAttribute("process") AggregationProcess process,
+			@RequestParam("id") String id) {
+		var item = process.getItems().findById(id);
+		model.addAttribute("item", item);
+		model.addAttribute("structures", modelService.getStructureIds());
+		return "aggregation/item-edit";
+	}
+
+	@PostMapping("top-level-scan/items/edit")
+	String topLevelScanItemsEditPost(@ModelAttribute("process") AggregationProcess process,
+			@RequestParam("id") String id, AddElementForm form) {
+		var item = process.getItems().findById(id);
+		switch (form.getItemType()) {
+			case TRUE_FALSE -> {
+				var trueFalseItem = (TrueFalseItem) item;
+				trueFalseItem.setContent(form.getContent());
+				trueFalseItem.setCorrect(form.isTrue());
+			}
+			case SINGLE_CHOICE -> {
+				var singleChoiceItem = (SingleChoiceItem) item;
+				singleChoiceItem.setContent(form.getContent());
+				singleChoiceItem.setCorrectAnswer(form.getCorrectAnswers().getFirst());
+				singleChoiceItem.setAlternativeAnswers(form.getWrongAnswers().stream().filter(it -> !it.isBlank())
+														   .map(String::strip).toList());
+			}
+			case MULTIPLE_CHOICE -> {
+				var multipleChoiceItem = (MultipleChoiceItem) item;
+				multipleChoiceItem.setContent(form.getContent());
+				var correct = form.getCorrectAnswers().stream().filter(it -> !it.isBlank()).map(String::strip).toList();
+				multipleChoiceItem.setCorrectAnswers(correct);
+				var alternative =
+						form.getWrongAnswers().stream().filter(it -> !it.isBlank()).map(String::strip).toList();
+				multipleChoiceItem.setAlternativeAnswers(alternative);
+			}
+			case FILL_OUT_BLANKS -> {
+				var fillOutBlanksItem = (FillOutBlanksItem) item;
+				fillOutBlanksItem.setContent(form.getContent());
+				fillOutBlanksItem.setBlanks(form.getBlanks().stream().filter(it -> !it.isBlank()).toList());
+			}
+			default -> throw new IllegalStateException(STR."Unexpected value: \{form.getItemType()}");
+		}
+		item.setStructureId(form.getStructureId());
+		return STR."redirect:edit?id=\{id}";
+	}
+
+
+	@PostMapping("top-level-scan/items/{action}")
+	String topLevelScanItemsActions(@ModelAttribute("process") AggregationProcess process,
+			@PathVariable("action") String action, @RequestParam(value = "id", defaultValue = "NONE") String id) {
+		if (DEFAULT_ACTIONS.contains(action)) {
+			return doDefaultAction(process, action, id);
+		}
+		throw new IllegalArgumentException(STR."Unknown action: \{action}");
+	}
+
+	private String doDefaultAction(AggregationProcess process, String action, String id) {
+		switch (action) {
+			case "remove" -> process.removeById(id);
+			case "reject" -> process.rejectById(id);
+			case "accept" -> process.approveById(id);
+			default -> throw new IllegalArgumentException(STR."Unknown action: \{action}");
+		}
+		return "redirect:/aggregation/top-level-scan/examples";
+	}
+
+	@PostMapping("top-level-scan/items/next")
+	String topLevelScanItemsNext(@ModelAttribute("process") AggregationProcess process) {
+		if (process.getStepNumber() != 4) {
+			return STR."redirect:/aggregation/top-level-scan/\{process.getStep().toLowerCase()}";
+		}
+		process.nextStep();
+		process.nextStep(); //  Skip Code for now Todo add the code step
+		return "redirect:/aggregation/integration";
+	}
+
+	@PostMapping("top-level-scan/items/back")
+	String topLevelScanItemsBack(@ModelAttribute("process") AggregationProcess process) {
+		if (process.getStepNumber() != 4) {
+			return STR."redirect:/aggregation/top-level-scan/\{process.getStep().toLowerCase()}";
+		}
+		process.previousStep();
+		return "redirect:/aggregation/top-level-scan/examples";
+	}
+	//endregion
 
 	@GetMapping("compile")
 	public String compile() {
@@ -435,11 +702,7 @@ public class AggregationController {
 		return "aggregation/deep-scan";
 	}
 
-	@GetMapping("deep-scan/handle")
-	public String deepScanHandle() {
-		return "aggregation/deep-scan-handle";
-	}
-
+	//region integration
 	@GetMapping("integration")
 	public String integration(Model model, @ModelAttribute("process") AggregationProcess process) {
 		model.addAttribute("ready", !process.isComplete() && (process.hasElements() || process.hasRelations()));
@@ -448,11 +711,26 @@ public class AggregationController {
 	}
 
 	@PostMapping("integration")
-	public String integrationPost(@ModelAttribute("process") AggregationProcess process) {
-		modelService.integrate(process);
+	public String integrationPost(@ModelAttribute("process") AggregationProcess process,
+			RedirectAttributes redirectAttributes) {
+		var stat = modelService.integrate(process);
 		process.setComplete();
+		redirectAttributes.addFlashAttribute("message",
+				STR."Es wurden \{stat.elements()} Elemente und \{stat.relations()} Relationen integriert");
 		return "redirect:";
 	}
+
+	@PostMapping("integration/reset")
+	public String integrationReset(Model model, @ModelAttribute("process") AggregationProcess process) {
+		if (!process.isComplete()) {
+			model.addAttribute("ready", !process.isComplete() && (process.hasElements() || process.hasRelations()));
+			model.addAttribute("message", "Der Prozess ist noch nicht abgeschlossen");
+			return "aggregation/integration";
+		}
+		process.reset();
+		return "redirect:/aggregation/top-level-scan";
+	}
+	//endregion
 
 	@GetMapping("debug")
 	String debug(Model model, @ModelAttribute("process") AggregationProcess process) {

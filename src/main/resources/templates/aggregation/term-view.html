@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="|Term - ${term.termName}|">Term</title>
+    <th:block th:replace="~{main::head-tag}"></th:block>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div th:replace="~{main::navigation}"></div>
+<main class="flex-grow-1 container">
+    <header><h1>Term Übersicht</h1></header>
+    <section class="container border border-primary rounded-1">
+        <p>Term:
+            <span th:text="${term.termName}"></span>
+        </p>
+        <p>Structure-Id:
+            <span th:text="${term.structureId}"></span>
+        </p>
+        <p>Id:
+            <span th:text="${term.id}"></span>
+        </p>
+        <p> Relations:
+            <span th:if="${term.relations.empty}">Keine Relationen vorhanden</span>
+        <div class="border border-info rounded-1" th:unless="${term.relations.empty}">
+            <p th:each="relation:${term.relations}" th:text="${relation}"></p>
+        </div>
+        </p>
+    </section>
+    <section>
+        <a href="../terms">
+            <button class="btn btn-check" type="submit">Zurück</button>
+        </a>
+    </section>
+</main>
+<footer th:replace="~{main::footer}"></footer>
+</body>
+</html>

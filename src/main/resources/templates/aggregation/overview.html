@@ -10,11 +10,26 @@
 <main>
     <div class="container">
         <header class="mb-2"><h1>Übersicht der Aggregation</h1></header>
+        <div th:if="${message}">
+            <div class="alert alert-success" role="alert">
+                <span th:text="${message}"></span>
+            </div>
+        </div>
         <section class="pt-1">
             <h2>Mehr Wissen</h2>
             <div>
                 <a th:href="@{/aggregation/collect}">
                     <button class="btn btn-primary">Neues Wissen aus Quelle</button>
+                </a>
+                <a th:href="@{/aggregation/only-one-fragment}">
+                    <button class="btn btn-warning">Neues Wissen aus Fragment</button>
+                </a>
+                <a th:href="@{elements/add}">
+                    <button class="btn btn-primary" data-bs-target="#element-add-modal" data-bs-toggle="modal"
+                            type="button">
+                        <i class="bi bi-plus-circle"></i>
+                        <span th:text="#{knowledgemodel.element.add}">Add</span>
+                    </button>
                 </a>
                 <a th:href="@{/knowledge-model/elements/link}">
                     <button class="btn btn-info">Elemente linken</button>
@@ -28,6 +43,13 @@
             <article class="ms-2">
                 <h3>Struktur</h3>
                 Struktur Objekte: <span th:text="${structureCount}"></span><br>
+                <a th:href="@{/knowledge-model/structure}">
+                    <button class="btn btn-primary">Bearbeiten</button>
+                </a>
+                <a th:href="@{/knowledge-model}">
+                    <button class="btn btn-info"><i class="bi bi-binoculars"></i> Ansehen
+                    </button>
+                </a>
                 <hr>
                 <h3>Wissen</h3> <a th:href="@{/knowledge-model/elements}">
                 <button class="btn btn-success" th:text="#{knowledgemodel.elements}">Element</button>
@@ -41,7 +63,8 @@
                 <hr>
                 Terme: <span th:text="${aggregation.terms}"></span><br>
                 Definitionen: <span th:text="${aggregation.definitions}"></span><br>
-                Beispiele: <span th:text="${aggregation.examples}"></span>
+                Beispiele: <span th:text="${aggregation.examples}"></span><br>
+                Fragen: <span th:text="${aggregation.items}"></span><br>
                 <hr>
                 <h3>Quellen</h3>
             </article>

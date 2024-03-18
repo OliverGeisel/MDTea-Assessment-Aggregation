@@ -4,6 +4,7 @@ import de.olivergeisel.materialgenerator.aggregation.extraction.ElementNegotiato
 import de.olivergeisel.materialgenerator.aggregation.extraction.GPT_Request;
 import de.olivergeisel.materialgenerator.aggregation.extraction.ModelParameters;
 import de.olivergeisel.materialgenerator.aggregation.extraction.Negotiator;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModel;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.*;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.BasicRelation;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.Relation;
@@ -19,9 +20,26 @@ import java.util.NoSuchElementException;
 /**
  * Session-Object for the aggregation process.
  * ONLY for the aggregation process and usage in Controllers.
+ * <p>
+ * The AggregationProcess is used to store the state of the aggregation process.
+ * It contains the sources, the current fragment, the area of knowledge, the apiKey and the url of the model.
+ * It also contains the model parameters and the location of the model.
+ * <br>
+ * But the main part of the AggregationProcess are the {@link ElementNegotiator}s.
+ * They are used to store the elements that are extracted from the sources.
+ * If the elements are accepted, they are stored in the accepted list of the negotiator.
+ * At the end of the process, the accepted elements are used to create the knowledge model.
+ * </p>
+ * <p>
+ * The AggregationProcess has a state that is represented by the {@link Step} enum.
+ * The state is used to show the user the current type of elements that are expected.
+ * </p>
  *
  * @author Oliver Geisel
  * @version 1.1.0
+ * @see ElementNegotiator
+ * @see KnowledgeModel
+ * @see AggregationController
  * @since 1.1.0
  */
 public class AggregationProcess {
@@ -58,7 +76,12 @@ public class AggregationProcess {
 		terms = new ElementNegotiator<>(null);
 		definitions = new ElementNegotiator<>(null);
 		examples = new ElementNegotiator<>(null);
+		codes = new ElementNegotiator<>(null);
+		items = new ElementNegotiator<>(null);
+		complete = false;
+		step = Step.INITIAL;
 		relations.clear();
+		start = LocalDateTime.now();
 	}
 
 	public void setComplete() {
@@ -75,6 +98,19 @@ public class AggregationProcess {
 			return false;
 		}
 		step = step.next();
+		return true;
+	}
+
+	/**
+	 * Sets the current step to the previous one.
+	 *
+	 * @return true if the step was changed, false if the step is already at the beginning or at the end.
+	 */
+	public boolean previousStep() {
+		if (step == Step.INITIAL || step == Step.END) {
+			return false;
+		}
+		step = step.previous();
 		return true;
 	}
 
@@ -197,6 +233,13 @@ public class AggregationProcess {
 		return removed;
 	}
 
+	/**
+	 * Approves the element with the given id.
+	 *
+	 * @param id The id of the element to approve.
+	 * @return true if the element was approved, false if the element was not found.
+	 * @see ElementNegotiator#approveById(String)
+	 */
 	public boolean approveById(String id) {
 		if (id == null || id.isBlank()) {
 			return false;
@@ -236,7 +279,6 @@ public class AggregationProcess {
 		return relations.stream().filter(it -> it.getTo().getId().equals(id)).toList();
 	}
 
-
 	/**
 	 * Links two {@link KnowledgeElement}s with a {@link Relation} of the given type.
 	 *
@@ -256,20 +298,40 @@ public class AggregationProcess {
 		if (!relations.contains(relation)) {
 			relations.add(relation);
 			from.addRelation(relation);
+			// reverse relation
+			var reverseRelation = new BasicRelation(type.getInverted(), to, from);
+			if (relations.contains(reverseRelation)) {
+				return true;
+			}
+			relations.add(reverseRelation);
+			to.addRelation(reverseRelation);
 			return true;
 		}
 		return false;
-	}
-
-	public boolean containsElement(String id) {
-		return terms.contains(id) || definitions.contains(id) || examples.contains(id) || codes.contains(id)
-			   || tasks.contains(id);
 	}
 
 	public boolean link(String fromId, String toId, RelationType type) {
 		var from = findById(fromId);
 		var to = findById(toId);
 		return link(from, to, type);
+	}
+
+	/**
+	 * Unlinks the given relation from the linked elements.
+	 * Also unlinks the inverse relation.
+	 *
+	 * @param relation The relation to unlink.
+	 */
+	public void unlink(Relation relation) {
+		var from = relation.getFrom();
+		from.getRelations().remove(relation);
+		var to = relation.getTo();
+		var toRemove = to.getRelations().stream().filter(it -> it.isReverseFrom(relation)).toList();
+		for (var rel : toRemove) {
+			to.getRelations().remove(rel);
+			relations.remove(rel);
+		}
+		relations.remove(relation);
 	}
 
 	/**
@@ -324,13 +386,25 @@ public class AggregationProcess {
 	}
 
 	/**
-	 * Checks if the process has elements in the accepted lists.
+	 * Checks if the process contains an element with the given id. Looks in all {@link Negotiator}s.
+	 *
+	 * @param id The id of the element.
+	 * @return true if the process contains the element, false if not.
+	 * @see ElementNegotiator#contains(String)
+	 */
+	public boolean containsElement(String id) {
+		return terms.contains(id) || definitions.contains(id) || examples.contains(id) || codes.contains(id)
+			   || items.contains(id);
+	}
+
+	/**
+	 * Checks if the process has elements in the <b>accepted</b> lists.
 	 *
 	 * @return true if the process has elements in the accepted lists, false if not.
 	 */
 	public boolean hasElements() {
 		return !terms.getAcceptedElements().isEmpty() || !definitions.getAcceptedElements().isEmpty() || !examples
-				.getAcceptedElements().isEmpty() || !codes.getAcceptedElements().isEmpty() || !tasks
+				.getAcceptedElements().isEmpty() || !codes.getAcceptedElements().isEmpty() || !items
 				.getAcceptedElements().isEmpty();
 	}
 
@@ -389,6 +463,14 @@ public class AggregationProcess {
 
 	public ElementNegotiator<Item> getItems() {
 		return items;
+	}
+
+	public ElementNegotiator<Code> getCodes() {
+		return codes;
+	}
+
+	public void setCurrentFragment(String currentFragment) {
+		this.currentFragment = currentFragment;
 	}
 
 	public ModelParameters getModelParameters() {
@@ -474,9 +556,21 @@ public class AggregationProcess {
 		TERMS,
 		DEFINITIONS,
 		EXAMPLES,
+		ITEMS,
 		CODE,
-		QUESTIONS,
 		END;
+
+
+		public Step previous() {
+			return switch (this) {
+				case TERMS, INITIAL -> INITIAL;
+				case DEFINITIONS -> TERMS;
+				case EXAMPLES -> DEFINITIONS;
+				case ITEMS -> EXAMPLES;
+				case CODE -> ITEMS;
+				case END -> CODE;
+			};
+		}
 
 
 		public Step next() {
@@ -484,9 +578,9 @@ public class AggregationProcess {
 				case INITIAL -> TERMS;
 				case TERMS -> DEFINITIONS;
 				case DEFINITIONS -> EXAMPLES;
-				case EXAMPLES -> CODE;
-				case CODE -> QUESTIONS;
-				case QUESTIONS, END -> END;
+				case EXAMPLES -> ITEMS;
+				case ITEMS -> CODE;
+				case CODE, END -> END;
 			};
 		}
 	}

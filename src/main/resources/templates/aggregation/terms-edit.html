@@ -23,6 +23,9 @@
                     <option th:each="structure : ${structures}" th:text="${structure}" th:value="${structure}"></option>
                 </datalist>
             </label>
+            <label class="form-control"> Knowledge-Id:
+                <input name="newId" required th:value="${term.id}" type="text">
+            </label>
             <input class="btn btn-success" type="submit" value="Save">
         </form>
     </section>

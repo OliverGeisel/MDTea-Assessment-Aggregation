@@ -2,39 +2,11 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Top-Level-Scan - Definitions</title>
+    <title>Top-Level-Scan - Examples</title>
     <th:block th:replace="~{main::head-tag}"></th:block>
     <script>
         function enableTextarea() {
             document.getElementById("fragment-textarea").readOnly = false;
-        }
-
-        function removeTerm(id) {
-            document.getElementById('additional-term-' + id).remove();
-        }
-
-        function addTerm() {
-            const termElement = document.getElementById('add-term');
-            if (termElement.value === '') {
-                return;
-            }
-            const id = 'additional-term-' + document.querySelectorAll('[id^="additional-term-"]').length;
-            const div = document.createElement('div');
-            div.id = id;
-            const input = document.createElement('input');
-            input.name = 'terms';
-            input.value = termElement.value;
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.className = 'btn btn-danger';
-            button.onclick = function () {
-                removeTerm(id.split('-')[2]);
-            };
-            button.innerHTML = '<i class="bi bi-x"></i>';
-            div.appendChild(input);
-            div.appendChild(button);
-            document.getElementById('additional-terms').appendChild(div);
-            termElement.value = '';
         }
     </script>
 </head>
@@ -51,28 +23,10 @@
                 <textarea class="form-control" cols="80" id="fragment-textarea" name="fragment" readonly rows="10"
                           th:text="${process.currentFragment}" th:value="${process.currentFragment}"></textarea>
             </label>
-            <div>
-                <div id="additional-terms"> Weitere Terme:
-                    <div th:each="additional,stat:${form.terms}" th:id="'additional-term-'+${stat.count}">
-                        <input name="terms" th:value="${additional}">
-                        <button class="btn btn-danger" th:onclick="|removeTerm(${stat.count})|" type="button">
-                            <i class="bi bi-x"></i>
-                        </button>
-                    </div>
-                    <label>
-                        <input id="add-term" list="terms-list" name=th:value="${process.terms}" type="text">
-                    </label>
-                    <datalist id="terms-list">
-                        <option th:each="term:${terms}" th:text="${term}" th:value="${term}"></option>
-                    </datalist>
-                    <button class="btn btn-success" onclick="addTerm()" type="button"><i class="bi bi-plus"></i>
-                    </button>
-                </div>
-            </div>
             <div th:replace="~{aggregation/fragments :: area-of-knowledge-fragment}"></div>
             <div class="btn-group mt-2">
                 <button class="btn btn-info" onclick="enableTextarea()" type="button">Edit Fragment</button>
-                <button class="btn btn-primary" type="submit">Definitionen Suchen</button>
+                <button class="btn btn-primary" type="submit">Beispiele Suchen</button>
             </div>
         </form>
     </section>
@@ -86,42 +40,42 @@
             <header>
                 <h3>Antwort</h3>
             </header>
-            <form method="post" th:action="@{definitions/add}">
-                <button class="btn btn-primary" th:text="#{aggregation.definitions.add}">Add</button>
+            <form method="post" th:action="@{examples/add}">
+                <button class="btn btn-primary" th:text="#{aggregation.examples.add}">Add</button>
             </form>
             <article class="mt-2">
                 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
                     <div class="col-lg-6">
-                        <span th:text="#{aggregation.definitions.suggested}">Vorgeschlagen: </span>: <span
-                            th:text="${process.definitions.suggestedElements.size}"></span>
+                        <span th:text="#{aggregation.examples.suggested}">Vorgeschlagen: </span>: <span
+                            th:text="${process.examples.suggestedElements.size}"></span>
                         <div class="row">
                             <div class="card col-12 m-2 text-bg-primary"
-                                 th:each="definition:${suggestedDefinitions}">
+                                 th:each="example:${suggestedExamples}">
                                 <div class="card-header">
-                                    <span th:text="${definition.id.replace('-DEFINITION','')}"></span>
+                                    <span th:text="${example.id.replace('-EXAMPLE','')}"></span>
                                 </div>
                                 <div class="card-body">
-                                    <p class="card-text">Id: <span th:text="${definition.id}"></span></p>
-                                    <p class="card-text">Type: <span th:text="${definition.type}"></span></p>
-                                    <p class="card-text">Inhalt: <span th:text="${definition.content}"></span></p>
+                                    <p class="card-text">Id: <span th:text="${example.id}"></span></p>
+                                    <p class="card-text">Type: <span th:text="${example.type}"></span></p>
+                                    <p class="card-text">Inhalt: <span th:text="${example.content}"></span></p>
                                     <p class="card-text">Structure-Id:
-                                        <span th:text="${definition.structureId}"></span></p>
+                                        <span th:text="${example.structureId}"></span></p>
                                 </div>
                                 <div class="card-footer">
-                                    <a th:href="@{/aggregation/definitions/{id}(id=${definition.id})}">
+                                    <a th:href="@{/aggregation/definitions/{id}(id=${example.id})}">
                                         <button class="btn btn-primary">Details</button>
                                     </a>
                                     <div class="btn-group btn-group-sm">
-                                        <form method="post" th:action="@{definitions/remove}">
-                                            <input name="id" th:value="${definition.id}" type="hidden">
+                                        <form method="post" th:action="@{examples/remove}">
+                                            <input name="id" th:value="${example.id}" type="hidden">
                                             <button class="btn btn-danger"><i class="bi bi-trash ms-2"></i></button>
                                         </form>
-                                        <form method="post" th:action="@{definitions/accept}">
-                                            <input name="id" th:value="${definition.id}" type="hidden">
+                                        <form method="post" th:action="@{examples/accept}">
+                                            <input name="id" th:value="${example.id}" type="hidden">
                                             <button class="btn btn-success"><i class="bi bi-plus-square"></i></button>
                                         </form>
-                                        <form th:action="@{definitions/edit}">
-                                            <input name="id" th:value="${definition.id}" type="hidden">
+                                        <form th:action="@{examples/edit}">
+                                            <input name="id" th:value="${example.id}" type="hidden">
                                             <button class="btn btn-info"><i class="bi bi-pen"></i></button>
                                         </form>
                                     </div>
@@ -130,19 +84,19 @@
                         </div>
                     </div>
                     <div class="col-lg-6">
-                        <span th:text="#{aggregation.definitions.accepted}">Angenommen</span>: <span
-                            th:text="${process.definitions.acceptedElements.size}"></span>
+                        <span th:text="#{aggregation.examples.accepted}">Angenommen</span>: <span
+                            th:text="${process.examples.acceptedElements.size}"></span>
                         <div class="row">
                             <div class="card col-12 m-2 text-bg-success"
-                                 th:each="definition:${acceptedDefinitions}">
+                                 th:each="example:${acceptedExamples}">
                                 <div class="card-header">
-                                    <span th:text="${definition.id.replace('-DEFINITION','')}"></span>
+                                    <span th:text="${example.id.replace('-EXAMPLE','')}"></span>
                                 </div>
                                 <div class="card-body">
-                                    <p class="card-text">Id: <span th:text="${definition.id}"></span></p>
-                                    <p class="card-text">Type: <span th:text="${definition.type}"></span></p>
-                                    <p class="card-text">Inhalt: <span th:text="${definition.content}"></span></p>
-                                    <p class="card-text">Structure-Id: <span th:text="${definition.structureId}"></span>
+                                    <p class="card-text">Id: <span th:text="${example.id}"></span></p>
+                                    <p class="card-text">Type: <span th:text="${example.type}"></span></p>
+                                    <p class="card-text">Inhalt: <span th:text="${example.content}"></span></p>
+                                    <p class="card-text">Structure-Id: <span th:text="${example.structureId}"></span>
                                     </p>
                                 </div>
                                 <div class="card-footer">
@@ -150,17 +104,17 @@
                                         <button class="btn btn-primary">Details</button>
                                     </a>
                                     <div class="btn-group btn-group-sm">
-                                        <form method="post" th:action="@{definitions/remove}">
-                                            <input name="id" th:value="${definition.id}" type="hidden">
+                                        <form method="post" th:action="@{examples/remove}">
+                                            <input name="id" th:value="${example.id}" type="hidden">
                                             <button class="btn btn-danger"><i class="bi bi-trash ms-2"></i></button>
                                         </form>
-                                        <form method="post" th:action="@{definitions/reject}">
-                                            <input name="id" th:value="${definition.id}" type="hidden">
+                                        <form method="post" th:action="@{examples/reject}">
+                                            <input name="id" th:value="${example.id}" type="hidden">
                                             <button class="btn btn-warning"><i class="bi bi-dash-square ms-2"></i>
                                             </button>
                                         </form>
-                                        <form th:action="@{definitions/edit}">
-                                            <input name="id" th:value="${definition.id}" type="hidden">
+                                        <form th:action="@{examples/edit}">
+                                            <input name="id" th:value="${example.id}" type="hidden">
                                             <button class="btn btn-info"><i class="bi bi-pen"></i></button>
                                         </form>
                                     </div>
@@ -172,7 +126,31 @@
             </article>
             <hr>
             <article class="mt-2">
-                <h3>Terms</h3>
+                <h3>Beispiel-Relationen</h3>
+                <div class="row">
+                    <div class="col-6 card m-2 text-bg-success" th:each="relation:${exampleRelations}">
+                        <div class="card-header">
+                            <span th:text="${relation}"></span>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">From: <span th:text="${relation.fromId}"></span></p>
+                            <p class="card-text">To: <span th:text="${relation.toId}"></span></p>
+                        </div>
+                        <div class="card-footer">
+                            <div class="btn-group btn-group-sm">
+                                <form method="post" th:action="@{examples/removeRelation}">
+                                    <input name="id" th:value="${relation.id}" type="hidden">
+                                    <button class="btn btn-danger"><i class="bi bi-trash ms-2"></i></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </article>
+            <hr>
+            <article class="mt-2">
+                <h3>Terme</h3>
                 <div>
                     <span th:text="#{aggregation.terms.accepted}">Angenommen</span>: <span
                         th:text="${process.terms.acceptedElements.size}"></span>
@@ -205,7 +183,7 @@
                                 </form>
                                 <form th:action="@{terms/edit}">
                                     <input name="id" th:value="${term.id}" type="hidden">
-                                    <button class="btn btn-info"><i class="bi bi-pen"></i></button>
+                                    <button class="btn btn-info" disabled><i class="bi bi-pen"></i></button>
                                 </form>
                             </div>
                         </div>
@@ -217,11 +195,11 @@
     <hr>
     <section>
         <article class="row mb-2" id="next-step">
-            <header><h4>Weiter zu den Beispielen</h4></header>
-            <form method="post" th:action="@{definitions/next}">
+            <header><h4>Weiter zu den Fragen</h4></header>
+            <form method="post" th:action="@{examples/next}">
                 <div class="btn-group">
                     <button class="btn btn-primary">Weiter</button>
-                    <button class="btn btn-info" th:formaction="@{definitions/back}">Zurück</button>
+                    <button class="btn btn-info" th:formaction="@{examples/back}">Zurück</button>
                 </div>
             </form>
         </article>
