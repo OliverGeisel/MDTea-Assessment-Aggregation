@@ -87,7 +87,7 @@ function getTrueFalseInputs() {
 
 function getSingleChoiceInputs() {
     let result = [];
-    result.push(createItemType("TRUE_FALSE"));
+    result.push(createItemType("SINGLE_CHOICE"));
     result.push(createTextArea());
     // correct answer
     const correct = document.createElement("label");
@@ -193,9 +193,68 @@ function getMultipleChoiceInputs() {
     return result;
 }
 
+function addBlankAnswer() {
+    const blanks = document.getElementById("blanks-answers");
+    const input = document.createElement("input");
+    input.setAttribute("type", "text");
+    input.setAttribute("name", "blanks");
+    input.setAttribute("placeholder", "Lücke eingeben");
+    blanks.appendChild(input);
+}
+
+function removeBlankAnswer() {
+    const blanks = document.getElementById("blanks-answers");
+    const children = blanks.children;
+    if (children.length > 1) {
+        blanks.removeChild(children[children.length - 1]);
+    }
+}
+
+function getFillOutBlanksInputs() {
+    const result = [];
+    result.push(createItemType("FILL_OUT_BLANKS"));
+    result.push(createTextArea());
+    // hint for blanks
+    const p = document.createElement("p");
+    p.appendChild(document.createTextNode("Schreibe eine Lücke durch: <_____>"));
+    result.push(p);
+    // blanks answers
+    const blanks = document.createElement("div");
+    blanks.classList.add("form-control", "mt-3");
+    blanks.setAttribute("id", "blanks-answers");
+    let blanksText = document.createTextNode("Blanks Answers: ");
+    blanks.appendChild(blanksText);
+    let blanksInput = document.createElement("input");
+    blanks.appendChild(blanksInput);
+    blanksInput.setAttribute("type", "text");
+    blanksInput.setAttribute("name", "blanks");
+    blanksInput.setAttribute("placeholder", "Lücke eingeben");
+    blanks.appendChild(blanksInput);
+    result.push(blanks);
+    // add button
+    const addButton = document.createElement("button");
+    addButton.setAttribute("type", "button");
+    addButton.classList.add("btn", "btn-warning", "mt-3");
+    addButton.setAttribute("onclick", "addBlankAnswer()");
+    addButton.appendChild(document.createTextNode("Lücke hinzufügen"));
+    result.push(addButton);
+    // remove last button
+    const removeButton = document.createElement("button");
+    removeButton.setAttribute("type", "button");
+    removeButton.classList.add("btn", "btn-danger", "mt-3");
+    removeButton.setAttribute("onclick", "removeBlankAnswer()");
+    removeButton.appendChild(document.createTextNode("Letzte Lücke entfernen"));
+    result.push(removeButton);
+    // submit
+    result.push(createSubmitButton("Lückentext"));
+    return result;
+}
+
 function loadItemMask(select) {
     const type = select.value;
     const form = document.getElementById("item-content");
+    // clean form
+    form.innerHTML = "";
     let result;
     switch (type) {
         case "TRUE_FALSE":
@@ -207,7 +266,11 @@ function loadItemMask(select) {
         case "SINGLE_CHOICE":
             result = getSingleChoiceInputs();
             break;
+        case "FILL_OUT_BLANKS":
+            result = getFillOutBlanksInputs();
+            break;
         case "NONE":
+            form.innerHTML = "Wähle einen anderen Typ aus!";
             return;
         default:
             form.innerHTML = "FALSCHER TYP";
@@ -236,6 +299,10 @@ function getItemTypes() {
     scOption.setAttribute("value", "SINGLE_CHOICE");
     scOption.appendChild(document.createTextNode("Single Choice"));
     select.add(scOption);
+    const fbOption = document.createElement("option");
+    fbOption.setAttribute("value", "FILL_OUT_BLANKS");
+    fbOption.appendChild(document.createTextNode("Lückentext"));
+    select.add(fbOption);
     return result;
 }
 
@@ -279,6 +346,7 @@ function getImageInputs() {
     let input = document.createElement("input");
     input.setAttribute("type", "file");
     input.setAttribute("name", "image");
+    input.classList.add("form-control");
     input.setAttribute("accept", "image/*");
     imageInput.appendChild(input);
     result.push(imageInput);
@@ -287,7 +355,7 @@ function getImageInputs() {
     // structure
     result.push(createStructureId());
     // button
-    result.push(createSubmitButton("Bild erstellen"));
+    result.push(createSubmitButton("Bild"));
     return result;
 }
 
@@ -295,6 +363,14 @@ function loadElementMask(select) {
     const type = select.value;
     const form = document.getElementById("element-add-form");
     form.innerHTML = "";
+    const label = document.createElement("label");
+    label.classList.add("form-control", "mt-3");
+    label.appendChild(document.createTextNode("Id-Vorschlag:"));
+    const input = document.createElement("input");
+    input.setAttribute("name", "id");
+    input.setAttribute("placeholder", "Id Vorschlag (Ignoriert Typ)");
+    label.appendChild(input);
+    form.appendChild(label);
     let result;
     switch (type) {
         case "TEXT":
@@ -318,6 +394,9 @@ function loadElementMask(select) {
         case "IMAGE":
             result = getImageInputs();
             break
+        case "NONE":
+            form.innerHTML = "Wähle einen anderen Typ aus!";
+            return;
         default:
             form.innerHTML = "FALSCHER TYP";
     }

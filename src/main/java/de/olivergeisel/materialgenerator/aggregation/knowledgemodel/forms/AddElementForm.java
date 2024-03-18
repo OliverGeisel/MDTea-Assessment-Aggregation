@@ -23,29 +23,32 @@ import java.util.List;
 @Getter
 public class AddElementForm {
 
+	// fields for true/false
+	boolean isTrue;
 	@NotBlank
 	private String content;
-
 	private String description;
+	private String       id;
 	@NotBlank
 	private String structureId;
-
 	private String        headline;
 	private String        language;
 	private KnowledgeType type;
-	// fields for true/false
-	boolean isTrue;
 	// item specific fields
-	private ItemType itemType;
+	private ItemType     itemType;
 	// fields for single/multiple choice
 	private List<String> correctAnswers;
 	private List<String> wrongAnswers;
+	// fields for fill out blanks
+	private List<String> blanks;
 
 	public AddElementForm() {
 	}
 
 	public AddElementForm(String content, String description, String structureId, KnowledgeType type,
-			ItemType itemType, String isTrue, List<String> correctAnswers, List<String> wrongAnswers) {
+			ItemType itemType, String isTrue, List<String> correctAnswers, List<String> wrongAnswers,
+			List<String> blanks, String id) {
+		this.id = id;
 		this.content = content;
 		this.description = description;
 		this.structureId = structureId;
@@ -54,5 +57,6 @@ public class AddElementForm {
 		this.isTrue = Boolean.parseBoolean(isTrue);
 		this.correctAnswers = correctAnswers;
 		this.wrongAnswers = wrongAnswers;
+		this.blanks = blanks;
 	}
 }

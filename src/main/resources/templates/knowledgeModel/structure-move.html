@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Verschiebe Struktur</title>
+    <th:block th:replace="~{main::head-tag}"></th:block>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div th:replace="~{main::navigation}"></div>
+<main class="flex-grow-1 container">
+    <header><h1>Verschieben eines Elementes</h1></header>
+    <section>
+        <datalist id="structures">
+            <option th:each="structure : ${structures}" th:text="${structure}" th:value="${structure}"></option>
+        </datalist>
+        <form method="post">
+            <label class="form-control"> Struktur:
+                <input id="id-input" list="structures" name="childId" required th:value="${structure.id}" type="text">
+                <button class="btn btn-primary" id="parent-button" onclick="requestByButton(this)"
+                        th:attrappend="data-id=${structure.id}" type="button">
+                    Parent anfragen
+                </button>
+            </label>
+            <p>Struktur ist in <span id="current-parent"></span></p>
+            <label class="form-control"> Ziel:
+                <input list="structures" name="newParent" required type="text">
+            </label>
+            <input class="btn btn-success" type="submit" value="Verschieben">
+        </form>
+    </section>
+</main>
+<footer th:replace="~{main::footer}"></footer>
+<script>
+    function request() {
+        requestWith(this.value)
+    }
+
+    function requestByButton(button) {
+        requestWith(button.getAttribute("data-id"));
+    }
+
+    function requestWith(id) {
+        fetch("/knowledge-model/structure/parent?id=" + id)
+            .then(response => response.json())
+            .then(structure => {
+                if (structure === null) {
+                    document.getElementById("current-parent").innerText = "Keine Struktur gefunden";
+                    return;
+                }
+                document.getElementById("current-parent").innerText = structure.id;
+            });
+    }
+
+    document.getElementById("id-input").addEventListener("change", function () {
+        requestWith(this.value);
+        let button = document.getElementById("parent-button");
+        button.setAttribute("data-id", this.value);
+    });
+</script>
+</body>
+</html>

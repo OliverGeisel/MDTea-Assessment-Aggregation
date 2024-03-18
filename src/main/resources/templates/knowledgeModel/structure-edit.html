@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Struktur bearbeiten</title>
+    <th:block th:replace="~{main::head-tag}"></th:block>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div th:replace="~{main::navigation}"></div>
+<main class="flex-grow-1 container">
+    <header><h1 th:text="${structure.name}">Name</h1></header>
+    <div th:if="${error} != null">
+        <div class="alert alert-danger" role="alert">
+            Fehler: <span th:text="${error}"></span>
+        </div>
+    </div>
+    <section>
+        <form method="post">
+            <input name="oldId" th:value="${structure.id}" type="hidden">
+            <label>Titel:
+                <input class="form-control" name="newName" placeholder="Titel eingeben" required
+                       th:value="${structure.id}">
+            </label>
+            <button class="btn btn-warning" type="submit">Umbenennen</button>
+        </form>
+        <div th:if="${isLeaf}">
+            <form method="post" th:action="@{/knowledge-model/structure/to-fragment}">
+                <input name="structureId" th:value="${structure.id}" type="hidden">
+                <button class="btn btn-danger" type="submit">In Fragment umwandeln</button>
+
+            </form>
+        </div>
+    </section>
+</main>
+<footer th:replace="~{main::footer}"></footer>
+</body>
+</html>

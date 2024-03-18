@@ -8,6 +8,9 @@ import de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_prom
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModelService;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.Term;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.ModelStatistic;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.forms.AddElementForm;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.*;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +81,8 @@ public class AggregationController {
 		var terms = modelService.termCount();
 		var definitions = modelService.definitionCount();
 		var examples = modelService.exampleCount();
-		var statistik = new Aggregation(elements, relations, terms, definitions, examples);
+		var items = modelService.count(KnowledgeType.ITEM);
+		var statistik = new ModelStatistic(terms, definitions, examples, items, relations, elements);
 		model.addAttribute("aggregation", statistik);
 		model.addAttribute("structureCount", modelService.structureCount());
 		return "aggregation/overview";
@@ -479,11 +483,4 @@ public class AggregationController {
 		return list;
 	}
 //endregion
-
-	private record Aggregation(long elements, long relations, long terms, long definitions, long examples) {
-
-		public Aggregation() {
-			this(0, 0, 0, 0, 0);
-		}
-	}
 }

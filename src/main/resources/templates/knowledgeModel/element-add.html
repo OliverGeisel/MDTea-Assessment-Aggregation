@@ -12,7 +12,7 @@
     <header><h1>Neues Element</h1></header>
     <section>
         <header><h3 th:text="#{knowledgemodel.element.add.header}">Element Wahl</h3></header>
-        <form method="post">
+        <form>
             <label class="mb-2"> Type:
                 <select name="type" onchange="loadElementMask(this)">
                     <option value="NONE"></option>
@@ -21,7 +21,7 @@
             </label>
         </form>
         <article id="element-fields">
-            <form id="element-add-form" method="post">
+            <form enctype="multipart/form-data" id="element-add-form" method="post">
             </form>
             <datalist id="structure-list">
                 <option th:each="structure: ${structures}" th:text="${structure}" th:value="${structure}"></option>
