@@ -13,29 +13,22 @@
     <div class="container" th:fragment="content">
         <header>
             <h1 class="text-center text-light" style="color: var(--bs-red); ">
-                Zusammenfassung für
+                Übersicht für en Abschnitt
                 <th:block th:text="${material.name}"></th:block>
             </h1>
         </header>
         <hr>
-        <!--/*@thymesVar id="material" type="de.olivergeisel.materialgenerator.generation.material.transfer.SummaryMaterial" */-->
+        <!--/*@thymesVar id="material" type="de.olivergeisel.materialgenerator.generation.material.transfer.OverviewMaterial" */-->
         <section>
-            Definition:
-            <div th:each="material:${material.definitions}">
-                <div th:replace="~{${material.templateType.type} :: content}"></div>
-            </div>
-        </section>
-        <section>
-            Listen:
-            <div th:each="material:${material.lists}">
-                <div th:replace="~{${material.templateType.type} :: content}"></div>
-            </div>
-        </section>
-        <section>
-            Beispiele:
-            <div th:each="material:${material.examples}">
-                <div th:replace="~{${material.templateType.type} :: content}"></div>
-            </div>
+            Begriffe:
+            <ul>
+                <li th:each="material:${material.parts}">
+                    <a th:href=""> <!-- Link to summary. -->
+                        <span th:text="${material.term}"></span>
+                    </a>
+                </li>
+            </ul>
+
         </section>
     </div>
 </main>
