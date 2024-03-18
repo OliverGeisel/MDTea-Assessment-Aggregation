@@ -5,6 +5,8 @@ import org.springframework.data.neo4j.core.schema.Node;
 @Node
 public class TrueFalseItem extends Item {
 
+//region setter/getter
+
 	private boolean correct;
 
 	public TrueFalseItem() {
@@ -16,8 +18,9 @@ public class TrueFalseItem extends Item {
 		super(question, id, "TRUE_FALSE");
 		this.correct = correct;
 	}
-
-//region setter/getter
+	public void setCorrect(boolean correct) {
+		this.correct = correct;
+	}
 	public boolean isCorrect() {
 		return correct;
 	}

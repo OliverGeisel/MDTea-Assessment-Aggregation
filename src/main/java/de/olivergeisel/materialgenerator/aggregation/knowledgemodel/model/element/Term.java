@@ -29,6 +29,12 @@ public class Term extends TermElement {
 	public String getTermName() {
 		return termName;
 	}
+
+	@Override
+	public void setContent(String content) {
+		super.setContent(content);
+		termName = content;
+	}
 //endregion
 
 	@Override

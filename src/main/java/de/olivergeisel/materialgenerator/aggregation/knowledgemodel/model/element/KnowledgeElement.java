@@ -6,10 +6,7 @@ import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -58,6 +55,9 @@ public abstract class KnowledgeElement {
 
 	protected KnowledgeElement(String content, String id, String type) {
 		this.content = content;
+		if (id == null || id.isBlank()) {
+			id = STR."\{UUID.randomUUID()}-\{type.toUpperCase()}";
+		}
 		this.id = id;
 		this.type = KnowledgeType.valueOf(type.toUpperCase());
 	}
@@ -101,7 +101,26 @@ public abstract class KnowledgeElement {
 		return this.type.equals(type);
 	}
 
-	//region setter/getter
+	/**
+	 * Edit the id of the element.
+	 * Is not named setId because this is a more powerful method to assure the id is unique and not illegal.
+	 * This method assures the id is not null, not blank and ends with the type of the element.
+	 * <p>
+	 * <b>Warning:</b> This method should only be used if the element is not persisted yet or if the id is
+	 * illegal.
+	 *
+	 * @param id the new id
+	 */
+	public void editId(String id) {
+		if (this.id.equals(id)) return;
+		if (id == null || id.isBlank()) {
+			id = STR."\{UUID.randomUUID()}-\{type.name()}";
+		}
+		if (!id.endsWith(STR."-\{type.name()}")) {
+			id = id.concat(STR."-\{type.name()}");
+		}
+		this.id = id;
+	}
 	public String getStructureId() {
 		return structureId;
 	}
@@ -130,6 +149,8 @@ public abstract class KnowledgeElement {
 	public String getId() {
 		return id;
 	}
+
+	//region setter/getter
 
 	public KnowledgeType getType() {
 		return type;

@@ -23,13 +23,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
- * Service for the knowledge model. Provides methods to access the knowledge model.
+ * Service for the knowledge model. Provides methods to access the {@link KnowledgeModel}.
  * And edit it.
  *
  * @author Oliver Geisel
  * @version 1.1.0
  * @see KnowledgeObject
  * @see KnowledgeElement
+ * @see Relation
+ * @see KnowledgeModel
  * @since 1.1.0
  */
 @Service
@@ -786,6 +788,13 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	public Set<KnowledgeNode> getKnowledgeNodesIncludingSimilarFor(String structureId) {
 		return getKnowledgeNodesFor(structureId, true, true);
 	}
+
+	@Override
+	public List<KnowledgeElement> findElementByType(KnowledgeType knowledgeType) {
+		return elementRepository.findByType(knowledgeType).toList();
+	}
+
+
 	//endregion
 
 

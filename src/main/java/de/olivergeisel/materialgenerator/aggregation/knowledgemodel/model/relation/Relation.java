@@ -33,7 +33,6 @@ public abstract class Relation {
 	private KnowledgeElement from;
 	@Relationship("TO")
 	private KnowledgeElement to;
-
 	protected Relation() {
 		this.type = RelationType.CUSTOM;
 		this.name = "";
@@ -101,6 +100,10 @@ public abstract class Relation {
 	}
 
 	//region setter/getter
+	public UUID getId() {
+		return id;
+	}
+
 	public String getFromId() {
 		return fromId;
 	}
@@ -123,8 +126,8 @@ public abstract class Relation {
 		if (from == null) {
 			throw new IllegalArgumentException("from must not be null");
 		}
-		if (from.getId() == null || !from.getId().equals(fromId)) {
-			throw new IllegalArgumentException("from.id must not be null and must match fromId");
+		if (from.getId() == null) {
+			throw new IllegalArgumentException("from.id must not be null");
 		}
 		this.from = from;
 		fromId = from.getId();
@@ -178,8 +181,8 @@ public abstract class Relation {
 		if (to == null) {
 			throw new IllegalArgumentException("to must not be null");
 		}
-		if (to.getId() == null || !to.getId().equals(toId)) {
-			throw new IllegalArgumentException("to.id must not be null and must match toId");
+		if (to.getId() == null) {
+			throw new IllegalArgumentException("to.id must not be null");
 		}
 		this.to = to;
 		toId = to.getId();
@@ -198,7 +201,7 @@ public abstract class Relation {
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (!(o instanceof Relation relation)) return false;
-
+		// Todo use the id as well
 		if (!name.equals(relation.name)) return false;
 		if (!fromId.equals(relation.fromId)) return false;
 		return toId.equals(relation.toId);

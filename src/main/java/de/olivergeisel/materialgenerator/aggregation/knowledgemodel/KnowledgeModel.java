@@ -1,6 +1,7 @@
 package de.olivergeisel.materialgenerator.aggregation.knowledgemodel;
 
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeType;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.Relation;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationType;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeFragment;
@@ -139,7 +140,15 @@ public interface KnowledgeModel<T> {
 
 	Set<KnowledgeNode> getKnowledgeNodesIncludingSimilarFor(String structureId);
 
-//region setter/getter
+	/**
+	 * Find all elements that are of the given {@link KnowledgeType}.
+	 *
+	 * @param knowledgeType the type of the elements to find
+	 * @return a list of all elements that are of the given type. Will newer return null.
+	 */
+	List<KnowledgeElement> findElementByType(KnowledgeType knowledgeType);
+
+	//region setter/getter
 	List<KnowledgeElement> getAllElements();
 
 	RootStructureElement getRoot();

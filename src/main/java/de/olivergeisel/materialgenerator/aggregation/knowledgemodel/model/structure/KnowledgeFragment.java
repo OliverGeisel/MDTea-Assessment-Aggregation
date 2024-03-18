@@ -70,7 +70,7 @@ public class KnowledgeFragment extends KnowledgeObject {
 				}
 			}
 		}
-		throw new NoSuchElementException("No element with id " + id + " found");
+		throw new NoSuchElementException(STR."No element with id \{id} found");
 	}
 
 	public boolean addObject(KnowledgeObject object) {
@@ -97,6 +97,16 @@ public class KnowledgeFragment extends KnowledgeObject {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Returns whether the given object is a direct child of this object.
+	 *
+	 * @param object the object to check
+	 * @return whether the given object is a direct child of this object
+	 */
+	public boolean hasDirectChild(KnowledgeObject object) {
+		return children.contains(object);
 	}
 
 	/**
@@ -183,6 +193,7 @@ public class KnowledgeFragment extends KnowledgeObject {
 		}
 		return children.remove(object);
 	}
+
 	public void setChildren(List<KnowledgeObject> children) {
 		this.children.clear();
 		this.children.addAll(children);
@@ -207,6 +218,22 @@ public class KnowledgeFragment extends KnowledgeObject {
 		this.name = name;
 	}
 //endregion
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof KnowledgeFragment fragment)) return false;
+		if (super.equals(o)) return true;
+		return children.equals(fragment.children) && name.equals(fragment.name);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = super.hashCode();
+		result = 31 * result + children.hashCode();
+		result = 31 * result + name.hashCode();
+		return result;
+	}
 
 	@Override
 	public String toString() {

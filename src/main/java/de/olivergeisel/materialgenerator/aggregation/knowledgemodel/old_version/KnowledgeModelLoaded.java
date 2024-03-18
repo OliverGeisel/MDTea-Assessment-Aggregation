@@ -3,6 +3,7 @@ package de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version
 
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModel;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeType;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.Relation;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationGenerator;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationType;
@@ -519,6 +520,11 @@ public class KnowledgeModelLoaded implements KnowledgeModel<RelationEdge<Knowled
 	 */
 	public Set<KnowledgeNode> getKnowledgeNodesIncludingSimilarFor(String structureId) {
 		return getKnowledgeNodesFor(structureId, true, true);
+	}
+
+	@Override
+	public List<KnowledgeElement> findElementByType(KnowledgeType knowledgeType) {
+		return graph.vertexSet().stream().filter(it -> it.getType().equals(knowledgeType)).toList();
 	}
 
 	//region setter/getter

@@ -14,10 +14,14 @@ public class KnowledgeLeaf extends KnowledgeObject {
 	}
 
 	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof KnowledgeLeaf)) return false;
+		return super.equals(o);
+	}
+
+	@Override
 	public String toString() {
-		return "KnowledgeLeaf{" +
-			   "linkedElements size=" + getLinkedElements().size() +
-			   ", id='" + getName() + '\'' +
-			   '}';
+		return STR."KnowledgeLeaf{linkedElements size=\{getLinkedElements().size()}, id='\{getName()}'}";
 	}
 }
