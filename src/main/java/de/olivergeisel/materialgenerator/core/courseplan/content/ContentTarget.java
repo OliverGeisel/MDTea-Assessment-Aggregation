@@ -1,5 +1,7 @@
 package de.olivergeisel.materialgenerator.core.courseplan.content;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -54,6 +56,13 @@ public class ContentTarget {
 	//region setter/getter
 	public TopicStructureAliasMappings getAliases() {
 		return topicStructureAliasMappings;
+	}
+
+	public List<String> getAllAliases() {
+		var back = new LinkedList<String>();
+		back.add(mainTopicName);
+		back.addAll(topicStructureAliasMappings.complete());
+		return back;
 	}
 
 	public String getMainTopicName() {

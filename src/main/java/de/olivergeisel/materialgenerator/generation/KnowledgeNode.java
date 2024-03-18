@@ -54,6 +54,13 @@ public class KnowledgeNode {
 		this.relations = relations;
 	}
 
+	public void addTopics(Collection<String> topics) {
+		if (topics == null) {
+			throw new IllegalArgumentException("topics must not be null");
+		}
+		this.topics.addAll(topics);
+	}
+
 	public void addTopic(String topic) throws IllegalArgumentException {
 		if (topic == null) {
 			throw new IllegalArgumentException("topic must not be null");

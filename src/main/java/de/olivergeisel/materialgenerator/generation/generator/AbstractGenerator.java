@@ -95,12 +95,12 @@ public abstract class AbstractGenerator implements Generator {
 	}
 
 	/**
-	 * Find a {@link Term} of given type in a set of {@link KnowledgeNode} that fits the masterKeyword or one of the
-	 * topics.
+	 * Find a {@link KnowledgeNode} in a set of {@link KnowledgeNode} that fits the masterKeyword or one of the
+	 * topics <b>and</b> has as mainElement a {@link Term}.
 	 *
 	 * @param knowledge Set of KnowledgeNodes to search in
 	 * @param node      KnowledgeNode with masterKeyword and topics
-	 * @return Term that fits the masterKeyword or one of the topics of the node
+	 * @return KnowledgeNode with a mainElement of type {@link Term} that fits the masterKeyword or one of the topics
 	 * @throws NoSuchElementException if no KnowledgeNode fits the masterKeyword or one of the topics.
 	 */
 	protected static KnowledgeNode getTermNode(Set<KnowledgeNode> knowledge, KnowledgeNode node)
@@ -218,7 +218,7 @@ public abstract class AbstractGenerator implements Generator {
 	//endregion
 
 	/**
-	 * Load all {@link KnowledgeNode}s for a given structureId.
+	 * Load all {@link KnowledgeNode}s for a given structureId. It includes similar structureIds.
 	 *
 	 * @param structureId structureId to load the KnowledgeNodes for
 	 * @return Set of KnowledgeNodes for the given structureId. If no KnowledgeNode is found, an empty unmodifiable
@@ -358,17 +358,16 @@ public abstract class AbstractGenerator implements Generator {
 		int emptyTargetCount = 0;
 		for (var target : targets) {
 			var expression = goal.getExpression();
-			var aliases = target.getAliases().complete();
+			var aliases = target.getAllAliases();
 			var topicKnowledge = loadKnowledgeForStructureComplete(aliases);
 			if (topicKnowledge.isEmpty()) {
 				logger.info("No knowledge found for Topic {}", target);
 				emptyTargetCount++;
 				continue;
 			}
-			var topic = target.getTopic();
 			topicKnowledge.forEach(it -> {
 				it.setGoal(goal);
-				it.addTopic(topic);
+				it.addTopics(aliases);
 			});
 			try {
 				createMaterialFor(expression, topicKnowledge);
