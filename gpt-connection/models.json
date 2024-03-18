@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Mistral OpenOrca",
+    "file": "mistral-7b-openorca.Q4_0.gguf"
+  },
+  {
+    "name": "Mistral Instruct",
+    "file": "mistral-7b-instruct-v0.1.Q4_0.gguf"
+  },
+  {
+    "name": "GPT4All Falcon",
+    "file": "gpt4all-falcon-newbpe-q4_0.gguf"
+  },
+  {
+    "name": "Hermes",
+    "file": "nous-hermes-llama2-13b.Q4_0.gguf"
+  },
+  {
+    "name": "Mistral german",
+    "file": "em_german_mistral_v01.Q4_0.gguf"
+  }
+]

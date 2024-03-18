@@ -25,13 +25,15 @@ import java.util.concurrent.TimeoutException;
 @SessionAttributes("process")
 public class AggregationController {
 
-	private static final Logger              logger        = LoggerFactory.getLogger(AggregationController.class);
-	private static final Map<String, String> modelListName = Map.of("Mistral OpenOrca", "mistral-7b-openorca.Q4_0.gguf",
-			"Mistral Instruct", "mistral-7b-instruct-v0.1.Q4_0.gguf",
-			"GPT4All Falcon", "gpt4all-falcon-newbpe-q4_0.gguf",
-			"Hermes", "nous-hermes-llama2-13b.Q4_0.gguf",
-			"Mistral german", "em_german_mistral_v01.Q4_0.gguf");
-	private static final String ZUFALL = "ZUFALL";
+	private static final List<String> DEFAULT_ACTIONS = List.of("remove", "reject", "accept");
+
+	private static final Logger              logger = LoggerFactory.getLogger(AggregationController.class);
+	private static final Map<String, String> modelListName;
+	private static final String              ZUFALL = "ZUFALL";
+
+	static {
+		modelListName = ModelNameLoader.load();
+	}
 
 	private final GPT_Manager gptManager;
 	private final KnowledgeModelService modelService;

@@ -9,6 +9,7 @@ import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -26,6 +27,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @since 1.1.0
  */
 @Component
+@Order(2) // Run after cleaning the database
 public class InitModel implements CommandLineRunner {
 
 	private static final Logger logger = LoggerFactory.getLogger(InitModel.class);
