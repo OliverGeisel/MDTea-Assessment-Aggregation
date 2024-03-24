@@ -25,7 +25,7 @@ Die Informatik ist eine junge Wissenschaft, die sich in den letzten Jahrzehnten 
 </head>
 <body class="d-flex flex-column min-vh-100">
 <div th:replace="~{main::navigation}"></div>
-<main class="flex-grow-1 container-fluid mb-3">
+<main class="flex-grow-1 container mb-3">
     <div th:replace="~{main::aggregationProgress}"></div>
     <header class="flex-header"><h1>Konfiguration für NLP</h1></header>
     <section class="container-fluid">
@@ -36,7 +36,10 @@ Die Informatik ist eine junge Wissenschaft, die sich in den letzten Jahrzehnten 
             <label class="form-control">Fragment (wenn notwendig):
                 <textarea class="form-control" cols="80" id="fragment-input" name="fragment" rows="10"
                           th:if="${process.sources.isEmpty()}" th:text="${process.currentFragment}"></textarea>
-                <button class="btn btn-info" onclick="randomFragment()" type="button">Random fragment</button>
+                <button class="btn btn-info" onclick="randomFragment()" th:text="#{aggregation.random-fragment}"
+                        type="button">Random
+                    fragment
+                </button>
             </label>
             <div th:replace="~{aggregation/fragments :: area-of-knowledge-fragment}"></div>
             <div class="btn-group mt-2">

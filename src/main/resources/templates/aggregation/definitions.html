@@ -84,7 +84,7 @@
         </div>
         <th:block th:unless="${error}">
             <header>
-                <h3>Antwort</h3>
+                <h3 th:text="#{aggregation.answer}">Antwort</h3>
             </header>
             <form method="post" th:action="@{definitions/add}">
                 <button class="btn btn-primary" th:text="#{aggregation.definitions.add}">Add</button>
@@ -172,7 +172,7 @@
             </article>
             <hr>
             <article class="mt-2">
-                <h3>Terms</h3>
+                <h3 th:text="#{aggregation.terms}">Terms</h3>
                 <div>
                     <span th:text="#{aggregation.terms.accepted}">Angenommen</span>: <span
                         th:text="${process.terms.acceptedElements.size}"></span>
@@ -220,8 +220,10 @@
             <header><h4>Weiter zu den Beispielen</h4></header>
             <form method="post" th:action="@{definitions/next}">
                 <div class="btn-group">
-                    <button class="btn btn-primary">Weiter</button>
-                    <button class="btn btn-info" th:formaction="@{definitions/back}">Zurück</button>
+                    <button class="btn btn-primary" th:text="#{aggregation.next}">Weiter</button>
+                    <button class="btn btn-info" th:formaction="@{definitions/back}" th:text="#{aggregation.back}">
+                        Zurück
+                    </button>
                 </div>
             </form>
         </article>

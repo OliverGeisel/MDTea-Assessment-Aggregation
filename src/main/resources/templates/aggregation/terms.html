@@ -23,12 +23,16 @@
                 <textarea class="form-control" cols="80" id="fragment-textarea" name="fragment"
                           readonly rows="10" th:text="${process.currentFragment}"></textarea>
             </label>
-            <button class="btn btn-info" onclick="enableTextarea()" type="button">Edit Fragment</button>
+            <div class="pt-1">
+                <button class="btn btn-info" onclick="enableTextarea()" type="button">Edit Fragment</button>
+            </div>
             <div th:replace="~{aggregation/fragments :: area-of-knowledge-fragment}"></div>
-            <button class="btn btn-primary" type="submit">Speichern</button>
-            <button class="btn btn-warning" th:formaction="@{/aggregation/top-level-scan}" type="submit">
-                Erneut Scannen
-            </button>
+            <div class="pt-1">
+                <button class="btn btn-primary" type="submit">Speichern</button>
+                <button class="btn btn-warning" th:formaction="@{/aggregation/top-level-scan}" type="submit">
+                    Erneut Scannen
+                </button>
+            </div>
         </form>
     </section>
     <hr>
@@ -39,7 +43,7 @@
         </div>
         <div th:unless="${error}">
             <header>
-                <h3>Antwort</h3>
+                <h3 th:text="#{aggregation.answer}">Antwort</h3>
             </header>
             <span>
                 <form th:action="@{terms/add}">
@@ -127,7 +131,10 @@
             <article class="row mb-2" id="next-step">
                 <header><h4>Weiter zu den Definitionen</h4></header>
                 <form method="post" th:action="@{terms/next}">
-                    <button class="btn btn-primary" th:disabled="${process.terms.isEmpty}">Weiter</button>
+                    <button class="btn btn-primary" th:disabled="${process.terms.isEmpty}"
+                            th:text="#{aggregation.next}">
+                        Weiter
+                    </button>
                 </form>
             </article>
             <article>

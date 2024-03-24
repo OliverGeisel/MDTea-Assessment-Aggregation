@@ -43,7 +43,7 @@
                             </div>
                             <div>
                                 <ul class="list-unstyled">
-                                    <li class="d-flex mb-2" th:each="chapter : ${course.courseOrder.chapterOrder}">
+                                    <li class="d-flex mb-2" th:each="chapter : ${course.order.chapterOrder}">
                                         <span
                                                 class="bs-icon-xs bs-icon-rounded bs-icon-semi-white bs-icon bs-icon-xs me-2"><svg
                                                 class="bi bi-check-lg text-primary" fill="currentColor" height="1em"
@@ -56,14 +56,14 @@
                             </div>
                             <div class="d-flex justify-content-between">
                                 <form method="post" th:action="@{/edit/{id}/export(id=${course.id})}">
-                                    <button class="btn btn-warning d-block w-100 m-1" disabled name="export"
+                                    <button class="btn btn-danger d-block w-100 m-1" disabled name="export"
                                             value="pdf">PDF
                                     </button>
-                                    <button class="btn btn-info d-block w-100 m-1" name="kind"
-                                            th:disabled="${course.valid}" value="html">HTML
+                                    <button class="btn btn-outline-dark d-block w-100 m-1" name="kind"
+                                            th:disabled="${!course.valid}" value="html">HTML
                                     </button>
-                                    <button class="btn btn-danger d-block w-100 m-1" name="kind"
-                                            th:disabled="${course.valid}" value="opal">OPAL
+                                    <button class="btn btn-success d-block w-100 m-1" name="kind"
+                                            th:disabled="${!course.valid}" value="opal">OPAL
                                     </button>
                                 </form>
                                 <p th:unless="${course.valid}">

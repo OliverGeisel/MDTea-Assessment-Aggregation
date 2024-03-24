@@ -63,9 +63,7 @@
             <option th:each="language : ${T(de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_prompts.Language).languageStrings}"
                     th:value="${language}"></option>
         </datalist>
-
     </div>
-
     <label class="form-control">
         API-Key:
         <input class="form-text" name="apiKey" th:placeholder="'Nur wenn remote genutzt'"
@@ -85,7 +83,6 @@
                     th:text="#{aggregation.skipToIntegration}"></button>
         </a>
     </label>
-
 </article>
 
 

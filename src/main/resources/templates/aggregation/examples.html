@@ -38,7 +38,7 @@
         </div>
         <th:block th:unless="${error}">
             <header>
-                <h3>Antwort</h3>
+                <h3 th:text="#{aggregation.answer}">Antwort</h3>
             </header>
             <form method="post" th:action="@{examples/add}">
                 <button class="btn btn-primary" th:text="#{aggregation.examples.add}">Add</button>
@@ -198,8 +198,9 @@
             <header><h4>Weiter zu den Fragen</h4></header>
             <form method="post" th:action="@{examples/next}">
                 <div class="btn-group">
-                    <button class="btn btn-primary">Weiter</button>
-                    <button class="btn btn-info" th:formaction="@{examples/back}">Zurück</button>
+                    <button class="btn btn-primary" th:text="#{aggregation.next}">Weiter</button>
+                    <button class="btn btn-info" th:formaction="@{examples/back}" th:text="#{aggregation.back}">Zurück
+                    </button>
                 </div>
             </form>
         </article>

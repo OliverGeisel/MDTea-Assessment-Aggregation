@@ -18,7 +18,9 @@
             </div>
         </div>
         <div class="row row-cols-1 row-cols-md-2 mx-auto" style="max-width: 900px;">
-            <div class="col mb-5"><img class="rounded img-fluid shadow" src="images/blank-ex.png"></div>
+            <div class="col mb-5">
+                <img class="rounded img-fluid shadow" src="images/blank-ex.png">
+            </div>
             <div class="col d-md-flex align-items-md-end align-items-lg-center mb-5">
                 <div>
                     <h5 class="fw-bold">BLANK</h5>
@@ -26,13 +28,14 @@
                         Animation.</p>
                     <form th:action="@{/generator/plan-selection}">
                         <input name="template" th:value="${blank}" type="hidden" value="blank">
-                        <button class="btn btn-primary shadow" type="submit">Learn more</button>
+                        <button class="btn btn-primary shadow" th:text="#{general.select}" type="submit">Select</button>
                     </form>
                 </div>
             </div>
         </div>
         <div class="row row-cols-1 row-cols-md-2 mx-auto" style="max-width: 900px;">
-            <div class="col order-md-last mb-5"><img class="rounded img-fluid shadow" src="images/color-ex.png">
+            <div class="col order-md-last mb-5">
+                <img class="rounded img-fluid shadow" src="images/color-ex.png">
             </div>
             <div class="col d-md-flex align-items-md-end align-items-lg-center mb-5">
                 <div>
@@ -40,13 +43,13 @@
                     <p class="text-muted mb-4">Etwas schöner mit CSS Design.</p>
                     <form th:action="@{/generator/plan-selection}">
                         <input name="template" th:value="${color}" type="hidden" value="color">
-                        <button class="btn btn-primary shadow" type="submit">Learn more</button>
+                        <button class="btn btn-primary shadow" th:text="#{general.select}" type="submit">Select</button>
                     </form>
                 </div>
             </div>
         </div>
         <div class="row row-cols-1 row-cols-md-2 mx-auto" style="max-width: 900px;">
-            <div class="col mb-5"><img class="rounded img-fluid shadow" src="assets/img/products/3.jpg"></div>
+            <div class="col mb-5"></div>
             <div class="col d-md-flex align-items-md-end align-items-lg-center mb-5">
                 <div>
                     <h5 class="fw-bold">Weitere</h5>
@@ -57,7 +60,11 @@
                                     th:value="${option.name}">
                             </option>
                         </select>
-                        <button class="btn btn-primary shadow" type="submit">Learn more</button>
+                        <div class="pt-2">
+                            <button class="btn btn-primary shadow" th:text="#{general.select}" type="submit">
+                                Select
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
