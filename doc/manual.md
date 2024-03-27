@@ -2,6 +2,8 @@
 
 Dieses Dokument ist das Nutzerhandbuch für die Anwendung **MDTea-Aggregation-Assessment**, welche im Rahmen der
 Diplomarbeit von Oliver Geisel entstanden ist.
+Dieses Handbuch soll dem Nutzer das Einrichten und Nutzung der Anwendung erleichtern und die wichtigsten Funktionen
+erklären.
 
 
 <!-- TOC -->
@@ -79,17 +81,19 @@ Das System kann je nach Nutzung sehr hohe Anforderungen haben. Es sollte ein seh
 
 ### Empfohlen
 
-* 16GB oder mehr (je nach Modell für GPT4All)
+* 16 GB oder mehr (je nach Modell für GPT4All)
 * 4 oder mehr Kerne (Je mehr, umso besser für GPT4All)
-* Grafikkarte mit Cuda Support - RAM ist wichtiger als die Leistung. Wenn das Modell zu groß ist, wird die Grafikkarte
-  nicht genutzt.
+* Grafikkarte mit Cuda Support - RAM ist wichtiger als die Leistung.
+  Wenn das Modell zu groß ist, wird die Grafikkarte nicht genutzt.
 * Docker
+* 10 GB Speicher (Modell abhängig)
 
 ## Installation und Konfiguration
 
 ### Programmierumgebungen
 
-Es werden sowohl Java als auch Python benötigt. Die Installation von Java und Python wird hier nicht erklärt.
+Es werden sowohl Java als auch Python benötigt.
+Die Installation von Java und Python wird hier nicht erklärt.
 Die konkrete Version von Java ist wichtig. Es muss exakt die Version 21 sein.
 Der Grund sind die benutzten Preview-Features.
 Für Python wird mindestens die Version 3.10 benötigt.
@@ -154,7 +158,9 @@ Weitere Modelle müssen diese in `gpt-connection/model.json` hinzugefügt werden
 Sollte ein Modell nicht verfügbar sein, wird das Default-Modell des Clients genommen.
 
 Der Sever muss allerdings noch in dem GPT4All-Client aktiviert werden.
-Dazu geht man in die Einstellungen. ![Server aktivieren](images/enable-server.png)
+Dazu geht man in die Einstellungen (Zahnrad oben rechts).
+![Server aktivieren](images/enable-server.png)
+Wie in der Abbildung zu sehen muss bei "Enable API server" ein Haken gesetzt werden.
 
 #### Lokale Nutzung
 
@@ -199,6 +205,7 @@ In der Navigation sind folgende Punkte aufgelistet:
 * Erstellen
 * Bearbeiten
 * Exportieren
+* Info
 
 ### Aggregation (Wissensmodell bearbeiten)
 
@@ -208,7 +215,7 @@ Die Anwendung bietet folgende Möglichkeiten:
 + Ein Fragment analysieren und Wissen extrahieren. Hierfür ist GPT4All notwendig.
 + Das Modell bearbeiten
 + Neue (einzelne) Elemente hinzufügen
-+ Informationen/ Statistik über das Modell
++ Informationen/Statistik über das Modell
 
 #### Wissen aus einem Fragment (Text)
 
@@ -238,19 +245,26 @@ Der Ort des Modells gibt an, ob GPT4All lokal oder remote genutzt wird.
 Die weiteren Parameter sind nicht so wichtig und können so gelassen werden.
 Falls ein Modell auf einem anderen Server genutzt werden soll, muss der Server-Ort und der API-Key angegeben werden.
 
+Für Testzwecke kann auch zufällig ein Fragment aus durch das Klicken auf den Button "Zufälliges Fragment" generiert
+werden.
+
 ##### 2. Extraktion von Termen
 
-Die Extraktion von Termen geschieht durch das Klicken auf den Button "Extrahieren".
-Wenn der Client von GPT4All lokal ausgeführt wird, dann kann beobachtet werden, wie der Prompt in den Client
+Die Extraktion von Termen geschieht durch das Klicken auf den Button "Analysieren".
+Wenn der Client von GPT4All lokal ausgeführt wird, dann kann beobachtet werden, wie die Prompt in den Client
 eingetragen wird und Wort für Wort die Antwort generiert wird.
 ![Extraktion von Termen](images/term-extraction.png)
-Nach der Extraktion werden die Terme als Vorschlag in der GUI der Anwendung angezeigt. Hier kann der Nutzer nun die
-Terme bearbeiten und entscheiden welche Terme behalten werden sollen und welche nicht angenommen
-werden. ![Akzeptierte und vorgeschlagene Terme](images/acceptet-terms.png)
+Nach der Extraktion werden die Terme als Vorschlag in der GUI der Anwendung angezeigt.
+Hier kann der Nutzer nun die Terme bearbeiten und entscheiden welche Terme behalten werden sollen und welche nicht
+angenommen
+werden.
+Es ist aber auch möglich die Anaylse erneut zu starten.
+Hierfür kann auf den Button "Erneut Scannen" geklickt werden.
+![Akzeptierte und vorgeschlagene Terme](images/acceptet-terms.png)
 In der Abbildung ist zu sehen wie auf der linken Seite die vorgeschlagenen und auf der rechten Seite die akzeptierten
 Terme zu sehen sind.
 
-Wenn alle Terme bearbeitet wurden, kann der Nutzer auf den Button "Weiter" klicken.
+Wenn alle Terme bearbeitet wurden, kann der Nutzer auf den Button "Weiter" (ganz unten auf der Seite) klicken.
 
 ##### 3. Extraktion und Bearbeiten von Definitionen
 
@@ -261,15 +275,32 @@ Nur sind in diesem Fall die akzeptierten Terme entscheidend, welche Definitionen
 Die Definitionen können auch "außerhalb" des Fragmentes extrahiert werden.
 Je nach Modell kann es sein, das der vordefinierte Prompt nicht perfekt verarbeitet wird und die Definition für
 einen Term aus dem "Wissen des GPT-Modells" geholt wird.
-
-Auch hier wird der Button "Extrahieren" geklickt und die Definitionen werden extrahiert.
+![Definitionen mit Wissen außerhalb des Fragmentes](images/definition-bad.png)
+Auch hier wird der Button "Anaylsieren" geklickt und die Definitionen werden extrahiert.
 Genau wie bei den Termen werden die Definitionen als Vorschlag angezeigt und können bearbeitet werden.
 Zusätzlich kann jeder Definition auch eine Vielzahl von Termen zugeordnet werden.
 Im Normalfall ist bereits der Term, welcher durch die Definition erklärt wird, zugeordnet.
 
 Wenn alles bearbeitet wurde, kann der Nutzer auf den Button "Weiter" klicken.
+Sollte es sein, dass ein Term vergessen wurde, kann dürch das Klicken auf den Button "Zurück" wieder zu den Termen
+gelangt werden.
+Die Definitionen werden dabei nicht gelöscht.
 
 ##### 4. Extraktion und Bearbeiten von Beispielen
+
+Auch die Extraktion von Beispielen ist ähnlich wie die Extraktion von Definitionen.
+Hier versucht das LLM zum einen die Relation (IS_EXAMPLE) zwischen Termen zu finden und zum anderen konkrete
+Beispiel-Elemente für das Wissensmodell zu finden.
+Dementsprechend gibt es auch zwei Sektionen in der GUI.
+Die erste ist genauso wie schon bei den Definitionen, eine Auflistung von Vorschlägen und akzeptierten Beispielen.
+![Beispiele](images/examples.png)
+Darunter befindet sich eine Sektion, in der die Relationen zwischen den Elementen angezeigt werden.
+![Beispiele und Relationen](images/examples-relations.png)
+Es kann sein, dass durch den Prozess auch neue Terme gefunden werden.
+Diese werden automatisch in die Liste der akzeptierten Terme eingefügt.
+
+Auch hier ist ganz unten ein Button "Weiter", der den Nutzer zur nächsten Phase bringt.
+Auch der Button "Zurück" ist vorhanden, um noch einmal die Definitionen zu bearbeiten.
 
 ##### 5. Extraktion und Bearbeiten von Code
 
@@ -291,13 +322,19 @@ Die Extraktion läuft genauso ab wie bei den anderen Wissensarten.
 Der Nutzer kann die Fragen bearbeiten und entscheiden, welche Fragen behalten werden sollen und welche nicht
 angenommen.
 Zudem kann der Nutzer selbst eigene Fragen hinzufügen.
-![](images/item-add.png)
+![Hinzufügen von Fragen](images/item-add.png)
+Die Maske ist identisch, wenn eine Frage direkt in das Modell eingefügt werden sollte.
+(siehe [Einbinden von einzelnen Elementen](#einbinden-von-einzelnen-elementen))
 
 ##### 7. Integration ins Wissensmodell
 
 Das ist der letzte Schritt, der das Wissen in das Wissensmodell integriert.
 ![Integration des neuen Wissens](images/integration.png)
-Durch das Klicken auf den Button wird das Wissen in das Wissensmodell integriert.
+Durch das Klicken auf den Button "Integrieren" wird das Wissen in das Wissensmodell integriert.
+Nach Abschluss wird man automatisch zur Übersicht des Modells weitergeleitet.
+![Übersicht der Wissensmodells nach integration](images/integration-uebersicht.png)
+In der Konsole kann ein Log gefunden werden, welches eine kurze Übersicht über die integrierten Elemente gibt.
+![Log der Integration in der Konsole](images/integation-konsole.png)
 Nun kann das Wissen in der Generation-Phase genutzt werden.
 
 #### Einbinden von einzelnen Elementen
@@ -306,17 +343,18 @@ Wenn nur ein einzelnes Element hinzugefügt werden soll, kann das einfach über 
 Hierzu geht man in der Navigation auf den Unterpunkt "einzelnes Element hinzufügen" im Bereich
 Aggregation. ![Einzelnes Element hinzufügen](images/add-single-element.png)
 Auf der auftauchenden Seite ist zunächst nur ein Dropdown-Menü zu sehen.
-Durch anklicken des gewünschten Types wird automatisch darunter ein Formular angezeigt, in dem die entsprechenden
+Durch Anklicken des gewünschten Types wird automatisch darunter ein Formular angezeigt, in dem die entsprechenden
 Daten eingetragen werden können.
+Nicht jeder Typ wird unterstützt.
 Jedes Element hat dabei eine eigene Maske, die spezifisch für das Element ist.
 Folgende Tabelle zeigt die Elemente und die entsprechenden Felder (Ohne Items):
 
 | **Term**    | **Definition** | **Code** | **Text** | **Bild** |
 |-------------|----------------|----------|----------|----------|
-| Struktur-Id |                |          |          |          |
-| Term-Name   | Definition     |          |          |          |
-|             |                |          |          |          |
-|             |                |          |          |          |
+| Struktur-Id |
+| Term-Name   | Definition     | Headline | Headline | Headline |
+|             |                | Code     |          | File     |
+|             |                | Sprache  |          |          |
 |             |                |          |          |          |
 
 Es gibt einen Typ bei Wissenselementen, der Aufgaben, Fragen und ähnliches zusammenfasst.
@@ -336,6 +374,7 @@ Folgende Felder können bei Items angezeigt werden:
 
 Die Felder mit einem * sind mehrfach vorhanden und durch einen Klick auf einen Button können weitere Felder
 hinzugefügt werden.
+![Beispiel der Maske für Fill Out Blanks Frage](images/add-fill-out.png)
 
 ### Generation (Generierung von Material/Kursen)
 
@@ -457,9 +496,10 @@ Materialien" zu finden.
 In der Sektion "Nicht zugeordnete Materialien" können die Materialien wieder einem Task zugewiesen werden.
 Dazu muss lediglich die Id (der Name) des Tasks in das Eingabefeld eingetragen werden und auf den Button mit dem "+"  
 geklickt werden.
-Ein Test kann nicht einem Task zugewiesen werden. Tests können nur in Gruppen eingefügt werden.
+Ein Test kann nicht einem Task zugewiesen werden.
+Tests können nur in Gruppen eingefügt werden.
 Auch wenn in den Vorschlägen Kapitel auftauchen, so wird bei der Zuweisung nichts passieren.
-![](images/assign-test.png)
+![Ein nicht zugewiesener Test](images/assign-test.png)
 
 ##### Export eines Kurses
 
@@ -498,6 +538,8 @@ Bei der Wahl von "OPAL" wird der Kurs als eine ZIP-Datei exportiert, die in OPAL
 
 Alternativ kann das auch in der Bearbeitungsansicht des Kurses gemacht werden.
 Siehe dazu [Bearbeiten](#bearbeiten).
+
+<hr>
 
 ## Technische Details
 
