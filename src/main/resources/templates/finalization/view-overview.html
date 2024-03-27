@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Overview - '+${material.name}">Overview</title>
+    <th:block th:replace="~{main::head-tag}"></th:block>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div th:replace="~{main::navigation}"></div>
+<main class="flex-grow-1 container">
+    <header><h1>Overview - <span th:remove="tag" th:text="${material.name}"></span></h1></header>
+    <section>
+        <div class="row">
+            <h2>Materials</h2>
+            <div class="col-12">
+            </div>
+            <!--/*@thymesVar id="summary" type="de.olivergeisel.materialgenerator.generation.material.transfer.SummaryMaterial"*/-->
+            <div th:each="summary:${material.parts}">
+                <p>Term: <span th:text="${summary.term}"></span></p>
+                <hr>
+            </div>
+        </div>
+    </section>
+    <section>
+        <a th:href="@{.}">
+            <button class="btn btn-primary" th:text="#{back}">Back</button>
+        </a>
+    </section>
+</main>
+<footer th:replace="~{main::footer}"></footer>
+</body>
+</html>

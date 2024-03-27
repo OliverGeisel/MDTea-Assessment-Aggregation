@@ -8,7 +8,8 @@
 <!--/*@thymesVar id="process" type="de.olivergeisel.materialgenerator.aggregation.AggregationProcess"*/-->
 <div th:fragment="area-of-knowledge-fragment">
     <label><span th:remove="tag" th:text="#{aggregation.areaOfKnowledge.title}">Wissensgebiet</span>:
-        <input class="form-control" id="area-of-knowledge-input" list="areas-list" name="areaOfKnowledge" placeholder="Type or select an option"
+        <input class="form-control" id="area-of-knowledge-input" list="areas-list" name="areaOfKnowledge"
+               placeholder="Type or select an option"
                th:value="${process.areaOfKnowledge}" type="text">
         <datalist id="areas-list">
             <option th:each="area : ${structures}" th:text="${area}" th:value="${area}"></option>
@@ -39,8 +40,8 @@
             <input min="1" name="maxTokens" step="1" th:value="${process.modelParameters.maxTokens}" type="number">
         </label>
         <label> Temperatur
-            <input class="form-" max="1" min="0.01" name="temperature" step="0.01" th:value="${process.modelParameters.temperature}"
-                   type="number">
+            <input class="form-" max="1" min="0.01" name="temperature" step="0.01"
+                   th:value="${process.modelParameters.temperature}" type="number">
         </label>
         <label> Top P
             <input max="1" min="0.01" name="topP" step="0.01" th:value="${process.modelParameters.topP}" type="number">
@@ -49,7 +50,20 @@
             <input min="1" name="retries" step="1" th:value="${process.modelParameters.retries}" type="number">
         </label>
     </div>
-
+    <div class="form-control" id="language-select">
+        <label>Fragment Language:
+            <input list="languages" name="fragmentLanguage" required
+                   th:value="${process.fragmentLanguage}" type="text">
+        </label>
+        <label>Target Language:
+            <input list="languages" name="targetLanguage" required
+                   th:value="${process.targetLanguage}" type="text">
+        </label>
+        <datalist id="languages">
+            <option th:each="language : ${T(de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_prompts.Language).languageStrings}"
+                    th:value="${language}"></option>
+        </datalist>
+    </div>
     <label class="form-control">
         API-Key:
         <input class="form-text" name="apiKey" th:placeholder="'Nur wenn remote genutzt'"
@@ -69,7 +83,6 @@
                     th:text="#{aggregation.skipToIntegration}"></button>
         </a>
     </label>
-
 </article>
 
 

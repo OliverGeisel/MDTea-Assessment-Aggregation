@@ -57,7 +57,7 @@ public class StructureChapter extends StructureElement {
 
 	@Override
 	public Relevance updateRelevance() {
-		relevance = parts.stream().map(StructureElement::getRelevance).max(Enum::compareTo).orElseThrow();
+		relevance = parts.stream().map(StructureElement::getRelevance).max(Enum::compareTo).orElse(Relevance.TO_SET);
 		return relevance;
 	}
 
@@ -91,7 +91,12 @@ public class StructureChapter extends StructureElement {
 		return false;
 	}
 
-	public int size() {
+	/**
+	 * Returns the number of Tasks in the chapter
+	 *
+	 * @return number of itemConfigurations in the chapter
+	 */
+	public int numberOfTasks() {
 		int back = 0;
 		for (StructureElement element : parts) {
 			if (element instanceof StructureGroup group) {
@@ -101,6 +106,15 @@ public class StructureChapter extends StructureElement {
 			}
 		}
 		return back;
+	}
+
+	/**
+	 * Returns the number of groups in the chapter
+	 *
+	 * @return number of parts in the chapter
+	 */
+	public int size() {
+		return parts.size();
 	}
 
 	//region setter/getter
@@ -119,8 +133,7 @@ public class StructureChapter extends StructureElement {
 
 	@Override
 	public String toString() {
-		return "StructureChapter{" + "name=" + getName() + ", parts=" + parts.size() + ", weight=" + weight
-			   + ", relevance=" + relevance + '}';
+		return STR."StructureChapter{name=\{getName()}, parts=\{parts.size()}, weight=\{weight}, relevance=\{relevance}}";
 	}
 
 

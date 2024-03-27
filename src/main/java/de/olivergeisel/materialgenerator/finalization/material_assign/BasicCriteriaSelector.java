@@ -7,8 +7,6 @@ import de.olivergeisel.materialgenerator.finalization.parts.MaterialOrderCollect
 import de.olivergeisel.materialgenerator.finalization.parts.Topic;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 
-import java.util.LinkedList;
-
 
 /**
  * Basic implementation of a criteria selector. It selects a material based on the alias of the material.
@@ -96,8 +94,10 @@ public class BasicCriteriaSelector implements CriteriaSelector {
 	@Override
 	public boolean satisfies(Material material, Topic target) throws IllegalArgumentException {
 		if (target == null) throw new IllegalArgumentException("target must not be null");
-		var topicName = target.getName();
-		return satisfies(material, topicName);
+		for (var alias : target.getTopicStructureAliasMappings().complete()) {
+			if (satisfies(material, alias)) return true;
+		}
+		return false;
 	}
 
 	/**
@@ -109,12 +109,19 @@ public class BasicCriteriaSelector implements CriteriaSelector {
 	@Override
 	public boolean satisfies(Material material, MaterialOrderCollection collection) throws IllegalArgumentException {
 		if (collection == null) throw new IllegalArgumentException("target must not be null");
-		var toCheck = new LinkedList<>(collection.getAlias());
-		toCheck.add(collection.getTopic().getName());
-		for (var name : toCheck) {
-			if (satisfies(material, name)) return true;
+		if (collection.getTopic() == null) {
+			throw new IllegalArgumentException("collection must have a topic");
+		}
+		var mappings = collection.getTopic().getTopicStructureAliasMappings();
+		var structure = material.getStructureId();
+		for (var criteria : mappings.complete()) {
+			if (strictMatchExceptCase(structure, criteria)) return true;
 		}
 		return false;
 	}
 
+	private boolean strictMatchExceptCase(String material, String criteria) {
+		if (material == null || criteria == null) return false;
+		return material.equalsIgnoreCase(criteria);
+	}
 }

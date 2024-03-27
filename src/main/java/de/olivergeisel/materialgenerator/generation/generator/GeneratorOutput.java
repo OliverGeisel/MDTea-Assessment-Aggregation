@@ -12,6 +12,15 @@ public class GeneratorOutput {
 	private final List<Material>             allMaterial = new LinkedList<>();
 	private final List<MaterialMappingEntry> allMappings = new LinkedList<>();
 
+	/**
+	 * Returns the number of materials in the output.
+	 *
+	 * @return the number of materials in the output.
+	 */
+	public int size() {
+		return allMaterial.size();
+	}
+
 	public void add(MaterialAndMapping materialAndMapping) {
 		addMapping(materialAndMapping.mapping());
 		addMaterial(materialAndMapping.material());

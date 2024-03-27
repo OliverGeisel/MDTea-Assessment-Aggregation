@@ -7,9 +7,21 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
 <div th:replace="~{main::navigation}"></div>
-<main class="flex-grow-1">
+<main class="flex-grow-1 container">
     <header><h1 th:text="${element.id}"></h1></header>
+    <section>Allgemeines
+        <p>Name: <span th:text="${element.id}"></span></p>
+        <p>Typ: <span th:text="${element.type}"></span></p>
+        <p>Inhalt: <span th:text="${element.content}"></span></p>
+        <p>Struktur: <span th:text="${element.structureId}"></span></p>
+    </section>
     <section>
+        Relationen:
+        <div class="border border-primary border-1 rounded" th:each="rel:${element.relations}">
+            <p th:text="${rel.name}"></p>
+            <p th:text="${rel.type}"></p>
+            <p th:text="${rel.to}"></p>
+        </div>
 
     </section>
 </main>

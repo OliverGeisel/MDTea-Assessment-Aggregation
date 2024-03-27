@@ -1,6 +1,7 @@
 package de.olivergeisel.materialgenerator.generation;
 
 import de.olivergeisel.materialgenerator.FileSystemStorageService;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModelService;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.IncompleteJSONException;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlanParser;
@@ -31,13 +32,16 @@ public class GeneratorController {
 	private final FileSystemStorageService storageService;
 	private final TemplateSetRepository    templateSetRepository;
 	private final MaterialRepository       materialRepository;
+	private final KnowledgeModelService knowledgeModelService;
 
 	public GeneratorController(GeneratorService service, FileSystemStorageService storageService,
-			TemplateSetRepository templateSetRepository, MaterialRepository materialRepository) {
+			TemplateSetRepository templateSetRepository, MaterialRepository materialRepository,
+			KnowledgeModelService knowledgeModelService) {
 		this.service = service;
 		this.storageService = storageService;
 		this.templateSetRepository = templateSetRepository;
 		this.materialRepository = materialRepository;
+		this.knowledgeModelService = knowledgeModelService;
 	}
 
 	@GetMapping({"", "/", ".html"})
@@ -91,6 +95,7 @@ public class GeneratorController {
 		model.addAttribute("template", template);
 		model.addAttribute("structure", coursePlan.getStructure());
 		model.addAttribute("meta", coursePlan.getMetadata());
+		model.addAttribute("testConfiguration", coursePlan.getTestConfiguration());
 		return PATH + "overview-all";
 	}
 
@@ -126,7 +131,26 @@ public class GeneratorController {
 		var completePlan = parser.parseFromFile(storageService.load(planName).toFile());
 		model.addAttribute("structure", completePlan.getStructure());
 		model.addAttribute("meta", completePlan.getMetadata());
+		model.addAttribute("testConfiguration", completePlan.getTestConfiguration());
 		return PATH + "overview-all";
+	}
+
+	@GetMapping("tests/generate")
+	String generateTests(Model model) {
+		var allSections = knowledgeModelService.getStructureIds();
+		model.addAttribute("areas", allSections);
+		return PATH + "tests-for-topic";
+	}
+
+	@PostMapping("tests/generate")
+	String generateTests(@RequestParam String topic, Model model) {
+		var allSections = knowledgeModelService.getStructureIds();
+		model.addAttribute("areas", allSections);
+		model.addAttribute("topic", topic);
+		var test = service.generateTest(topic);
+		model.addAttribute("test", test);
+
+		return PATH + "generated-test";
 	}
 
 	@GetMapping("generate")

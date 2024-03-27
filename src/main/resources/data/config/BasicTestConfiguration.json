@@ -1,18 +1,19 @@
 {
-  "name": "Default-TestConfiguration",
+  "configurationName": "Default-TestConfiguration",
   "description": "Default-TestConfiguration for the MDTea-prototype",
   "version": "1.0.0",
   "testPer": [
     "GROUP"
   ],
+  "shuffle": true,
   "defaultTestParameters": {
     "tries": 1,
     "pointsPerUnit": 1,
     "negativeFactor": 0.0
   },
-  "numberTasks": 5,
+  "numberItems": 5,
   "markSchema": "NUMBERS",
-  "order": "RANDOM",
+  "sorting": "RANDOM",
   "marks": [
     "1.0",
     "1.3",
@@ -38,7 +39,7 @@
     "3.7": 55,
     "4.0": 50
   },
-  "tasks": [
+  "items": [
     {
       "type": "TrueFalse",
       "testParameters": null
@@ -52,16 +53,18 @@
     {
       "type": "SingleChoice",
       "testParameters": null,
-      "numberOfChoices": 4
+      "numberOfChoices": 4,
+      "shuffle": true
     },
     {
       "type": "MultipleChoice",
       "testParameters": null,
       "numberOfChoices": 4,
-      "numberOfCorrectChoices": 2
+      "numberOfCorrectChoices": 2,
+      "shuffle": true
     },
     {
-      "type": "Assign",
+      "type": "Assignment",
       "testParameters": null
     }
   ]

@@ -2,11 +2,11 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Terms</title>
+    <title>Top-Level-Scan - Terms</title>
     <th:block th:replace="~{main::head-tag}"></th:block>
     <script>
         function enableTextarea() {
-            document.getElementById("fragment-textarea").disabled = false;
+            document.getElementById("fragment-textarea").readOnly = false;
         }
     </script>
 </head>
@@ -19,14 +19,20 @@
     <section class="container-fluid">
         <form method="post" th:action="@{terms/update-config}">
             <th:block th:replace="~{aggregation/fragments :: model-configs}"></th:block>
-            <label class="form-control">Fragment (wenn notwendig):<textarea class="form-control" cols="80"
-                                                                            disabled id="fragment-textarea" name="fragment"
-                                                                            rows="10"
-                                                                            th:text="${process.currentFragment}"></textarea>
+            <label class="form-control">Fragment (wenn notwendig):
+                <textarea class="form-control" cols="80" id="fragment-textarea" name="fragment"
+                          readonly rows="10" th:text="${process.currentFragment}"></textarea>
             </label>
-            <button class="btn btn-info" onclick="enableTextarea()" type="button">Edit Fragment</button>
+            <div class="pt-1">
+                <button class="btn btn-info" onclick="enableTextarea()" type="button">Edit Fragment</button>
+            </div>
             <div th:replace="~{aggregation/fragments :: area-of-knowledge-fragment}"></div>
-            <button class="btn btn-primary" type="submit">Speichern</button>
+            <div class="pt-1">
+                <button class="btn btn-primary" type="submit">Speichern</button>
+                <button class="btn btn-warning" th:formaction="@{/aggregation/top-level-scan}" type="submit">
+                    Erneut Scannen
+                </button>
+            </div>
         </form>
     </section>
     <hr>
@@ -37,7 +43,7 @@
         </div>
         <div th:unless="${error}">
             <header>
-                <h3>Antwort</h3>
+                <h3 th:text="#{aggregation.answer}">Antwort</h3>
             </header>
             <span>
                 <form th:action="@{terms/add}">
@@ -62,20 +68,19 @@
                                     <p class="card-text">Structure-Id: <span th:text="${term.structureId}"></span></p>
                                 </div>
                                 <div class="card-footer">
-                                    <a th:href="@{/aggregation/term/{id}(id=${term.id})}">
+                                    <a th:href="@{term(id=${term.id})}">
                                         <button class="btn btn-primary">Details</button>
                                     </a>
                                     <form method="post">
                                         <input name="id" th:value="${term.id}" type="hidden">
                                         <div class="btn-group btn-group-sm col">
-                                            <button class="btn btn-danger" th:formaction="@{terms/remove#answers}"><i
-                                                    class="bi bi-trash ms-2"></i></button>
-                                            <button class="btn btn-success" th:formaction="@{terms/accept#answers}"><i
-                                                    class="bi bi-plus-square"></i></button>
+                                            <button class="btn btn-danger" th:formaction="@{terms/remove#answers}">
+                                                <i class="bi bi-trash ms-2"></i></button>
+                                            <button class="btn btn-success" th:formaction="@{terms/accept#answers}">
+                                                <i class="bi bi-plus-square"></i></button>
                                             <button class="btn btn-info" formmethod="get" th:formaction="@{terms/edit}">
-                                                <i
-                                                        class="bi bi-pen"></i></button>
-                                    </div>
+                                                <i class="bi bi-pen"></i></button>
+                                        </div>
                                     </form>
                                 </div>
                             </div>
@@ -126,7 +131,10 @@
             <article class="row mb-2" id="next-step">
                 <header><h4>Weiter zu den Definitionen</h4></header>
                 <form method="post" th:action="@{terms/next}">
-                    <button class="btn btn-primary" th:disabled="${process.terms.isEmpty}">Weiter</button>
+                    <button class="btn btn-primary" th:disabled="${process.terms.isEmpty}"
+                            th:text="#{aggregation.next}">
+                        Weiter
+                    </button>
                 </form>
             </article>
             <article>

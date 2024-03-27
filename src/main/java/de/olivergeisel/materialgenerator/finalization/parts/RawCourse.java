@@ -3,12 +3,12 @@ package de.olivergeisel.materialgenerator.finalization.parts;
 import de.olivergeisel.materialgenerator.core.course.Course;
 import de.olivergeisel.materialgenerator.core.course.Meta;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
+import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
+import de.olivergeisel.materialgenerator.generation.material.assessment.ItemMaterial;
 import jakarta.persistence.*;
 
-import java.util.Collection;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -43,9 +43,26 @@ public class RawCourse extends Course {
 	private CourseMetadataFinalization metadata;
 	@OneToOne(cascade = CascadeType.ALL)
 	private RawCourseOrder rawCourseOrder;
+	@ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	private Set<Material> unassignedMaterials = new HashSet<>();
 
 	@OneToMany(cascade = CascadeType.ALL)
 	private Set<Goal> goals;
+
+	/**
+	 * Assign materials to this course.
+	 *
+	 * @param materials The materials to assign
+	 * @return True if all materials are assigned. False otherwise
+	 */
+	public boolean assignMaterial(Collection<MaterialAndMapping> materials) {
+		var assigner = rawCourseOrder.assignMaterial(materials.stream().map(MaterialAndMapping::material).collect(
+				Collectors.toSet()));
+		// remove all items Todo -> only items, that are assigned to a test
+		var filtered = assigner.getUnassignedMaterials().stream().filter(it -> !(it instanceof ItemMaterial));
+		unassignedMaterials.addAll(filtered.toList());
+		return true;
+	}
 
 	protected RawCourse() {
 	}
@@ -67,6 +84,8 @@ public class RawCourse extends Course {
 		return rawCourseOrder.materialCount();
 	}
 
+	//region setter/getter
+
 	/**
 	 * Change the plan. THis will also change the course order. Materials must be reassigned.
 	 */
@@ -74,19 +93,15 @@ public class RawCourse extends Course {
 		setPlanId(plan.getId());
 		// Todo change rawCourseOrder
 	}
-
 	/**
-	 * Assign materials to this course.
+	 * Get the materials that are assigned to this course.
 	 *
-	 * @param materials The materials to assign
-	 * @return True if all materials are assigned. False otherwise
+	 * @return An unmodifiable materials that are assigned to this course
 	 */
-	public boolean assignMaterial(Collection<MaterialAndMapping> materials) {
-		return rawCourseOrder.assignMaterial(materials.stream().map(MaterialAndMapping::material).collect(
-				Collectors.toSet()));
+	public List<Material> getMaterials() {
+		return rawCourseOrder.getMaterials();
 	}
-
-	//region setter/getter
+	public Set<Material> getUnassignedMaterials() {return unassignedMaterials;}
 
 	/**
 	 * Say if a course has enough materials and fulfill all requirements to use.

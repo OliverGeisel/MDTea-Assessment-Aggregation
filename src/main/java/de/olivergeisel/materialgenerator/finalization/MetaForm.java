@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Range;
 
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -12,22 +13,32 @@ import java.util.Map;
 public class MetaForm {
 
 	@NotBlank
-	private String              name;
+	private String                          name;
 	@NotBlank
-	private String              description;
+	private String                          description;
 	@Range(min = 2000)
-	private int                 year;
+	private int                             year;
 	@NotBlank
-	private String              level;
+	private String                          level;
 	@NotBlank
-	private String              type;
-	private Map<String, String> extras;
+	private String                          type;
+	private Map<List<String>, List<String>> extras;
 
 
 	public MetaForm() {
 	}
 
-	public MetaForm(String name, String description, int year, String level, String type, Map<String, String> extras) {
+	public MetaForm(Map map) {
+		this.name = (String) map.get("name");
+		this.description = (String) map.get("description");
+		this.year = Integer.parseInt(map.get("year").toString());
+		this.level = (String) map.get("level");
+		this.type = (String) map.get("type");
+		this.extras = (Map<List<String>, List<String>>) map.get("extras");
+	}
+
+	public MetaForm(String name, String description, int year, String level, String type,
+			Map<List<String>, List<String>> extras) {
 		this.name = name;
 		this.description = description;
 		this.year = year;

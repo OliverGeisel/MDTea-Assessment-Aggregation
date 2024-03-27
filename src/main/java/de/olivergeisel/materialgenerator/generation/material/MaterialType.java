@@ -9,5 +9,5 @@ public enum MaterialType {
 	REPORT,
 	FAQ,
 	COMPLEX,
-	TASK,
+	ITEM,
 }

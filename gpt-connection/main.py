@@ -71,7 +71,7 @@ def parse_args():
 def local(prompt, model_name):
     model_dir = pathlib.Path().joinpath("../model-files/")
     model_name = model_names[0] if model_name is None else model_name
-    model = GPT4All(model_name, model_path=model_dir, device="cpu")
+    model = GPT4All(model_name, model_path=model_dir, device="cpu")  # todo find the best way to use gpu or cpu
     output = model.generate(prompt, max_tokens=global_prompt_parameters.m, temp=global_prompt_parameters.t,
                             top_p=global_prompt_parameters.p)
     print(output)

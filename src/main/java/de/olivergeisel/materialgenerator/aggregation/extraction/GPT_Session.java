@@ -79,7 +79,7 @@ public class GPT_Session {
 		return answer;
 	}
 
-	private <T extends KnowledgeElement, A extends PromptAnswer<T>> String requestLocalModel(
+	public <T extends KnowledgeElement, A extends PromptAnswer<T>> String requestLocalModel(
 			GPT_Request<T, A> request) throws TimeoutException {
 		logger.info("open connection to a local GPT-Model. Model-Name: {} - Parameters: {}", request.getModelName(),
 				request.getPromptParameters());
@@ -87,7 +87,7 @@ public class GPT_Session {
 		return answer.toString();
 	}
 
-	private <T extends KnowledgeElement, A extends PromptAnswer<T>> String requestRemoteModel(GPT_Request<T, A> request)
+	public <T extends KnowledgeElement, A extends PromptAnswer<T>> String requestRemoteModel(GPT_Request<T, A> request)
 			throws ServerNotAvailableException, TimeoutException {
 		logger.info("open connection to a GPT/Model-Server. Model-Name: {} - Parameters: {}", request.getModelName(),
 				request.getPromptParameters());

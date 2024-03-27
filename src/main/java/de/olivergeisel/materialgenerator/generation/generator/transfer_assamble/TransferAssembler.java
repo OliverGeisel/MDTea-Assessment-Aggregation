@@ -41,19 +41,20 @@ public class TransferAssembler {
 
 
 	public List<MaterialAndMapping> createOverview(Collection<MaterialAndMapping> summaryMaterials) {
-		var StructureMapping = new HashMap<String, List<SummaryMaterial>>();
+		var structureMapping = new HashMap<String, List<SummaryMaterial>>();
 		var summaries = summaryMaterials.stream().map(it -> (SummaryMaterial) it.material()).toList();
 		for (var m : summaries) {
 			var key = m.getStructureId();
-			if (StructureMapping.containsKey(key)) {
-				StructureMapping.get(key).add(m);
+			if (structureMapping.containsKey(key)) {
+				structureMapping.get(key).add(m);
 			} else {
-				StructureMapping.put(key, new LinkedList<>(List.of(m)));
+				structureMapping.put(key, new LinkedList<>(List.of(m)));
 			}
 		}
 		var back = new ArrayList<MaterialAndMapping>();
-		for (var entry : StructureMapping.entrySet()) {
+		for (var entry : structureMapping.entrySet()) {
 			var material = new OverviewMaterial(entry.getKey(), "");
+			material.setStructureId(entry.getKey());
 			entry.getValue().forEach(material::append);
 			back.add(new MaterialAndMapping<>(material, createMappingEntry(material, summaryMaterials)));
 		}
@@ -81,7 +82,6 @@ public class TransferAssembler {
 							 .toList();
 		var material = new SummaryMaterial(term);
 		var mapping = new MaterialMappingEntry(material);
-		material.setTemplateType(TemplateType.SUMMARY);
 		definitions.forEach(it -> {
 			material.append(it.material());
 			mapping.addAll(it.mapping().getRelatedElements());
@@ -95,7 +95,7 @@ public class TransferAssembler {
 			mapping.addAll(it.mapping().getRelatedElements());
 		});
 		if (!material.getParts().isEmpty()) {
-			back.add(new MaterialAndMapping<>(material, mapping));
+			back.add(new MaterialAndMapping<>(mapping));
 		}
 		return back;
 	}

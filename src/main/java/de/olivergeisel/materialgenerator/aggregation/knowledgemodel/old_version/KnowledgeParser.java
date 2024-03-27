@@ -1,6 +1,7 @@
 package de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version;
 
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.ElementGenerator;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModel;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.ElementParser;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.Relation;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationGenerator;
@@ -54,7 +55,7 @@ public class KnowledgeParser {
 
 	private KnowledgeElement createElement(String type, String id, String structure, String content,
 			List<Map<String, String>> relationsJSON) {
-		var newElement = ElementGenerator.create(type, id, structure, content);
+		var newElement = ElementParser.create(type, id, structure, content);
 		var relations = createRelation(relationsJSON, newElement);
 		newElement.addRelations(relations);
 		return newElement;

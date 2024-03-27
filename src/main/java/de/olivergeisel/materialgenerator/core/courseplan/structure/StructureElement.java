@@ -13,7 +13,7 @@ import java.util.*;
  * @see CourseStructure
  * @see StructureChapter
  * @see StructureElementPart
- * @since 1.0.0
+ * @since 0.2.0
  */
 public abstract class StructureElement {
 
@@ -23,7 +23,7 @@ public abstract class StructureElement {
 	private       String        name; // KnowledgeObject id; most important alias
 
 	protected StructureElement() {
-
+		relevance = Relevance.TO_SET;
 	}
 
 	protected StructureElement(ContentTarget topic, Relevance relevance, String name,
@@ -31,7 +31,9 @@ public abstract class StructureElement {
 		this.relevance = relevance;
 		this.name = name;
 		this.topic = topic;
-		alias.addAll(alternatives);
+		if (alternatives != null) {
+			alias.addAll(alternatives);
+		}
 	}
 
 	/**
@@ -125,6 +127,7 @@ public abstract class StructureElement {
 	 * @return the Element that contains the alias, {@literal null} if it was not found
 	 */
 	public StructureElement findByAlias(String alias) {
+		if (name == null) return null;
 		if (name.equals(alias) || hasAlias(alias)) return this;
 		return null;
 	}
@@ -197,12 +200,7 @@ public abstract class StructureElement {
 
 	@Override
 	public String toString() {
-		return "StructureElement{" +
-			   "name='" + name +
-			   ", alias=" + alias +
-			   ", relevance=" + relevance +
-			   ", topic=" + topic + '\'' +
-			   '}';
+		return STR."StructureElement{name='\{name}', alias=\{alias}, relevance=\{relevance}, topic=\{topic}}";
 	}
 
 }

@@ -1,6 +1,6 @@
 package de.olivergeisel.materialgenerator.generation.generator;
 
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.KnowledgeModel;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModel;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentGoal;
 import de.olivergeisel.materialgenerator.core.courseplan.content.Curriculum;
@@ -48,6 +48,22 @@ public interface Generator {
 	 * @return True if the generation was successful, false if not.
 	 */
 	boolean update();
+
+	/**
+	 * A subgeneration of the {@link #update()}-method. Creates only simple Material for the given Input.
+	 *
+	 * @return true if there was new {@link Material} generated, otherwise false
+	 */
+	boolean createSimpleMaterial();
+
+	/**
+	 * A subgeneration of {@link #update()}-method. Creates only complex Material for the given Input <b>and</b> the
+	 * (simple) material, that was already generated.
+	 * This can be tricky. When no materials are in the {@link KnowledgeModel} then no Material will be generated.
+	 *
+	 * @return true if there was new {@link Material} generated, otherwise false
+	 */
+	boolean createComplexMaterial();
 
 	/**
 	 * Method to get the output of the generation process. This method should be called after the update method.

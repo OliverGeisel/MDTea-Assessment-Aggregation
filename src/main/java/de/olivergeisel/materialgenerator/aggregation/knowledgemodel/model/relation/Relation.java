@@ -33,13 +33,13 @@ public abstract class Relation {
 	private KnowledgeElement from;
 	@Relationship("TO")
 	private KnowledgeElement to;
-
 	protected Relation() {
 		this.type = RelationType.CUSTOM;
 		this.name = "";
 		this.fromId = "";
 		this.toId = "";
 	}
+
 	protected Relation(String name, String fromId, String toId, RelationType type) {
 		if (fromId == null || toId == null || type == null || name == null) {
 			throw new IllegalArgumentException("Arguments must not be null");
@@ -62,11 +62,48 @@ public abstract class Relation {
 		this.name = name;
 	}
 
+	/**
+	 * Check if the relation is a reverse of the given relation
+	 *
+	 * @param other relation to compare with
+	 * @return true if the relation is a reverse of the given relation
+	 */
+	public boolean isReverseFrom(Relation other) {
+		if (other == null) {
+			return false;
+		}
+		var isReverseType = this.type.getInverted().equals(other.type);
+		if (!isReverseType) {
+			return false;
+		}
+		return this.fromId.equals(other.toId) && this.toId.equals(other.fromId);
+	}
+
 	public boolean hasType(RelationType type) {
 		return this.type.equals(type);
 	}
 
+	/**
+	 * Check if this relation is the same as another relation.
+	 * Ignores the id of the relation.
+	 *
+	 * @param relation the relation to compare
+	 * @return true if the relations are the same
+	 */
+	public boolean isSameAs(Relation relation) {
+		if (this == relation) return true;
+		if (relation == null) return false;
+		if (!type.equals(relation.type)) return false;
+		if (!name.equals(relation.name)) return false;
+		if (!toId.equals(relation.toId)) return false;
+		return fromId.equals(relation.fromId);
+	}
+
 	//region setter/getter
+	public UUID getId() {
+		return id;
+	}
+
 	public String getFromId() {
 		return fromId;
 	}
@@ -89,8 +126,8 @@ public abstract class Relation {
 		if (from == null) {
 			throw new IllegalArgumentException("from must not be null");
 		}
-		if (from.getId() == null || !from.getId().equals(fromId)) {
-			throw new IllegalArgumentException("from.id must not be null and must match fromId");
+		if (from.getId() == null) {
+			throw new IllegalArgumentException("from.id must not be null");
 		}
 		this.from = from;
 		fromId = from.getId();
@@ -144,8 +181,8 @@ public abstract class Relation {
 		if (to == null) {
 			throw new IllegalArgumentException("to must not be null");
 		}
-		if (to.getId() == null || !to.getId().equals(toId)) {
-			throw new IllegalArgumentException("to.id must not be null and must match toId");
+		if (to.getId() == null) {
+			throw new IllegalArgumentException("to.id must not be null");
 		}
 		this.to = to;
 		toId = to.getId();
@@ -164,7 +201,7 @@ public abstract class Relation {
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (!(o instanceof Relation relation)) return false;
-
+		// Todo use the id as well
 		if (!name.equals(relation.name)) return false;
 		if (!fromId.equals(relation.fromId)) return false;
 		return toId.equals(relation.toId);
@@ -180,6 +217,6 @@ public abstract class Relation {
 
 	@Override
 	public String toString() {
-		return "Relation " + name + ": " + fromId + " → " + toId;
+		return STR."Relation \{name}: \{fromId} → \{toId}";
 	}
 }

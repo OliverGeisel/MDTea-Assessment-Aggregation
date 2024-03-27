@@ -54,6 +54,19 @@
                 </div>
             </div>
         </section>
+        <section class="border border-light border-4 m-3 p-2" id="testConfiguration">
+            <header>
+                <h3>Testkonfiguration</h3>
+            </header>
+            <div class="border border-light border-3 m-2 " style="margin-left: 20px">
+                <!--/*@thymesVar id="testConfiguration" type="de.olivergeisel.materialgenerator.generation.configuration.TestConfiguration"*/-->
+                <h4>Name: <span th:remove="tag" th:text="${testConfiguration.configurationName}"></span></h4>
+                <p th:text="${testConfiguration.description}"></p>
+                <p>Version: <span th:text="${testConfiguration.version}"></span></p>
+                <p> Tests per: <span th:each="level:${testConfiguration.level}" th:remove="tag"
+                                     th:text="${level}+' '"></span></p>
+            </div>
+        </section>
         <section>
             <form class="form-control " th:action="@{generate}">
                 <input name="template" th:value="${template}" type="hidden">
@@ -63,7 +76,7 @@
             </form>
         </section>
     </main>
-    <footer th:replace="~{main::footer}"></footer>
 </div>
+<footer th:replace="~{main::footer}"></footer>
 </body>
 </html>

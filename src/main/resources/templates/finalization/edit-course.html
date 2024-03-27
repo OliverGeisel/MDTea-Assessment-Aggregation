@@ -7,16 +7,50 @@
     <link href="https://fonts.googleapis.com/css?family=Inter:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&amp;display=swap"
           rel="stylesheet">
 </head>
-
 <body>
 <script th:inline="javascript">
+
     function addKeyValuePair() {
-        let pairsDiv = document.getElementById('extra-pairs');
+        let pairsDiv = document.getElementById('extras');
         let newPair = document.createElement('div');
-        newPair.innerHTML = '<input type="text" name="keys[]" placeholder="Key">:' +
-            '<input type="text" name="values[]" placeholder="Value">';
+        newPair.classList.add('m-1');
+        newPair.innerHTML = '<input type="text" name="key" placeholder="Key"> : ' +
+            '<input type="text" name="value" placeholder="Value">';
         pairsDiv.appendChild(newPair);
     }
+
+    function submitForm() {
+        let formData = new FormData(document.getElementById("meta-form"));
+        let object = {};
+        object["extras"] = {};
+        formData.forEach(function (value, key) {
+            if (key === "key" || key === "value") {
+                if (object["extras"][key] === undefined) {
+                    object["extras"][key] = [];
+                }
+                object["extras"][key].push(value);
+                return;
+            }
+            object[key] = value;
+        });
+        let json = JSON.stringify(object);
+        let id = /*[[${course.id}]]*/ 0;
+        fetch(id + "/meta-update", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: json
+        })
+            .then(response => response.text())
+            .then(data => {
+                console.log(data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
+
 </script>
 <nav th:replace="~{main :: navigation}">
 </nav>
@@ -24,7 +58,7 @@
     <section class="py-5" id="metadata-section">
         <h3>Allgemeine Informationen</h3>
         <div class="p-3">
-            <form method="post" th:action="@{${course.id}/update-meta}">
+            <form id="meta-form">
                 <label class="form-label">Name: <input class="form-control" name="name"
                                                        th:value="${course.metadata.name.get}"></label>
                 <label class="form-label">Jahr: <input class="form-control" min="2000" name="year" step="1"
@@ -38,19 +72,20 @@
                                                                   th:text="${course.metadata.description.get}"></textarea>
                 </label>
                 <label>
-                    <div class="container" id="extra-pairs" th:if="${course.metadata.otherInfos.size}!=0">
+                    <div class="container" id="extras" th:if="${course.metadata.otherInfos.size} != 0">
                         <h4>Weitere Daten</h4>
                         <th:block th:each="info : ${course.metadata.otherInfos}">
                             <div class="m-1">
-                                <input name="key[]" th:value="${info.key}">
-                                : <input name="value[]" th:value="${info.value}"></div>
+                                <input name="key" th:value="${info.key}">
+                                : <input name="value" th:value="${info.value}"></div>
                         </th:block>
                     </div>
-                    <button class="btn btn-info" onclick="addKeyValuePair()" type="button">Weiteres Paar
-                        hinzufügen
+                    <button class="btn btn-info" onclick="addKeyValuePair()" type="button">
+                        Weiteres Paar hinzufügen
                     </button>
                 </label>
-                <button class="btn btn-primary" th:text="#{general.save}" type="submit">Speichern</button>
+                <button class="btn btn-primary" onclick="submitForm()" th:text="#{general.save}" type="button">Speichern
+                </button>
             </form>
         </div>
     </section>
@@ -58,6 +93,10 @@
         <header>
             <h3>Themen</h3>
         </header>
+        <datalist id="structures">
+            <option th:each="structure : ${collectionIds}" th:text="${structure.name}"
+                    th:value="${structure.id}"></option>
+        </datalist>
         <div class="container border border-secondary border-3 m-2 " style="margin-left: 20px"
              th:each="chapter,statc : ${course.order.chapterOrder}"
              th:id="'chapter-'+${chapter.name.replace(' ','-')}">
@@ -138,12 +177,14 @@
                                         <h6 class="col-sm mt-2 order-first" th:text="${task.name}"></h6>
                                         <div class="col-sm order">
                                             <form method="post" th:action="${course.id}+'/relevance'">
-                                                <select class="form-select bg-primary" name="relevance">
-                                                    <option class="form-select" th:each="relevance : ${RELEVANCE}"
-                                                            th:selected="${relevance}==${task.relevance}"
-                                                            th:text="${relevance}">
-                                                    </option>
-                                                </select>
+                                                <label> Relevanz:
+                                                    <select class="form-select bg-primary" name="relevance">
+                                                        <option class="form-select" th:each="relevance : ${RELEVANCE}"
+                                                                th:selected="${relevance}==${task.relevance}"
+                                                                th:text="${relevance}">
+                                                        </option>
+                                                    </select>
+                                                </label>
                                                 <button class="btn badge bg-primary" data-bs-target="#taskModal"
                                                         data-bs-toggle="modal" name="task" th:value="${task.id}"
                                                         type="submit"><i class="bi bi-arrow-clockwise"></i>
@@ -177,60 +218,101 @@
                                     <div class="container pt-2">
                                         <div class="row pt-1" th:each="material,stat:${task.materials}"
                                              th:id="'material-'+${material.id}">
-                                            <p class="col-sm order-first m-1 mt-2" th:text="${material.shortName}"></p>
-                                            <div class="col-sm-3 order-last">
-                                                <div class="container">
-                                                    <div class="row">
-                                                        <div class="col">
-                                                            <form th:action="@{/view}">
-                                                                <input name="templateSet"
-                                                                       th:value="${course.templateName}" type="hidden">
-                                                                <input name="materialId" th:value="${material.id}"
-                                                                       type="hidden">
-                                                                <span class="col order-5"><button class="btn btn-dark"
-                                                                                                  type="submit">
-                                            <i class="bi bi-binoculars-fill"></i>
-                                        </button>
-                                        </span>
-                                                            </form>
-                                                        </div>
-                                                        <div class="col">
-                                                            <div class="col">
-                                                                <form method="post" th:unless="${stat.first}">
-                                                                    <input name="task" th:value="${task.id}"
-                                                                           type="hidden">
-                                                                    <button class="btn badge bg-primary" name="up"
-                                                                            th:value="${material.id}"><i
-                                                                            class="bi bi-arrow-up-circle"></i>
-                                                                    </button>
-                                                                </form>
-                                                            </div>
-                                                            <div class="col">
-                                                                <form method="post" th:unless="${stat.last}">
-                                                                    <input name="task" th:value="${task.id}"
-                                                                           type="hidden">
-                                                                    <button class="btn badge bg-primary" name="down"
-                                                                            th:value="${material.id}">
-                                                                        <i class="bi bi-arrow-down-circle"></i>
-                                                                    </button>
-                                                                </form>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col">
-                                                            <form method="post"
-                                                                  th:action="@{${course.id}+'/deletePart'}">
-                                                                <button class="btn badge bg-danger" name="id"
-                                                                        th:value="${material.id}">
-                                                                    <i class="bi bi-trash-fill"></i>
-                                                                </button>
-                                                            </form>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <th:block
+                                                    th:replace="~{::material-fragment (${material}, ${stat}) }"></th:block>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="container" th:id="'group-' +${group.name.replace(' ','-')} + 'complex'">
+                                <p th:if="${group.complexMaterials.isEmpty}"
+                                   th:text="#{finalization.complex.empty}"></p>
+                                <div class="row" th:each="complex :${group.complexMaterials}">
+                                    <div class="col">
+                                        Name: <span th:text="${complex.name}"></span><br>
+                                        Type: <span th:text="${complex.templateType.type}"></span><br>
+                                        Items: <span th:text="${complex.size}"></span><br>
+                                    </div>
+                                    <div class="col">
+                                        <form method="get" th:action="@{${course.id}+'/viewComplex'}">
+                                            <input name="materialId" th:value="${complex.id}" type="hidden">
+                                            <div class="btn-group">
+                                                <button class="btn badge bg-primary" type="submit">
+                                                    <i class="bi bi-binoculars-fill"></i>
+                                                </button>
+                                                <button class="btn badge bg-danger" name="id"
+                                                        th:formaction="@{${course.id}+'/unassignPart'}"
+                                                        th:value="${complex.id}">
+                                                    <i class="bi bi-slash-circle"></i>
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="col" th:if="${complex.templateType.type} == 'TEST'">
+                                        <form method="post" th:action="@{/edit/download-material}">
+                                            <input name="materialId" th:value="${complex.id}" type="hidden">
+                                            <button class="btn badge bg-primary" title="Download" type="submit">
+                                                <i class="bi bi-download"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="mb-2" id="unassigned-materials-section">
+        <div class="row">
+            <h3 th:text="#{finalization.edit.unassigned}">Unzugeordnete Materialien <span
+                    th:text="${course.unassignedMaterials.size}"></span></h3>
+            <div class="col" th:each="material:${course.unassignedMaterials}">
+                <div class="card border border-1 border-dark rounded-1 bg-primary-light">
+                    <div class="card-header">
+                        <p class="col-sm order-first m-1 mt-2" th:text="${material.shortName}"></p>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-text">Material type: <span th:text="${material.templateType.type}">Type</span>
+                        </h5>
+                        <h5 class="card-text" th:if="${material.templateType.type=='TEST'}">Parts:
+                            <span th:remove="tag" th:text="${material.parts.size}"></span></h5>
+                        <h5 class="card-text">Structure-Id: <span th:text="${material.structureId}">Structure</span>
+                        </h5>
+                    </div>
+                    <div class="card-footer">
+                        <div class="btn-group">
+                            <form method="post">
+                                <input name="materialId" th:value="${material.id}" type="hidden">
+                                <button class="btn badge bg-primary" th:formaction="@{${course.id}+'/view'}"
+                                        type="submit">
+                                    <i class="bi bi-binoculars-fill"></i>
+                                </button>
+                                <button class="btn badge bg-danger" disabled name="id" title="delete"
+                                        th:formaction="@{${course.id}+'/deleteUnassigned'}">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </form>
+                            <form method="post">
+                                <input name="id" th:value="${material.id}" type="hidden">
+                                <label>Assign to:
+                                    <input list="structures" name="collectionId" required>
+                                </label>
+                                <button class="btn badge bg-primary" th:formaction="@{${course.id}+'/assignPart'}"
+                                        title="assign to part" type="submit">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                            </form>
+                            <div th:if="${material.templateType.type} == 'TEST'">
+                                <form method="post" th:action="@{/edit/download-material}">
+                                    <input name="materialId" th:value="${material.id}" type="hidden">
+                                    <button class="btn badge bg-primary" title="Download" type="submit">
+                                        <i class="bi bi-download"></i>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -250,7 +332,7 @@
             </form>
         </article>
     </section>
-    <section class="container" id="delete">
+    <section class="container mb-2" id="delete">
         <header>
             <h3>Löschen</h3>
         </header>
@@ -262,6 +344,56 @@
     </section>
 </main>
 <footer th:replace="~{main :: footer}"></footer>
+<!--/*@thymesVar id="material" type="de.olivergeisel.materialgenerator.generation.material.Material"*/-->
+<th:block th:fragment="material-fragment (material, stat)">
+    <div class="row">
+        <div class="col">
+            <p class="col col-sm order-first m-1 mt-2" th:text="${material.shortName}"></p>
+        </div>
+        <div class="col-8 col-sm-8 col-auto col-sm-auto">
+            <div class="row">
+                <div class="col col-sm">
+                    <form th:action="@{/view}">
+                        <input name="templateSet" th:value="${course.templateName}" type="hidden">
+                        <input name="materialId" th:value="${material.id}" type="hidden">
+                        <button class="btn btn-dark btn-sm" type="submit">
+                            <i class="bi bi-binoculars-fill"></i>
+                        </button>
+                    </form>
+                </div>
+                <div class="col-auto col-sm-auto">
+                    <form method="post" th:action="@{${course.id}+'/unassignPart'}">
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn bg-danger btn-sm" name="id" title="unassign"
+                                    th:value="${material.id}">
+                                <i class="bi bi-slash-circle"></i>
+                            </button>
+                            <button class="btn bg-danger btn-sm" name="id" th:formaction="@{${course.id}+'/deletePart'}"
+                                    th:value="${material.id}" title="delete">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-4 col-sm-4 order-last">
+                    <form method="post">
+                        <input name="task" th:value="${task.id}" type="hidden">
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn bg-primary" name="up" th:unless="${stat.first}"
+                                    th:value="${material.id}" title="move up">
+                                <i class="bi bi-arrow-up-circle"></i>
+                            </button>
+                            <button class="btn bg-primary" name="down" th:unless="${stat.last}"
+                                    th:value="${material.id}"
+                                    title="move down">
+                                <i class="bi bi-arrow-down-circle"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
 </body>
-
 </html>

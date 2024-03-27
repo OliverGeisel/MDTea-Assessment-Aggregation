@@ -63,11 +63,10 @@ public class RawCourseOrder extends CourseOrder {
 	 * @param materials Materials to assign
 	 * @return True if all chapters, groups and parts could assign to the materials. False otherwise
 	 */
-	public boolean assignMaterial(Set<Material> materials) {
-		var materialAssigner =
-				new BasicMaterialAssigner(materials);
+	public MaterialAssigner assignMaterial(Set<Material> materials) {
+		var materialAssigner = new BasicMaterialAssigner(materials);
 		chapterOrder.forEach(c -> c.assignMaterial(materialAssigner));
-		return true;
+		return materialAssigner;
 	}
 
 	public boolean assignMaterial(Set<Material> materials, MaterialAssigner assigner) {
@@ -126,6 +125,36 @@ public class RawCourseOrder extends CourseOrder {
 	public UUID getId() {
 		return id;
 	}
+
+	public List<UUID> getCollectionIds() {
+		var back = new LinkedList<UUID>();
+		for (var chapter : chapterOrder) {
+			back.addAll(chapter.getCollectionIds());
+		}
+		return back;
+	}
+
+	public List<NameAndId> getCollectionsNameAndId() {
+		var back = new LinkedList<NameAndId>();
+		for (var chapter : chapterOrder) {
+			back.addAll(chapter.collectionsNameAndId());
+		}
+		return back;
+	}
+
+	/**
+	 * Get the materials that are assigned to this course.
+	 *
+	 * @return An unmodifiable materials that are assigned to this course
+	 */
+	public List<Material> getMaterials() {
+
+		var res = chapterOrder.stream().map(ChapterOrder::getMaterials).reduce(new LinkedList<>(), (a, b) -> {
+			a.addAll(b);
+			return a;
+		});
+		return Collections.unmodifiableList(res);
+	}
 //endregion
 
 	@Override
@@ -146,3 +175,4 @@ public class RawCourseOrder extends CourseOrder {
 		return "MaterialOrder{" + "chapterOrder=" + chapterOrder + '}';
 	}
 }
+

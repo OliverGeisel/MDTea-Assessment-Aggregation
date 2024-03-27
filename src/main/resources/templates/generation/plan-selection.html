@@ -67,9 +67,9 @@
         }
     </script>
 </head>
-<body class="container">
+<body class="d-flex flex-column min-vh-100">
 <nav th:replace="~{main::navigation}"></nav>
-<main>
+<main class="container flex-grow-1">
     <section>
         <h2> Gewähltes Template: <span th:text="${templateSetName}"></span></h2>
         <form enctype="multipart/form-data" method="post" th:action="@{/generator/overview}">

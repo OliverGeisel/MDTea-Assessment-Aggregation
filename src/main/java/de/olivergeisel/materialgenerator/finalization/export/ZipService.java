@@ -86,14 +86,6 @@ public class ZipService {
 		return zipFile;
 	}
 
-	public void saveToFile(String templateContent, File outputDir, String fileName) {
-		try (Writer writer = new BufferedWriter(new FileWriter(new File(outputDir, fileName)))) {
-			writer.write(templateContent);
-		} catch (IOException e) {
-			logger.error(STR."Error while saving file:'\{fileName}'", e);
-		}
-	}
-
 	/**
 	 * Recursive method to create a zip archive from a directory.
 	 *
@@ -120,6 +112,26 @@ public class ZipService {
 					}
 				}
 			}
+		}
+	}
+
+	/**
+	 * Writes a file to another file.
+	 *
+	 * @param source the source file
+	 * @param target the target file
+	 */
+	public void writeTo(File source, File target) {
+		try (OutputStream out = new FileOutputStream(target); FileInputStream fis = new FileInputStream(source)) {
+			byte[] buffer = new byte[1024];
+			int length;
+			while ((length = fis.read(buffer)) > 0) {
+				out.write(buffer, 0, length);
+			}
+			logger.info(STR."Zip file successfully written to: \{target}");
+		} catch (IOException e) {
+			logger.error(e.getMessage());
+			logger.error(STR."Error while writing zip file to: \{target}");
 		}
 	}
 }

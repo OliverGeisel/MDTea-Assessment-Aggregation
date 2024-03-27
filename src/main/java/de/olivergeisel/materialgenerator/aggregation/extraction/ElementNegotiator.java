@@ -1,8 +1,8 @@
 package de.olivergeisel.materialgenerator.aggregation.extraction;
 
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModel;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeFragment;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.KnowledgeModel;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -11,8 +11,9 @@ import java.util.List;
 /**
  * A Negotiator is a class that extracts a list of {@link KnowledgeElement}s from a given source/{@link KnowledgeFragment}.
  * But the Elements <b>must not be</b> correct. The user must check the elements for correctness.
+ * This is done by approve (call {@link #approve}) the elements to the negotiator.
  * So the main purpose of a Negotiator is to extract the elements from a source/fragment and hold it until the user
- * is okay with it. Is all okay, the elements will be added to a {@link KnowledgeModel}.
+ * is okay with it. Is all okay, the elements can be added to a {@link KnowledgeModel}.
  *
  * @author Oliver Geisel
  * @version 1.1.0
@@ -44,6 +45,18 @@ public class ElementNegotiator<T extends KnowledgeElement> implements Negotiator
 		return false;
 	}
 
+	/**
+	 * Check if the negotiator contains an element with the given id. It's not important if the element is suggested
+	 * or accepted.
+	 *
+	 * @param id the id to check
+	 * @return true if the negotiator contains an element with the given id, false if not.
+	 */
+	public boolean contains(String id) {
+		return suggestedElements.stream().anyMatch(it -> it.getId().equals(id))
+			   || acceptedElements.stream().anyMatch(it -> it.getId().equals(id));
+	}
+
 	public boolean hasElements() {
 		return !isEmpty();
 	}
@@ -60,7 +73,6 @@ public class ElementNegotiator<T extends KnowledgeElement> implements Negotiator
 		return acceptedElements.stream().filter(it -> it.getId().equals(id)).findFirst().orElse(null);
 	}
 
-	//region setter/getter
 
 	/**
 	 * Move an element from the list of suggested elements to the list of accepted elements.
@@ -177,13 +189,20 @@ public class ElementNegotiator<T extends KnowledgeElement> implements Negotiator
 			   || acceptedElements.removeIf(it -> it.getId().equals(id));
 	}
 
+	/**
+	 * Not supported yet. This method throws an {@link UnsupportedOperationException}.
+	 * The negotiator is used to only hold elements until the user is okay with it. The user must approve the elements.
+	 */
 	@Override
 	public List<KnowledgeElement> extract() {
-		return null;
+		throw new UnsupportedOperationException();
 	}
+
+	//region setter/getter
 	public boolean isEmpty() {
 		return suggestedElements.isEmpty() && acceptedElements.isEmpty();
 	}
+
 	public KnowledgeFragment getFragment() {
 		return fragment;
 	}

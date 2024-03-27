@@ -2,8 +2,18 @@ package de.olivergeisel.materialgenerator.aggregation;
 
 import de.olivergeisel.materialgenerator.aggregation.extraction.ModelParameters;
 
+
+/**
+ * General form to configure the aggregation process.
+ *
+ * @author Oliver Geisel
+ * @version 1.1.0
+ * @see ModelParameters
+ * @see AggregationController
+ * @since 1.1.0
+ */
 public class AggregationConfigForm {
-	//region setter/getter
+
 
 	private String connectionType;
 	private String modelName;
@@ -14,6 +24,8 @@ public class AggregationConfigForm {
 	private double temperature;
 	private double topP;
 	private String fragment;
+	private String targetLanguage;
+	private String fragmentLanguage;
 
 	public AggregationConfigForm() {
 		this.fragment = "";
@@ -25,10 +37,13 @@ public class AggregationConfigForm {
 		this.maxTokens = 1800;
 		this.temperature = .28;
 		this.topP = .95;
+		this.targetLanguage = "english";
+		this.fragmentLanguage = "english";
 	}
 
 	public AggregationConfigForm(String connectionType, String modelName, String url, String apiKey, String fragment,
-			int retries, int maxTokens, double temperature, double topP) {
+			int retries, int maxTokens, double temperature, double topP, String fragmentLanguage,
+			String targetLanguage) {
 		this.connectionType = connectionType;
 		this.modelName = modelName;
 		this.url = url;
@@ -38,10 +53,31 @@ public class AggregationConfigForm {
 		this.maxTokens = maxTokens;
 		this.temperature = temperature;
 		this.topP = topP;
+		this.fragmentLanguage = fragmentLanguage;
+		this.targetLanguage = targetLanguage;
 	}
+
+	//region setter/getter
+	public String getFragmentLanguage() {
+		return fragmentLanguage;
+	}
+
+	public void setFragmentLanguage(String fragmentLanguage) {
+		this.fragmentLanguage = fragmentLanguage;
+	}
+
+	public String getTargetLanguage() {
+		return targetLanguage;
+	}
+
+	public void setTargetLanguage(String targetLanguage) {
+		this.targetLanguage = targetLanguage;
+	}
+
 	public ModelParameters getModelParameters() {
 		return new ModelParameters(this.maxTokens, this.temperature, this.topP, this.retries);
 	}
+
 	public String getFragment() {
 		return fragment;
 	}

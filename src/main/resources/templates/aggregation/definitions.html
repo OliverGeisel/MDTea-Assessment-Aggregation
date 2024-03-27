@@ -2,11 +2,39 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Definitions</title>
+    <title>Top-Level-Scan - Definitions</title>
     <th:block th:replace="~{main::head-tag}"></th:block>
     <script>
         function enableTextarea() {
-            document.getElementById("fragment-textarea").disabled = false;
+            document.getElementById("fragment-textarea").readOnly = false;
+        }
+
+        function removeTerm(id) {
+            document.getElementById('additional-term-' + id).remove();
+        }
+
+        function addTerm() {
+            const termElement = document.getElementById('add-term');
+            if (termElement.value === '') {
+                return;
+            }
+            const id = 'additional-term-' + document.querySelectorAll('[id^="additional-term-"]').length;
+            const div = document.createElement('div');
+            div.id = id;
+            const input = document.createElement('input');
+            input.name = 'terms';
+            input.value = termElement.value;
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'btn btn-danger';
+            button.onclick = function () {
+                removeTerm(id.split('-')[2]);
+            };
+            button.innerHTML = '<i class="bi bi-x"></i>';
+            div.appendChild(input);
+            div.appendChild(button);
+            document.getElementById('additional-terms').appendChild(div);
+            termElement.value = '';
         }
     </script>
 </head>
@@ -20,9 +48,27 @@
         <form method="post">
             <th:block th:replace="~{aggregation/fragments :: model-configs}"></th:block>
             <label class="form-control">Fragment (wenn notwendig):
-                <textarea class="form-control" cols="80" disabled id="fragment-textarea" name="fragment" rows="10"
+                <textarea class="form-control" cols="80" id="fragment-textarea" name="fragment" readonly rows="10"
                           th:text="${process.currentFragment}" th:value="${process.currentFragment}"></textarea>
             </label>
+            <div>
+                <div id="additional-terms"> Weitere Terme:
+                    <div th:each="additional,stat:${form.terms}" th:id="'additional-term-'+${stat.count}">
+                        <input name="terms" th:value="${additional}">
+                        <button class="btn btn-danger" th:onclick="|removeTerm(${stat.count})|" type="button">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                    <label>
+                        <input id="add-term" list="terms-list" name=th:value="${process.terms}" type="text">
+                    </label>
+                    <datalist id="terms-list">
+                        <option th:each="term:${terms}" th:text="${term}" th:value="${term}"></option>
+                    </datalist>
+                    <button class="btn btn-success" onclick="addTerm()" type="button"><i class="bi bi-plus"></i>
+                    </button>
+                </div>
+            </div>
             <div th:replace="~{aggregation/fragments :: area-of-knowledge-fragment}"></div>
             <div class="btn-group mt-2">
                 <button class="btn btn-info" onclick="enableTextarea()" type="button">Edit Fragment</button>
@@ -38,13 +84,11 @@
         </div>
         <th:block th:unless="${error}">
             <header>
-                <h3>Antwort</h3>
+                <h3 th:text="#{aggregation.answer}">Antwort</h3>
             </header>
-            <span>
-                <form method="post" th:action="@{definitions/add}">
-                    <button class="btn btn-primary" th:text="#{aggregation.definitions.add}">Add</button>
-                </form>
-            </span>
+            <form method="post" th:action="@{definitions/add}">
+                <button class="btn btn-primary" th:text="#{aggregation.definitions.add}">Add</button>
+            </form>
             <article class="mt-2">
                 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
                     <div class="col-lg-6">
@@ -128,6 +172,7 @@
             </article>
             <hr>
             <article class="mt-2">
+                <h3 th:text="#{aggregation.terms}">Terms</h3>
                 <div>
                     <span th:text="#{aggregation.terms.accepted}">Angenommen</span>: <span
                         th:text="${process.terms.acceptedElements.size}"></span>
@@ -173,8 +218,13 @@
     <section>
         <article class="row mb-2" id="next-step">
             <header><h4>Weiter zu den Beispielen</h4></header>
-            <form method="post" th:action="@{examples}">
-                <button class="btn btn-primary">Weiter</button>
+            <form method="post" th:action="@{definitions/next}">
+                <div class="btn-group">
+                    <button class="btn btn-primary" th:text="#{aggregation.next}">Weiter</button>
+                    <button class="btn btn-info" th:formaction="@{definitions/back}" th:text="#{aggregation.back}">
+                        Zurück
+                    </button>
+                </div>
             </form>
         </article>
         <article>

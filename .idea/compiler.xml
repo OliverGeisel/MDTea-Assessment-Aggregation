@@ -7,7 +7,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="MDTea-Assesment-Aggregation" />
+        <module name="MDTea-Assessment-Aggregation" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -16,7 +16,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="MDTea-Assesment-Aggregation" options="-parameters --enable-preview" />
+      <module name="MDTea-Assessment-Aggregation" options="-parameters --enable-preview" />
       <module name="Material generator" options="-parameters" />
     </option>
   </component>

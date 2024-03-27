@@ -1,4 +1,5 @@
 {
+  "testConfiguration": "DEFAULT",
   "meta": {
     "name": "Neuer Testkurs",
     "description": "Hallo,\nDas ist ein Testkurs f\u00fcr Debugging und Tests",
@@ -119,7 +120,7 @@
           "alternatives": [
             "Programmiersprache"
           ],
-          "topic": "Programmiersprache-TERM",
+          "topic": "Programmiersprache",
           "tasks": [
             {
               "key": "task-2-2-1",

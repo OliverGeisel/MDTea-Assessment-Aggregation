@@ -49,6 +49,15 @@ public class StructureOPAL {
 				children.appendChild(xmlTask);
 			}
 		}
+		if (collection instanceof OPALGroupInfo group) {
+			for (var complex : group.getComplexMaterialInfos()) {
+				if (complex instanceof OPAlTestMaterialInfo testMaterial) {
+					var testOPAL = new TestOPAL();
+					var testXML = testOPAL.createTreeTestOPAL(testMaterial, TREE_PARENT, doc);
+					children.appendChild(testXML);
+				}
+			}
+		}
 		root.appendChild(children);
 		root.appendChild(elementWithText(doc, "accessible", true));
 		root.appendChild(elementWithText(doc, "selected", false));
@@ -90,6 +99,7 @@ public class StructureOPAL {
 			var children = doc.createElement("children");
 			children.setAttribute(CLASS, "linked-list");
 			root.appendChild(children);
+			// todo disable loop if nothing should be visible in OPAL for public
 			for (var part : collection.getMaterialOrder()) {
 				if (part instanceof MaterialCollectionOPAL materialOrderCollection) {
 					var xmlGroup =
@@ -101,6 +111,15 @@ public class StructureOPAL {
 					var xmlTask = page.createRunStructureOPAL(material, RUN_TYPE, doc);
 					// Todo change to a file that is linked with the task
 					children.appendChild(xmlTask);
+				}
+			}
+			if (collection instanceof OPALGroupInfo group) {
+				for (var complex : group.getComplexMaterialInfos()) {
+					if (complex instanceof OPAlTestMaterialInfo testMaterial) {
+						var testOPAL = new TestOPAL();
+						var testXML = testOPAL.createRunTestOPAL(testMaterial, RUN_TYPE, doc);
+						children.appendChild(testXML);
+					}
 				}
 			}
 		}
@@ -120,7 +139,9 @@ public class StructureOPAL {
 		displayOptions.setTextContent("title+desc+content");
 		}
 		root.appendChild(createDefaultModuleConfiguration(doc));
-		// Todo add other tags fo precondition
+		root.appendChild(createPreConditionVisibility(doc));
+		root.appendChild(createPreConditionAccess(doc));
+		root.appendChild(emptyElement(doc, "additionalConditions"));
 		var scoreCalc = doc.createElement("scoreCalculator");
 		root.appendChild(scoreCalc);
 		scoreCalc.appendChild(elementWithText(doc, "expertMode", false));

@@ -1,21 +1,25 @@
 package de.olivergeisel.materialgenerator.generation.generator;
 
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.KnowledgeModel;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModel;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.*;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationType;
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeObject;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
-import de.olivergeisel.materialgenerator.core.courseplan.content.ContentTarget;
 import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
-import de.olivergeisel.materialgenerator.generation.generator.task_exctraction.TrueFalseExtractor;
+import de.olivergeisel.materialgenerator.generation.configuration.*;
+import de.olivergeisel.materialgenerator.generation.generator.item_exctraction.TrueFalseExtractor;
+import de.olivergeisel.materialgenerator.generation.generator.test_assamble.TestAssembler;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
+import de.olivergeisel.materialgenerator.generation.material.MaterialMappingEntry;
+import de.olivergeisel.materialgenerator.generation.material.assessment.*;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateSet;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -56,41 +60,12 @@ public class AssessmentGenerator extends AbstractGenerator {
 		super(input);
 	}
 
-
-	@Override
-	protected void processTargets(List<ContentTarget> targets) throws IllegalStateException {
-		if (targets.isEmpty()) {
-			logger.warn("No targets found. This should not happen.");
-			return;
-		}
-		var goal = targets.stream().findFirst().orElseThrow().getRelatedGoal();
-		if (goal == null || targets.stream().anyMatch(it -> !it.getRelatedGoal().equals(goal)))
-			throw new IllegalStateException("Targets with different goals found. This should not happen. Ignoring all"
-											+ " targets.");
-		int emptyCount = 0;
-		for (var target : targets) {
-			var expression = goal.getExpression();
-			var aliases = target.getAliases();
-			var topic = target.getTopic();
-			try {
-				var topicKnowledge = loadKnowledgeForStructure(aliases.complete());
-				if (topicKnowledge.isEmpty()) {
-					logger.info("No knowledge found for Topic {}", target);
-					emptyCount++;
-					continue;
-				}
-				topicKnowledge.forEach(it -> {
-					it.setGoal(goal);
-					it.addTopic(topic);
-				});
-				createMaterialFor(expression, topicKnowledge);
-			} catch (NoSuchElementException e) {
-				logger.info("No knowledge found for Target {}", target);
-			}
-		}
-		if (emptyCount == targets.size()) {
-			logger.warn("No knowledge found for any target. Goal: {} has no materials", goal);
-		}
+	private Set<Item> getLinkedItems(Set<KnowledgeNode> knowledge) {
+		return knowledge.stream()
+						.flatMap(it -> Arrays.stream(it.getLinkedElements()))
+						.filter(it -> it instanceof Item)
+						.map(it -> (Item) it)
+						.collect(Collectors.toSet());
 	}
 
 	@Override
@@ -128,7 +103,20 @@ public class AssessmentGenerator extends AbstractGenerator {
 	protected List<MaterialAndMapping> materialForFirstLook(Set<KnowledgeNode> knowledge)
 			throws NoSuchElementException {
 
-		return new LinkedList<MaterialAndMapping>(createTrueFalse(knowledge));
+		var materials = new LinkedList<>(createTrueFalse(knowledge));
+		var singleChoice =
+				createSingleChoice(knowledge, plan.getTestConfiguration().getConfiguration(ItemType.SINGLE_CHOICE));
+		var multipleChoice =
+				createMultipleChoice(knowledge, plan.getTestConfiguration().getConfiguration(ItemType.MULTIPLE_CHOICE));
+		var fillOut = createFillOut(knowledge, plan.getTestConfiguration().getConfiguration(ItemType.FILL_OUT_BLANKS));
+
+		materials.addAll(singleChoice);
+		materials.addAll(multipleChoice);
+		materials.addAll(fillOut);
+		// tests
+		var tests = createTests(knowledge, materials, plan.getTestConfiguration());
+		materials.addAll(tests);
+		return materials;
 	}
 
 	/**
@@ -144,12 +132,70 @@ public class AssessmentGenerator extends AbstractGenerator {
 	 * @param knowledge The knowledge to create the materials for.
 	 * @return A list of materials with the questions.
 	 */
-	public List<MaterialAndMapping> createFillOut(Set<KnowledgeNode> knowledge) {
+	public List<MaterialAndMapping> createFillOut(Set<KnowledgeNode> knowledge, ItemConfiguration configuration) {
+		if (configuration == null || !configuration.getForItemType().equals(ItemType.FILL_OUT_BLANKS)) {
+			throw new IllegalArgumentException("Configuration is not for FillOutBlanks");
+		}
+		var fillOutBlanksConfiguration = (FillOutBlanksConfiguration) configuration;
+
 		var materials = new LinkedList<MaterialAndMapping>();
+		// collect - get all questions from knowledge
+		final var templateInfo = TemplateType.ITEM;
+		var firstNode = knowledge.stream().findFirst().orElseThrow();
+		var termNode = getTermNode(knowledge, firstNode);
+		var structure = termNode.getStructurePoint();
+		var mainTerm = termNode.getMainElement();
+		// If an Item is not connected to a Term, then find here
+		var items = getLinkedItems(knowledge);
+		items = items.stream().filter(it -> it instanceof FillOutBlanksItem).collect(Collectors.toSet());
+		for (var item : items) {
+			var fillOutItem = (FillOutBlanksItem) item;
+			createFillOutInner(materials, structure, mainTerm, fillOutItem, mainTerm.getStructureId(),
+					fillOutBlanksConfiguration);
+		}
+		// Items in relations to the main term
+		var relationsWithQuestion = getWantedRelationsKnowledge(knowledge, RelationType.RELATED);
+		relationsWithQuestion.forEach(it -> {
+			if (!(it.getTo() instanceof FillOutBlanksItem item)) {
+				return;
+			}
+			var term = it.getFrom();
+			if (ItemType.FILL_OUT_BLANKS.equals(item.getItemType())) {
+				createFillOutInner(materials, structure, term, item, mainTerm.getStructureId(),
+						fillOutBlanksConfiguration);
+			}
+		});
 
-		// Todo implement
-
+		// extraction - find extra questions
+		var extractor = new TrueFalseExtractor();
+		// todo get Tasks, that are stored in knowledge (added while aggregation)
+		for (var node : knowledge) {
+			var questions = extractor.extract(node, templateInfo);
+			materials.addAll(questions);
+		}
 		return materials;
+	}
+
+	private void createFillOutInner(LinkedList<MaterialAndMapping> materials, KnowledgeObject structure,
+			KnowledgeElement mainTerm, FillOutBlanksItem item, String structureId,
+			FillOutBlanksConfiguration configuration) {
+		try {
+			String name = getUniqueMaterialName(materials, STR."Lückentext-Frage zu \{mainTerm.getContent()}",
+					item.getId());
+			var question = item.getText();
+			var blanks =
+					item.getBlanks().stream().map(it -> new FillOutBlanksItemMaterial.Blank(false, it, 0, List.of()))
+						.toList();
+			var material = new FillOutBlanksItemMaterial(question, blanks, configuration.clone());
+			material.setStructureId(structure.getId());
+			material.setName(name);
+			var mappingEntry = new MaterialMappingEntry(material, item, mainTerm);
+			var mapping = new MaterialAndMapping(material, mappingEntry);
+			mapping.material().setStructureId(structureId);
+			materials.add(mapping);
+		} catch (Exception e) {
+			logger.error("Error while creating material for term {}", mainTerm.getContent(), e);
+		}
 	}
 
 	/**
@@ -167,8 +213,33 @@ public class AssessmentGenerator extends AbstractGenerator {
 	 */
 	public List<MaterialAndMapping> createTrueFalse(Set<KnowledgeNode> knowledge) {
 		var materials = new LinkedList<MaterialAndMapping>();
+		// collect - get all questions from knowledge
+		final var templateInfo = TemplateType.ITEM;
+		var firstNode = knowledge.stream().findFirst().orElseThrow();
+		var termNode = getTermNode(knowledge, firstNode);
+		var structure = termNode.getStructurePoint();
+		var mainTerm = termNode.getMainElement();
+		// If an Item is not connected to a Term, then find here
+		var items = getLinkedItems(knowledge);
+		items = items.stream().filter(it -> it instanceof TrueFalseItem).collect(Collectors.toSet());
+		for (var item : items) {
+			var trueFalseItem = (TrueFalseItem) item;
+			createTrueFalseInner(materials, structure, mainTerm, trueFalseItem, mainTerm.getStructureId());
+		}
+		// Items in relations to the main term
+		var relationsWithQuestion = getWantedRelationsKnowledge(knowledge, RelationType.RELATED);
+		relationsWithQuestion.forEach(it -> {
+			if (!(it.getTo() instanceof TrueFalseItem item)) {
+				return;
+			}
+			var term = it.getFrom();
+			if (ItemType.TRUE_FALSE.equals(item.getItemType())) {
+				createTrueFalseInner(materials, structure, term, item, mainTerm.getStructureId());
+			}
+		});
+
+		// extraction - find extra questions
 		var extractor = new TrueFalseExtractor();
-		final var templateInfo = TemplateType.TASK;
 		// todo get Tasks, that are stored in knowledge (added while aggregation)
 		for (var node : knowledge) {
 			var questions = extractor.extract(node, templateInfo);
@@ -177,35 +248,208 @@ public class AssessmentGenerator extends AbstractGenerator {
 		return materials;
 	}
 
-	public List<MaterialAndMapping> createSingleChoice(Set<KnowledgeNode> knowledge) {
+	/**
+	 * Create a True/False-Question for the given item and add it to the given materials.
+	 *
+	 * @param materials   The materials to add the question to.
+	 * @param structure   The structure of the knowledge.
+	 * @param mainTerm    Term the question is related to.
+	 * @param item        The item to create the question for.
+	 * @param structureId The id of the structure.
+	 */
+	private void createTrueFalseInner(LinkedList<MaterialAndMapping> materials, KnowledgeObject structure,
+			KnowledgeElement mainTerm, TrueFalseItem item, String structureId) {
+		try {
+			String name = getUniqueMaterialName(materials, STR."Wahr/Falsch-Frage zu \{mainTerm.getContent()}",
+					item.getId());
+			var question = item.getQuestion();
+			var isTrue = item.isCorrect();
+			var material = new TrueFalseItemMaterial(question, isTrue);
+			material.setStructureId(structure.getId());
+			material.setName(name);
+			var mappingEntry = new MaterialMappingEntry(material, item, mainTerm);
+			var mapping = new MaterialAndMapping(material, mappingEntry);
+			mapping.material().setStructureId(structureId);
+			materials.add(mapping);
+		} catch (Exception e) {
+			logger.error("Error while creating material for term {}", mainTerm.getContent(), e);
+		}
+	}
+
+
+	/**
+	 * This method creates the Single-Choice-Questions for the given knowledge.
+	 * <h3>Examples</h3>
+	 * A single choice question is a question with a question and multiple answers. Only one answer is correct.
+	 * <h4>1. Example</h4>
+	 * "What is the capital of Germany?"
+	 * <ul>
+	 *     <li>Berlin</li>
+	 *     <li>Paris</li>
+	 *     <li>London</li>
+	 *     <li>Madrid</li>
+	 *     <li>Rome</li>
+	 * </ul>
+	 *
+	 * @param knowledge     The knowledge to create the Single-Choice-questions for.
+	 * @param configuration The configuration for the Single-Choice-questions.
+	 * @return A list of materials with the questions.
+	 * @throws IllegalArgumentException If the configuration is not for Single-Choice-questions.
+	 */
+	public List<MaterialAndMapping> createSingleChoice(Set<KnowledgeNode> knowledge, ItemConfiguration configuration)
+			throws IllegalArgumentException {
+		if (configuration == null || !configuration.getForItemType().equals(ItemType.SINGLE_CHOICE)) {
+			throw new IllegalArgumentException("Configuration is not for SingleChoice");
+		}
+		var singleChoiceConfiguration = (SingleChoiceConfiguration) configuration;
 		var materials = new LinkedList<MaterialAndMapping>();
-		// Todo implement
+		// collect - get all questions from knowledge
+		final var templateInfo = TemplateType.ITEM;
+		var firstNode = knowledge.stream().findFirst().orElseThrow();
+		var termNode = getTermNode(knowledge, firstNode);
+		var structure = termNode.getStructurePoint();
+		var mainTerm = termNode.getMainElement();
+		// If an Item is not connected to a Term, then find here
+		var items = getLinkedItems(knowledge);
+		items = items.stream().filter(it -> it instanceof SingleChoiceItem).collect(Collectors.toSet());
+		for (var item : items) {
+			var singleChoiceItem = (SingleChoiceItem) item;
+			createSingleChoiceInner(materials, structure, mainTerm, singleChoiceItem, mainTerm.getStructureId(),
+					singleChoiceConfiguration);
+		}
+		// Items in relations to the main term
+		var relationsWithQuestion = getWantedRelationsKnowledge(knowledge, RelationType.RELATED);
+		relationsWithQuestion.forEach(it -> {
+			if (!(it.getTo() instanceof SingleChoiceItem item)) {
+				return;
+			}
+			var term = it.getFrom();
+			if (ItemType.SINGLE_CHOICE.equals(item.getItemType())) {
+				createSingleChoiceInner(materials, structure, term, item, mainTerm.getStructureId(),
+						singleChoiceConfiguration);
+			}
+		});
+
+		// todo extraction - find extra questions
 		return materials;
 	}
 
-	public List<MaterialAndMapping> createMultipleChoice(Set<KnowledgeNode> knowledge) {
+	private void createSingleChoiceInner(LinkedList<MaterialAndMapping> materials, KnowledgeObject structure,
+			KnowledgeElement mainTerm, SingleChoiceItem item, String structureId,
+			SingleChoiceConfiguration configuration) {
+		try {
+			String name = getUniqueMaterialName(materials, STR."Auswahl zu \{mainTerm.getContent()}", item.getId());
+			var question = item.getContent();
+			var correct = item.getCorrectAnswer();
+			var alternatives = item.getAlternativeAnswers();
+			try {
+				var material = new SingleChoiceItemMaterial(question, correct, alternatives, configuration.clone());
+				material.setName(name);
+				material.setStructureId(structure.getId());
+				var mappingEntry = new MaterialMappingEntry(material, item, mainTerm);
+				var mapping = new MaterialAndMapping(material, mappingEntry);
+				mapping.material().setStructureId(structureId);
+				materials.add(mapping);
+			} catch (IllegalArgumentException e) {
+				logger.debug("Error while creating single choice material for term {}", mainTerm.getContent(), e);
+			}
+		} catch (Exception e) {
+			logger.error("Error while creating single choice material for term {}", mainTerm.getContent(), e);
+		}
+	}
+
+	public List<MaterialAndMapping> createMultipleChoice(Set<KnowledgeNode> knowledge,
+			ItemConfiguration configuration) {
+		if (configuration == null || !configuration.getForItemType().equals(ItemType.MULTIPLE_CHOICE)) {
+			throw new IllegalArgumentException("Configuration is not for MultipleChoice");
+		}
+		var multipleChoiceConfiguration = (MultipleChoiceConfiguration) configuration;
 		var materials = new LinkedList<MaterialAndMapping>();
-		// Todo implement
+		// collect - get all questions from knowledge
+		final var templateInfo = TemplateType.ITEM;
+		var firstNode = knowledge.stream().findFirst().orElseThrow();
+		var termNode = getTermNode(knowledge, firstNode);
+		var structure = termNode.getStructurePoint();
+		var mainTerm = termNode.getMainElement();
+		// If an Item is not connected to a Term, then find here
+		var items = getLinkedItems(knowledge);
+		items = items.stream().filter(it -> it instanceof MultipleChoiceItem).collect(Collectors.toSet());
+		for (var item : items) {
+			var multipleChoiceItem = (MultipleChoiceItem) item;
+			createMultipleChoiceInner(materials, structure, mainTerm, multipleChoiceItem, mainTerm.getStructureId(),
+					multipleChoiceConfiguration);
+		}
+		// Items in relations to the main term
+		var relationsWithQuestion = getWantedRelationsKnowledge(knowledge, RelationType.RELATED);
+		relationsWithQuestion.forEach(it -> {
+			if (!(it.getTo() instanceof MultipleChoiceItem item)) {
+				return;
+			}
+			var term = it.getFrom();
+			if (ItemType.SINGLE_CHOICE.equals(item.getItemType())) {
+				createMultipleChoiceInner(materials, structure, term, item, mainTerm.getStructureId(),
+						multipleChoiceConfiguration);
+			}
+		});
+
+		// todo extraction - find extra questions
 		return materials;
+	}
+
+	private void createMultipleChoiceInner(LinkedList<MaterialAndMapping> materials, KnowledgeObject structure,
+			KnowledgeElement mainTerm, MultipleChoiceItem singleChoiceItem, String structureId,
+			MultipleChoiceConfiguration multipleChoiceConfiguration) {
+		try {
+			String name =
+					getUniqueMaterialName(materials, STR."Frage zu \{mainTerm.getContent()}", singleChoiceItem.getId());
+			var question = singleChoiceItem.getContent();
+			var correct = singleChoiceItem.getCorrectAnswers();
+			var alternatives = singleChoiceItem.getAlternativeAnswers();
+			try {
+				var material = new MultipleChoiceItemMaterial(question, correct, alternatives,
+						multipleChoiceConfiguration.clone());
+				material.setName(name);
+				material.setStructureId(structure.getId());
+				var mappingEntry = new MaterialMappingEntry(material, singleChoiceItem, mainTerm);
+				var mapping = new MaterialAndMapping(material, mappingEntry);
+				mapping.material().setStructureId(structureId);
+				materials.add(mapping);
+			} catch (IllegalArgumentException e) {
+				logger.debug("Error while creating multiple choice material for term {}", mainTerm.getContent(), e);
+			}
+
+		} catch (Exception e) {
+			logger.error("Error while creating single choice material for term {}", mainTerm.getContent(), e);
+		}
 	}
 
 	/**
 	 * Creates a test for the given knowledge. The test contains the following materials:
 	 *
-	 * @param knowledge
-	 * @param relatedMaterials
-	 * @return
+	 * @param knowledge        The knowledge to create the test for.
+	 * @param relatedMaterials The related materials to the knowledge.
+	 * @return A list of tests.
 	 */
 	public List<MaterialAndMapping> createTests(Set<KnowledgeNode> knowledge,
-			List<MaterialAndMapping> relatedMaterials) {
-		var materials = new LinkedList<MaterialAndMapping>();
-		// Todo implement
-		return materials;
+			LinkedList<MaterialAndMapping> relatedMaterials, TestConfiguration testConfiguration) {
+		var assembler = new TestAssembler<>(knowledge.stream().findFirst().get(), relatedMaterials, testConfiguration);
+		List<MaterialAndMapping<TestMaterial>> tests = assembler.assemble();
+		return new LinkedList<>(tests);
 	}
 
 
 	@Override
 	public void input(TemplateSet templates, KnowledgeModel model, CoursePlan plan) {
 		super.input(templates, model, plan);
+	}
+
+	@Override
+	public boolean createSimpleMaterial() {
+		return false;
+	}
+
+	@Override
+	public boolean createComplexMaterial() {
+		return false;
 	}
 }

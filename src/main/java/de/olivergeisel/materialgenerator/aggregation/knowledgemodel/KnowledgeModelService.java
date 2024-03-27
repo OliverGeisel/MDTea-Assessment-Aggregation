@@ -8,27 +8,30 @@ import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relati
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationRepository;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationType;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.*;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.KnowledgeModel;
 import de.olivergeisel.materialgenerator.aggregation.source.KnowledgeSource;
+import de.olivergeisel.materialgenerator.finalization.export.ImageService;
 import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
 import org.neo4j.driver.Driver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
- * Service for the knowledge model. Provides methods to access the knowledge model.
+ * Service for the knowledge model. Provides methods to access the {@link KnowledgeModel}.
  * And edit it.
  *
  * @author Oliver Geisel
  * @version 1.1.0
  * @see KnowledgeObject
  * @see KnowledgeElement
+ * @see Relation
+ * @see KnowledgeModel
  * @since 1.1.0
  */
 @Service
@@ -45,15 +48,19 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 
 	private final KnowledgeStructureService structureService;
 
+	private final ImageService imageService;
+
 	private final Driver neo4jDriver;
 
 
 	public KnowledgeModelService(ElementRepository elementRepository, RelationRepository relationRepository,
-			StructureRepository structureRepository, KnowledgeStructureService structureService, Driver neo4jDriver) {
+			StructureRepository structureRepository, KnowledgeStructureService structureService,
+			ImageService imageService, Driver neo4jDriver) {
 		this.elementRepository = elementRepository;
 		this.relationRepository = relationRepository;
 		this.structureRepository = structureRepository;
 		this.structureService = structureService;
+		this.imageService = imageService;
 		this.neo4jDriver = neo4jDriver;
 	}
 
@@ -73,7 +80,7 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	//endregion
 
 
-	//region static and existence
+	//region statistic and existence
 
 	/**
 	 * Check if the model contains the given KnowledgeElement.
@@ -165,12 +172,13 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 
 	//endregion
 
-	public void integrate(AggregationProcess process) {
+	public ModelStatistic integrate(AggregationProcess process) {
 		LOGGER.info("Integrating process started at {} into knowledge model.", process.getStart());
 
 		var terms = process.getTerms().getAcceptedElements();
 		var definitions = process.getDefinitions().getAcceptedElements();
 		var examples = process.getExamples().getAcceptedElements();
+		var items = process.getItems().getAcceptedElements();
 		var relations = process.getRelations();
 
 		// remove the unused elements
@@ -180,74 +188,262 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 		notAcceptedDefinitions.forEach(it -> process.removeAllRelationsWith(it.getId()));
 		var notAcceptedExamples = process.getExamples().getSuggestedElements();
 		notAcceptedExamples.forEach(it -> process.removeAllRelationsWith(it.getId()));
+		var notAcceptedItems = process.getItems().getSuggestedElements();
+		notAcceptedItems.forEach(it -> process.removeAllRelationsWith(it.getId()));
 
+
+		// handle the duplicates of terms
+		var savedTerms = elementRepository.findByType(KnowledgeType.TERM);
+		var cleandTerms = new LinkedList<Term>();
+		for (var term : terms) {
+			var duplicate =
+					savedTerms.stream().filter(it -> it.getContent().equalsIgnoreCase(term.getContent())).findFirst();
+			duplicate.ifPresentOrElse(it -> {
+						LOGGER.warn("Duplicate term found: {}\nConnect Elements with existing term.", term.getContent());
+						var termRelations = term.getRelations();
+						termRelations.forEach(relation -> {
+							it.addRelation(relation);
+							relation.setFrom(it); // todo setFrom is a bit to strong -> other method with check if id
+							// is the same
+							var to = relation.getTo();
+							to.getRelations().stream().filter(otherRelation -> otherRelation.getTo().equals(term))
+							  .forEach(otherRelation -> {
+								  otherRelation.setTo(it);
+								  relationRepository.save(otherRelation);
+							  });
+							relationRepository.save(relation);
+						});
+						elementRepository.save(it);
+					},
+					() -> cleandTerms.add(term)
+			);
+		}
+		// save area of knowledge
+		var area = process.getAreaOfKnowledge();
+		if (area != null) {
+			var structure = structureRepository.findById(area);
+			if (structure.isEmpty()) {
+				LOGGER.info("Area of knowledge not found. Create new area of knowledge.");
+				var root = structureRepository.findRoot();
+				var newLeaf = new KnowledgeLeaf(area);
+				root.addObject(newLeaf);
+				structureRepository.save(newLeaf);
+				structureRepository.save(root);
+			}
+		}
 		//save all remaining elements
-		elementRepository.saveAll(terms);
-		linkWithKnowledgeObject(terms);
+		elementRepository.saveAll(cleandTerms);
+		linkWithKnowledgeObject(cleandTerms);
 		elementRepository.saveAll(definitions);
 		linkWithKnowledgeObject(definitions);
 		elementRepository.saveAll(examples);
 		linkWithKnowledgeObject(examples);
-		relationRepository.saveAll(relations);
-
-
-		LOGGER.info("Integrating process finished. Add {} terms, {} definitions, {} examples and {} relations.",
-				process.getTerms().getAcceptedElements().size(), process.getDefinitions().getAcceptedElements().size(),
-				process.getExamples().getAcceptedElements().size(), process.getRelations().size());
-	}
-
-	private <T extends KnowledgeElement> void linkWithKnowledgeObject(List<T> elements) {
-		for (KnowledgeElement element : elements) {
-			var structureOptional = structureRepository.findById(element.getStructureId());
-			structureOptional.ifPresentOrElse(it -> {
-						it.linkElement(element);
-						structureRepository.save(it);
-					},
-					() -> {
-						var structure = new KnowledgeLeaf(element.getStructureId());
-						structureRepository.save(structure);
-						structure.linkElement(element);
-						var root = structureRepository.findRoot();
-						root.addObject(structure);
-						structureRepository.save(root); // todo check if this is necessary
-					});
+		elementRepository.saveAll(items);
+		linkWithKnowledgeObject(items);
+		for (var relation : relations) {
+			var from = elementRepository.findById(relation.getFromId());
+			from.ifPresent(it -> {
+				if (!it.getRelations().contains(relation)) {
+					it.addRelation(relation);
+					elementRepository.save(it);
+				}
+				relationRepository.save(relation);
+			});
 		}
+		LOGGER.info("Integrating process finished. Add {} terms, {} definitions, {} examples, {} items and {} "
+					+ "relations.",
+				process.getTerms().getAcceptedElements().size(), process.getDefinitions().getAcceptedElements().size(),
+				process.getExamples().getAcceptedElements().size(),
+				process.getItems().getAcceptedElements().size(), process.getRelations().size());
+		return new ModelStatistic(process.getTerms().getAcceptedElements().size(),
+				process.getDefinitions().getAcceptedElements().size(),
+				process.getExamples().getAcceptedElements().size(),
+				process.getItems().getAcceptedElements().size(), process.getRelations().size());
 	}
 
-	public List<KnowledgeElement> getElementsForStructure(String id) {
-		var structure = structureRepository.findById(id);
-		return structure.map(knowledgeObject -> knowledgeObject.getLinkedElements().stream().toList())
-						.orElseGet(List::of);
-	}
-
-	public void deleteElement(String id) {
-		elementRepository.deleteById(id);
-	}
+	//region structure
 
 	/**
-	 * Removes the given element from the model.
+	 * Adds a structure to the root structure element.
 	 *
-	 * @param element the element to remove
-	 * @return true if the element was removed, false if not
-	 * @throws IllegalArgumentException if the element was null
+	 * @param object the structure to add
+	 * @return true if the structure was added, false if not
 	 */
-	public boolean remove(KnowledgeElement element) throws IllegalArgumentException {
-		if (element == null) {
-			throw new IllegalArgumentException("KnowledgeElement was null!");
-		}
-		elementRepository.delete(element);
+	public boolean addStructureToRoot(KnowledgeObject object) {
+		var root = structureRepository.findRoot();
+		root.addObject(object);
+		structureRepository.save(object);
+		structureRepository.save(root);
 		return true;
 	}
 
+	/**
+	 * Get the parent {@link KnowledgeObject} of the object that has this id.
+	 *
+	 * @param id the id of the object
+	 * @return the parent of the object with the given id or null if the object is not in the model
+	 * @throws NoSuchElementException if the object is the Root
+	 */
+	public KnowledgeFragment getParent(String id) throws NoSuchElementException {
+		var object = structureRepository.findById(id);
+		return object.map(this::getParent).orElse(null);
+	}
 
-	public void deleteRelation(String id) {
-		relationRepository.deleteById(UUID.fromString(id));
+	/**
+	 * Get the parent {@link KnowledgeObject} of the given object.
+	 *
+	 * @param object the object you want the parent of
+	 * @return the parent of the given object or null if the object is not in the model
+	 * @throws NoSuchElementException if the object is the Root
+	 */
+	public KnowledgeFragment getParent(KnowledgeObject object) throws NoSuchElementException {
+		if (object instanceof RootStructureElement) {
+			throw new NoSuchElementException("Root has no parent");
+		}
+		var all = structureRepository.findAll();
+		for (var it : all) {
+			if (it instanceof KnowledgeFragment fragment) {
+				if (fragment.hasDirectChild(object)) {
+					return fragment;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Adds a structure to the given structure element.
+	 *
+	 * @param structure the structure to add
+	 * @param partToAdd the part to add to the structure
+	 * @return true if the structure was added, false if not
+	 */
+	public boolean addStructureTo(KnowledgeFragment structure, KnowledgeObject partToAdd) {
+		if (structure == null || partToAdd == null) {
+			return false;
+		}
+		if (!structureRepository.existsById(structure.getId())) {
+			return false;
+		}
+		structure.addObject(partToAdd);
+		structureRepository.save(partToAdd);
+		structureRepository.save(structure);
+		return true;
 	}
 
 	public void deleteStructure(String id) {
 		structureRepository.deleteById(id);
 	}
 
+	private boolean hasStructureSimilar(String structureId) {
+		return structureService.containsSimilar(structureId);
+	}
+
+	/**
+	 * Rename the given structure object.
+	 *
+	 * @param id      the id of the structure object
+	 * @param newName the new name of the structure object
+	 * @throws IllegalArgumentException if id or newName was null or blank or newName already exists, or you want to
+	 *                                  rename the root structure object
+	 */
+	public void renameStructure(String id, String newName) throws IllegalArgumentException {
+		if (id == null || newName == null || id.isBlank() || newName.isBlank()) {
+			throw new IllegalArgumentException("id and newName must not be null or blank!");
+		}
+		if (structureRepository.existsById(newName)) {
+			throw new IllegalArgumentException("New name already exists!");
+		}
+		var structure = structureRepository.findById(id);
+		structure.ifPresent(it -> {
+			if (it instanceof RootStructureElement) {
+				throw new IllegalArgumentException("RootStructureElement can not be renamed!");
+			}
+			it.overrideId(newName);
+			for (var element : it.getLinkedElements()) {
+				element.setStructureId(newName);
+				elementRepository.save(element);
+			}
+			structureRepository.save(it);
+		});
+	}
+
+	public void moveStructureTo(String id, String newParentId) {
+		var objectOpt = structureRepository.findById(id);
+		var newParentOpt = structureRepository.findById(newParentId);
+		if (objectOpt.isEmpty() || newParentOpt.isEmpty()) {
+			return;
+		}
+		var object = objectOpt.get();
+		var newParent = newParentOpt.get();
+		if (newParent instanceof KnowledgeLeaf) {
+			throw new IllegalArgumentException("Can not move structure object to leaf");
+		}
+		var oldParent = getParent(object); // todo catch exception
+		if (oldParent == null) {
+			throw new IllegalArgumentException("Structure object has no parent");
+		}
+		if (oldParent.equals(newParent)) {
+			return;
+		}
+		if (newParent instanceof KnowledgeFragment fragment) {
+			oldParent.removeObject(object);
+			fragment.addObject(object);
+			structureRepository.save(oldParent);
+			structureRepository.save(fragment);
+		}
+	}
+
+	/**
+	 * change a {@link KnowledgeLeaf} to a {@link KnowledgeFragment}. The leaf will be removed from the database and the
+	 * fragment will be added. The linked elements will be moved to the new fragment.
+	 * Will do nothing if the leaf does not exist.
+	 *
+	 * @param id the id of the leaf
+	 */
+	public void leafToNode(String id) {
+		var leaf = structureRepository.findById(id);
+		/*
+		try (var session = neo4jDriver.session()) {
+			var result = session.run(
+					STR."Match (a:KnowledgeObject {id: '\{id}'})<-[:CONTAINS]-(f:KnowledgeObject) return f");
+			parentId = result.next().fields().getFirst().value().asNode().get("name").asString();
+		}*/
+		var parentOpt = Optional.ofNullable(getParent(id));
+		if (parentOpt.isEmpty()) {
+			return;
+		}
+		var parent = parentOpt.orElseThrow();
+		leaf.ifPresent(oldLeaf -> {
+			var links = oldLeaf.getLinkedElements();
+			var newNode = new KnowledgeFragment(oldLeaf.getName());
+			for (var link : links) {
+				newNode.linkElement(link);
+				link.setStructureId(newNode.getName());
+			}
+			elementRepository.saveAll(links);
+			structureRepository.delete(oldLeaf);
+			parent.removeObject(oldLeaf); // first remove the leaf (they are equal)
+			structureRepository.save(parent);
+			parent.addObject(newNode);
+			structureRepository.save(newNode);
+			structureRepository.save(parent);
+		});
+	}
+
+	//endregion
+
+	//region elements
+
+	public void linkElements(String fromId, RelationType relationType, String toId) {
+		var fromElement = elementRepository.findById(fromId);
+		var toElement = elementRepository.findById(toId);
+		if (fromElement.isEmpty() || toElement.isEmpty()) {
+			return;
+		}
+		var relation = new BasicRelation(relationType, fromElement.get(), toElement.get());
+		relationRepository.save(relation);
+	}
 
 	/**
 	 * Link two elements with the given relation.
@@ -284,7 +480,7 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	 *
 	 * @param from the element to link from
 	 * @param to   the element to link to
-	 * @return true if the elements were linked, false if not
+	 * @return the created relation
 	 * @throws IllegalArgumentException if one of the arguments was null
 	 * @throws IllegalStateException    if the elements were not in the model
 	 */
@@ -307,85 +503,54 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	}
 
 
-
-	/**
-	 * change a {@link KnowledgeLeaf} to a {@link KnowledgeFragment}. The leaf will be removed from the database and the
-	 * fragment will be added. The linked elements will be moved to the new fragment.
-	 * Will do nothing if the leaf does not exist.
-	 *
-	 * @param id the id of the leaf
-	 */
-	public void leafToNode(String id) {
-		// Todo check if works
-		var leaf = structureRepository.findById(id);
-		if (leaf.isEmpty()) {
-			return;
-		}
-		String parentId;
-		try (var session = neo4jDriver.session()) {
-			var result = session.run(
-					STR."Match (a:KnowledgeObject {id: '\{id}'})<-[:CONTAINS]-(f:KnowledgeObject) return f");
-			parentId = result.next().get("_fields").get(0).get("properties").get("name").asString();
-		}
-		var parent = structureRepository.findById(parentId);
-		leaf.ifPresent(it -> {
-			var links = it.getLinkedElements();
-			var newNode = new KnowledgeFragment(it.getName());
-			for (var link : links) {
-				newNode.linkElement(link);
-				link.setStructureId(newNode.getName());
-				elementRepository.save(link);
-			}
-			parent.ifPresent(it2 -> {
-				var parentFragment = (KnowledgeFragment) it2;
-				parentFragment.addObject(newNode);
-				parentFragment.removeObject(it);
-				structureRepository.save(parentFragment);
-			});
-			structureRepository.save(newNode);
-			structureRepository.delete(it);
-		});
-	}
-
-	public void linkElements(String fromId, RelationType relationType, String toId) {
-		var fromElement = elementRepository.findById(fromId);
-		var toElement = elementRepository.findById(toId);
-		if (fromElement.isEmpty() || toElement.isEmpty()) {
-			return;
-		}
-		var relation = new BasicRelation(relationType, fromElement.get(), toElement.get());
-		relationRepository.save(relation);
-	}
-
 	/**
 	 * Adds a new element to the knowledge model.
 	 * Links the new element to the structure point with the given id, if it exists.
 	 *
-	 * @param form the form with the data for the new element
+	 * @param form  the form with the data for the new element
+	 * @param image the image for the new element
+	 * @throws IllegalArgumentException if the form was null
 	 */
-	public void addElement(AddElementForm form) {
+	public void addElement(AddElementForm form, MultipartFile image) throws IllegalArgumentException {
 		var structureId = form.getStructureId();
 		var structureObject = structureRepository.findById(structureId);
 		if (structureObject.isEmpty()) {
 			return;
 		}
-		KnowledgeElement newElement;
-		switch (form.getType()) {
-			case TERM -> newElement = new Term(form.getContent(), createId(STR."\{form.getContent()}-TERM"),
-					form.getType().name());
-			case DEFINITION -> newElement = new Definition(form.getContent(),
-					createId(STR."\{form.getContent()}-DEFINITION"));
-			case EXAMPLE -> newElement = new Example(form.getContent(),
-					createId(STR."\{form.getContent()}-EXAMPLE"), form.getType().name());
-			case CODE -> newElement = new Code(form.getLanguage(), form.getHeadline(), form.getContent(),
-					createId(STR."\{form.getContent()}-CODE"));
-			case IMAGE -> newElement = new Image(form.getContent(), form.getDescription(), form.getHeadline(),
-					(STR."\{form.getContent()}-IMAGE"));
-			case TEXT -> newElement =
-					new Text(form.getHeadline(), form.getContent(), createId(STR."\{form.getContent()}-TEXT"));
-			case FACT -> newElement = new Fact(form.getContent(), createId(STR."\{form.getContent()}-FACT"));
-			default -> throw new IllegalStateException(STR."Unexpected value: \{form.getType()}");
+		if (form.getId().isBlank()) {
+			form.setId(UUID.randomUUID().toString());
 		}
+		KnowledgeElement newElement = switch (form.getType()) {
+			case TERM -> new Term(form.getId(), createId(STR."\{form.getContent()}-TERM"),
+					form.getType().name());
+			case DEFINITION -> new Definition(form.getContent(),
+					createId(STR."\{form.getId()}-DEFINITION"));
+			case EXAMPLE -> new Example(form.getContent(),
+					createId(STR."\{form.getId()}-EXAMPLE"), form.getType().name());
+			case CODE -> new Code(form.getLanguage(), form.getHeadline(), form.getContent(),
+					createId(STR."\{form.getId()}-CODE"));
+			case IMAGE -> {
+				if (image == null) {
+					throw new IllegalArgumentException("Image was null!");
+				}
+				var name = image.getOriginalFilename();
+				int i = 1;
+				while (imageService.hasImage(name)) {
+					var names = Objects.requireNonNull(image.getOriginalFilename()).split("\\.");
+					name = STR."\{names[0]}\{i}.\{names[1]}";
+					i++;
+				}
+				var back = new Image(name, form.getContent(), form.getHeadline(),
+						createId(STR."\{name}-IMAGE"));
+				back.setStructureId(structureId);
+				imageService.store(image);
+				yield back;
+			}
+			case TEXT -> new Text(form.getHeadline(), form.getContent(), createId(STR."\{form.getId()}-TEXT"));
+			case FACT -> new Fact(form.getContent(), createId(STR."\{form.getId()}-FACT"));
+			case ITEM -> createItem(form);
+			default -> throw new IllegalStateException(STR."Unexpected value: \{form.getType()}");
+		};
 		newElement.setStructureId(structureId);
 		structureObject.ifPresent(it -> {
 			it.linkElement(newElement);
@@ -393,12 +558,6 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 		});
 		elementRepository.save(newElement);
 	}
-
-	private String createId(String name) {
-		var exists = elementRepository.existsById(name);
-		return exists ? createId(name + UUID.randomUUID().toString()) : name;
-	}
-
 
 	/**
 	 * Adds an element to the model. Link the element to the structure of the model.
@@ -436,77 +595,24 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 		return elements.stream().anyMatch(this::addKnowledge);
 	}
 
-	/**
-	 * Adds a relation to the model.
-	 * If the relation is already in the model, nothing happens.
-	 *
-	 * @param relation the relation to add.
-	 * @return true if the relation was added, false if not.
-	 * @throws IllegalArgumentException if the relation was null.
-	 * @throws NoSuchElementException   if the from or to element of the relation was not found
-	 */
-	public boolean addAndLink(Relation relation) throws IllegalArgumentException, NoSuchElementException {
-		boolean hasFrom = false;
-		boolean hasTo = false;
-		if (relation == null) {
-			throw new IllegalArgumentException("Relation was null!");
-		}
-		var fromId = relation.getFromId();
-		var fromElement = findElementById(fromId).orElseThrow();
-		var toId = relation.getToId();
-		var toElement = findElementById(toId).orElseThrow();
-		hasFrom = true;
-		relation.setFrom(fromElement);
-		hasTo = true;
-		relation.setTo(toElement);
-		link(fromElement, toElement, relation.getType());
-		return relation != null;
+	public void deleteElement(String id) {
+		elementRepository.deleteById(id);
 	}
 
-	//region structure
-
 	/**
-	 * Adds a structure to the root structure element.
+	 * Removes the given element from the model.
 	 *
-	 * @param object the structure to add
-	 * @return true if the structure was added, false if not
+	 * @param element the element to remove
+	 * @return true if the element was removed, false if not
+	 * @throws IllegalArgumentException if the element was null
 	 */
-	public boolean addStructureToRoot(KnowledgeObject object) {
-		var root = structureRepository.findRoot();
-		root.addObject(object);
-		structureRepository.save(object);
-		structureRepository.save(root);
+	public boolean remove(KnowledgeElement element) throws IllegalArgumentException {
+		if (element == null) {
+			throw new IllegalArgumentException("KnowledgeElement was null!");
+		}
+		elementRepository.delete(element);
 		return true;
 	}
-
-	/**
-	 * Adds a structure to the given structure element.
-	 *
-	 * @param structure the structure to add
-	 * @param partToAdd the part to add to the structure
-	 * @return true if the structure was added, false if not
-	 */
-	public boolean addStructureTo(KnowledgeFragment structure, KnowledgeObject partToAdd) {
-		if (structure == null || partToAdd == null) {
-			return false;
-		}
-		if (structureRepository.existsById(structure.getId())) {
-			return false;
-		}
-		structure.addObject(partToAdd);
-		structureRepository.save(partToAdd);
-		structureRepository.save(structure);
-		return true;
-	}
-
-	private boolean hasStructureSimilar(String structureId) {
-		return structureService.containsSimilar(structureId);
-	}
-
-	//endregion
-
-	//region elements
-
 
 	/**
 	 * Link the given element to the structure of the model.
@@ -535,21 +641,6 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	}
 
 	/**
-	 * All {@link KnowledgeElement}s that are connected with the given element. In and outgoing.
-	 *
-	 * @param element the element to get the related elements for
-	 * @return an Array of {@link KnowledgeElement}s that are connected with the given element
-	 */
-	private KnowledgeElement[] getRelatedElements(KnowledgeElement element) {
-		var returnList = new LinkedList<KnowledgeElement>();
-		var outgoing = element.getRelations().stream().map(Relation::getTo).toList();
-		var incoming = relationRepository.findDistinctByToId(element.getId()).map(Relation::getFrom).toList();
-		returnList.addAll(outgoing);
-		returnList.addAll(incoming);
-		return returnList.toArray(new KnowledgeElement[0]);
-	}
-
-	/**
 	 * Returns all elements that connected with the given element in the model.
 	 *
 	 * @param elementId the id of the element
@@ -560,10 +651,123 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 		return Arrays.stream(getRelatedElements(findElementById(elementId).orElseThrow())).collect(Collectors.toSet());
 	}
 
+	public List<KnowledgeElement> getElementsForStructure(String id) {
+		var structure = structureRepository.findById(id);
+		return structure.map(knowledgeObject -> knowledgeObject.getLinkedElements().stream().toList())
+						.orElseGet(List::of);
+	}
+
+	private Item createItem(AddElementForm form) {
+		return switch (form.getItemType()) {
+			case TRUE_FALSE -> new TrueFalseItem(form.getContent(), form.isTrue(),
+					createId(STR."\{form.getHeadline()}-TRUE_FALSE_ITEM"));
+			case SINGLE_CHOICE -> {
+				var answers = new LinkedList<String>();
+				answers.add(form.getCorrectAnswers().getFirst());
+				answers.addAll(form.getWrongAnswers().stream().filter(it -> !it.isBlank()).map(String::strip)
+								   .toList());
+				yield new SingleChoiceItem(form.getContent(), answers,
+						createId(STR."\{form.getHeadline()}-SINGLE_CHOICE_ITEM"));
+			}
+			case MULTIPLE_CHOICE -> {
+				var answers = new LinkedList<>(form.getCorrectAnswers().stream().filter(it -> !it.isBlank())
+												   .map(String::strip).toList());
+				var correct = answers.size();
+				answers.addAll(form.getWrongAnswers().stream().filter(it -> !it.isBlank()).toList());
+				yield new MultipleChoiceItem(form.getContent(), answers, correct,
+						createId(STR."\{form.getHeadline()}-MULTIPLE_CHOICE_ITEM"));
+			}
+			case FILL_OUT_BLANKS -> {
+				var blanks = form.getBlanks().stream().filter(it -> !it.isBlank()).map(String::strip).toList();
+				yield new FillOutBlanksItem(form.getContent(), blanks,
+						createId(STR."\{form.getHeadline()}-FILL_OUT_BLANKS_ITEM"));
+			}
+
+			default -> throw new IllegalStateException(STR."Unexpected value: \{form.getItemType()}");
+		};
+	}
+
+	private String createId(String name) {
+		var exists = elementRepository.existsById(name);
+		return exists ? createId(name + UUID.randomUUID()) : name;
+	}
+
+	private <T extends KnowledgeElement> void linkWithKnowledgeObject(List<T> elements) {
+		for (KnowledgeElement element : elements) {
+			var structureOptional = structureRepository.findById(element.getStructureId());
+			structureOptional.ifPresentOrElse(it -> {
+						it.linkElement(element);
+						structureRepository.save(it);
+					},
+					() -> {
+						LOGGER.info("StructureObject {} not found. Create new structure object.",
+								element.getStructureId());
+						var structure = new KnowledgeLeaf(element.getStructureId());
+						structureRepository.save(structure);
+						structure.linkElement(element);
+						var root = structureRepository.findRoot();
+						root.addObject(structure);
+						structureRepository.save(root); // todo check if this is necessary
+					});
+		}
+	}
+
+	/**
+	 * All {@link KnowledgeElement}s that are connected with the given element. In and outgoing.
+	 *
+	 * @param element the element to get the related elements for
+	 * @return an Array of {@link KnowledgeElement}s that are connected with the given element
+	 */
+	private KnowledgeElement[] getRelatedElements(KnowledgeElement element) {
+		var returnList = new LinkedList<KnowledgeElement>();
+		var outgoing = new LinkedList<KnowledgeElement>();
+		relationRepository.findByFromId(element.getId()).forEach(it -> {
+			var to = it.getTo();
+			if (!outgoing.contains(to)) {
+				outgoing.add(to);
+			}
+		});
+		var incoming = relationRepository.findDistinctByToId(element.getId()).map(Relation::getFrom).toList();
+		returnList.addAll(outgoing);
+		returnList.addAll(incoming);
+		return returnList.toArray(new KnowledgeElement[0]);
+	}
 
 	//endregion
 
 	//region relations
+
+	/**
+	 * Adds a relation to the model.
+	 * If the relation is already in the model, nothing happens.
+	 *
+	 * @param relation the relation to add.
+	 * @return true if the relation was added, false if not.
+	 * @throws IllegalArgumentException if the relation was null.
+	 * @throws NoSuchElementException   if the from or to element of the relation was not found
+	 */
+	public boolean addAndLink(Relation relation) throws IllegalArgumentException, NoSuchElementException {
+		// Todo rework this method this is pointless at moment
+		boolean hasFrom = false;
+		boolean hasTo = false;
+		if (relation == null) {
+			throw new IllegalArgumentException("Relation was null!");
+		}
+		var fromId = relation.getFromId();
+		var fromElement = findElementById(fromId).orElseThrow();
+		var toId = relation.getToId();
+		var toElement = findElementById(toId).orElseThrow();
+		hasFrom = true;
+		relation.setFrom(fromElement);
+		hasTo = true;
+		relation.setTo(toElement);
+		link(fromElement, toElement, relation.getType());
+		return hasFrom && hasTo;
+	}
+
+	public void deleteRelation(String id) {
+		relationRepository.deleteById(UUID.fromString(id));
+	}
 
 	/**
 	 * All {@link Relation}s that are connected with the given element. In and outgoing.
@@ -577,6 +781,7 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 		var returnList = new ArrayList<>(ownRelations);
 		return returnList.toArray(new Relation[0]);
 	}
+
 	//endregion
 
 	//region source (source of the knowledge)
@@ -607,10 +812,11 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	}
 	//endregion
 
-	//region knowledgeNode (reading model)
+	//region knowledgeNode (reading partial model and give back)
 
 	/**
-	 * Returns all elements that are connected with the given structure object in the model.
+	 * Returns all elements that are connected with the given structure object in the model. If the structure object
+	 * is not found, it will not be searched for similar objects when includeSimilar is true.
 	 *
 	 * @param structureId    the id of the structure object
 	 * @param includeSimilar if true, also search for elements that contain the given structureId in their own
@@ -620,15 +826,25 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	private Set<KnowledgeNode> getKnowledgeNodesFor(String structureId, boolean includeSimilar,
 			boolean similarWhenFound) {
 		Set<KnowledgeNode> back = new HashSet<>();
-		var hasStructureObject = hasStructureObject(structureId);
-		if (hasStructureObject) {
+		boolean hasStructureObject = false;
+		try {
+			hasStructureObject = hasStructureObject(structureId);
+		} catch (IllegalArgumentException e) {
+			LOGGER.warn("Illegal id for a structure: '{}'", structureId);
+		}
+		if (!hasStructureObject) {
+			LOGGER.warn("No structure object with id: '{}' found.", structureId);
+		} else {
 			var structureObject = findStructureById(structureId).orElseThrow();
 			var elements = structureObject.getLinkedElements();
 			for (var element : elements) {
-				back.add(getKnowledgeNode(element.getId()));
+				try {
+					back.add(getKnowledgeNode(element));
+				} catch (NoSuchElementException e) {
+					LOGGER.warn("Element {} with Structure with id: '{}' not found.",
+							element.getId(), element.getStructureId());
+				}
 			}
-		} else {
-			LOGGER.warn("No structure object with id: '{}' found.", structureId);
 		}
 		if (includeSimilar && (similarWhenFound || !hasStructureObject)) {
 			LOGGER.info("Include similar objects for structure object '{}'.", structureId);
@@ -656,7 +872,11 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	}
 
 	/**
-	 * create a KnowledgeNode for a given KnowledgeElement
+	 * Create a KnowledgeNode for a given KnowledgeElement
+	 * <p>
+	 * The given element is the center of the KnowledgeNode. This is the mainElement.
+	 * Then the linked elements are added to the KnowledgeNode by getting the structureObject of the element. The
+	 * relations are also added. The related elements are all elements that are connected with the linked elements.
 	 *
 	 * @param element element you want
 	 * @return a Collection of all elements and relations that are connected with the given element
@@ -666,8 +886,12 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 		if (!containsElement(element)) {
 			throw new NoSuchElementException(STR."No element: \"\{element}\" found");
 		}
+		if (element.getStructureId() == null || element.getStructureId().isBlank()) {
+			LOGGER.info("No structureId object in element: '{}' found", element.getId());
+			throw new NoSuchElementException(STR."No structure object for element: \"\{element}\" found");
+		}
 		var structureObject = structureRepository.findById(element.getStructureId()).orElseThrow();
-		var linkedElements = structureObject.getLinkedElements();
+		var linkedElements = structureObject.getLinkedElements(); // todo decide how deep
 		var relatedElements = new LinkedList<>();
 		var relations = new HashSet<>();
 		for (var linked : linkedElements) {
@@ -684,7 +908,7 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	private Set<KnowledgeNode> getKnowledgeNodesForSimilar(String structureId) throws NoSuchElementException {
 		Set<KnowledgeNode> back = new HashSet<>();
 		if (!hasStructureSimilar(structureId)) {
-			throw new NoSuchElementException("No structure object with id " + structureId + "or similar found");
+			throw new NoSuchElementException(STR."No structure object with id \{structureId}or similar found");
 		} else {
 			var similarObject = structureService.getSimilarObjectById(structureId);
 			var elements = similarObject.getLinkedElements();
@@ -728,14 +952,21 @@ public class KnowledgeModelService implements KnowledgeModel<Relation> {
 	public Set<KnowledgeNode> getKnowledgeNodesIncludingSimilarFor(String structureId) {
 		return getKnowledgeNodesFor(structureId, true, true);
 	}
-	//endregion
 
+	@Override
+	public List<KnowledgeElement> findElementByType(KnowledgeType knowledgeType) {
+		return elementRepository.findByType(knowledgeType).toList();
+	}
+
+
+	//endregion
 
 
 	//region setter/getter
 
 	/**
 	 * Returns all ids of all KnowledgeObjects in the model.
+	 *
 	 * @return a list of all ids of all KnowledgeObjects in the model
 	 */
 	public List<String> getStructureIds() {

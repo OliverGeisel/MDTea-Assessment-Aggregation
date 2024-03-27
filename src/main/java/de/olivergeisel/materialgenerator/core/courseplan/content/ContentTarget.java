@@ -1,5 +1,7 @@
 package de.olivergeisel.materialgenerator.core.courseplan.content;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -24,8 +26,8 @@ public class ContentTarget {
 	 */
 	public static final ContentTarget EMPTY = new ContentTarget("NO_TARGET");
 
-	private String                      value;
-	private ContentGoal                 relatedGoal;
+	private String      mainTopicName;
+	private ContentGoal relatedGoal;
 	private TopicStructureAliasMappings topicStructureAliasMappings = new TopicStructureAliasMappings();
 
 	protected ContentTarget() {
@@ -34,19 +36,19 @@ public class ContentTarget {
 	/**
 	 * Create a new ContentTarget.
 	 *
-	 * @param value the value of the target.
+	 * @param mainTopicName the value of the target.
 	 */
-	public ContentTarget(String value) {
-		this.value = value;
+	public ContentTarget(String mainTopicName) {
+		this.mainTopicName = mainTopicName;
 	}
 
-	public ContentTarget(String value, ContentGoal relatedGoal) {
-		this.value = value;
+	public ContentTarget(String mainTopicName, ContentGoal relatedGoal) {
+		this.mainTopicName = mainTopicName;
 		this.relatedGoal = relatedGoal;
 	}
 
-	public ContentTarget(String value, ContentGoal relatedGoal, TopicStructureAliasMappings aliases) {
-		this.value = value;
+	public ContentTarget(String mainTopicName, ContentGoal relatedGoal, TopicStructureAliasMappings aliases) {
+		this.mainTopicName = mainTopicName;
 		this.relatedGoal = relatedGoal;
 		this.topicStructureAliasMappings = aliases;
 	}
@@ -56,12 +58,19 @@ public class ContentTarget {
 		return topicStructureAliasMappings;
 	}
 
-	public String getValue() {
-		return value;
+	public List<String> getAllAliases() {
+		var back = new LinkedList<String>();
+		back.add(mainTopicName);
+		back.addAll(topicStructureAliasMappings.complete());
+		return back;
 	}
 
-	public void setValue(String value) {
-		this.value = value;
+	public String getMainTopicName() {
+		return mainTopicName;
+	}
+
+	public void setMainTopicName(String mainTopicName) {
+		this.mainTopicName = mainTopicName;
 	}
 
 	public ContentGoal getRelatedGoal() {
@@ -74,12 +83,12 @@ public class ContentTarget {
 
 	/**
 	 * Get the most important alias of the target.
-	 * This method is identical to {@link #getValue()}.
+	 * This method is identical to {@link #getMainTopicName()}.
 	 *
 	 * @return the most important alias of the target.
 	 */
 	public String getTopic() {
-		return value;
+		return mainTopicName;
 	}
 //endregion
 
@@ -88,19 +97,19 @@ public class ContentTarget {
 		if (this == o) return true;
 		if (!(o instanceof ContentTarget that)) return false;
 
-		if (!Objects.equals(value, that.value)) return false;
+		if (!Objects.equals(mainTopicName, that.mainTopicName)) return false;
 		return Objects.equals(relatedGoal, that.relatedGoal);
 	}
 
 	@Override
 	public int hashCode() {
-		int result = value != null ? value.hashCode() : 0;
+		int result = mainTopicName != null ? mainTopicName.hashCode() : 0;
 		result = 31 * result + (relatedGoal != null ? relatedGoal.hashCode() : 0);
 		return result;
 	}
 
 	@Override
 	public String toString() {
-		return STR."ContentTarget{value='\{value}\{'\''}, relatedGoal=\{relatedGoal}}";
+		return STR."ContentTarget{value='\{mainTopicName}\{'\''}, relatedGoal=\{relatedGoal}}";
 	}
 }

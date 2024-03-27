@@ -1,10 +1,11 @@
 package de.olivergeisel.materialgenerator.generation;
 
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModel;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModelService;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.KnowledgeModel;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
 import de.olivergeisel.materialgenerator.finalization.FinalizationService;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourse;
+import de.olivergeisel.materialgenerator.generation.configuration.TestConfiguration;
 import de.olivergeisel.materialgenerator.generation.generator.AssessmentGenerator;
 import de.olivergeisel.materialgenerator.generation.generator.Generator;
 import de.olivergeisel.materialgenerator.generation.generator.GeneratorInput;
@@ -13,6 +14,7 @@ import de.olivergeisel.materialgenerator.generation.material.MappingRepository;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
 import de.olivergeisel.materialgenerator.generation.material.MaterialRepository;
+import de.olivergeisel.materialgenerator.generation.material.assessment.TestMaterial;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateSet;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateSetRepository;
 import org.springframework.stereotype.Service;
@@ -39,9 +41,9 @@ public class GeneratorService {
 
 	private final KnowledgeModelService knowledgeManagement;
 	private final FinalizationService   finalizationService;
-	private final TemplateSetRepository   templateSetRepository;
-	private final MaterialRepository      materialRepository;
-	private final MappingRepository       mappingRepository;
+	private final TemplateSetRepository templateSetRepository;
+	private final MaterialRepository    materialRepository;
+	private final MappingRepository     mappingRepository;
 
 	public GeneratorService(KnowledgeModelService knowledgeManagement, FinalizationService finalizationService,
 			TemplateSetRepository templateSetRepository, MaterialRepository materialRepository,
@@ -57,7 +59,7 @@ public class GeneratorService {
 	 * Generate a new {@link RawCourse} from the given {@link CoursePlan} and the given template.
 	 *
 	 * @param coursePlan the {@link CoursePlan} to generate the {@link RawCourse} from
-	 * @param template the template to use for the generation
+	 * @param template   the template to use for the generation
 	 * @return the generated {@link RawCourse}
 	 */
 	public RawCourse generateRawCourse(CoursePlan coursePlan, String template) {
@@ -70,9 +72,22 @@ public class GeneratorService {
 	}
 
 	/**
+	 * Generate a new {@link TestMaterial} for the given topic. Use the default template and
+	 * {@link TestConfiguration} for the generation.
+	 *
+	 * @param topic the topic to generate the test for
+	 * @return the generated {@link TestMaterial}
+	 */
+	public TestMaterial generateTest(String topic) {
+		TestMaterial test = finalizationService.generateTest(topic);
+		return materialRepository.save(test);
+	}
+
+	/**
 	 * Create the materials for the given {@link CoursePlan}. The materials are created from the given
 	 * {@link KnowledgeModel}.
-	 * @param coursePlan the {@link CoursePlan} to create the materials for
+	 *
+	 * @param coursePlan  the {@link CoursePlan} to create the materials for
 	 * @param templateSet the template set to use for the generation
 	 * @return the created materials
 	 */
@@ -87,7 +102,8 @@ public class GeneratorService {
 
 	/**
 	 * Create the assessment materials for the given {@link CoursePlan}.
-	 * @param coursePlan the {@link CoursePlan} to create the materials for
+	 *
+	 * @param coursePlan  the {@link CoursePlan} to create the materials for
 	 * @param templateSet the template set to use for the generation
 	 * @return the created assessment materials
 	 */
@@ -99,7 +115,8 @@ public class GeneratorService {
 
 	/**
 	 * Create the transfer materials for the given {@link CoursePlan}.
-	 * @param coursePlan the {@link CoursePlan} to create the materials for
+	 *
+	 * @param coursePlan  the {@link CoursePlan} to create the materials for
 	 * @param templateSet the template set to use for the generation
 	 * @return the created transfer materials
 	 */
@@ -112,6 +129,7 @@ public class GeneratorService {
 	/**
 	 * Internal method to run the generation of materials for a given generator. Save all materials and mappings to
 	 * the database.
+	 *
 	 * @param generator the generator to use for the generation
 	 * @return the generated materials
 	 * @throws IllegalStateException if the generator is not ready
@@ -134,5 +152,4 @@ public class GeneratorService {
 		mappingRepository.saveAll(materials.stream().map(MaterialAndMapping::mapping).toList());
 		return materials;
 	}
-
 }

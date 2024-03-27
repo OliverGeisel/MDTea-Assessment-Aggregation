@@ -6,6 +6,7 @@ import de.olivergeisel.materialgenerator.core.courseplan.structure.StructureElem
 import de.olivergeisel.materialgenerator.core.courseplan.structure.StructureGroup;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.StructureTask;
 import de.olivergeisel.materialgenerator.finalization.material_assign.MaterialAssigner;
+import de.olivergeisel.materialgenerator.generation.material.ComplexMaterial;
 import de.olivergeisel.materialgenerator.generation.material.Material;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -54,7 +55,7 @@ public class GroupOrder extends MaterialOrderCollection {
 		setName(group.getName());
 		var groupTopic = group.getTopic();
 		var topic = goals.stream().flatMap(goal -> goal.getTopics().stream().filter(t -> t.isSame(groupTopic)))
-						 .findFirst().orElse(null);
+						 .findFirst().orElse(Topic.empty());
 		setTopic(topic);
 		part.getAlternatives().forEach(this::appendAlias);
 	}
@@ -103,6 +104,10 @@ public class GroupOrder extends MaterialOrderCollection {
 
 	@Override
 	public Material findMaterial(UUID materialId) {
+		var filter = getComplexMaterials().stream().filter(m -> m.getId().equals(materialId)).findFirst();
+		if (filter.isPresent()) {
+			return filter.orElseThrow();
+		}
 		return taskOrder.stream().map(t -> t.findMaterial(materialId)).filter(Objects::nonNull).findFirst()
 						.orElse(null);
 	}
@@ -120,13 +125,17 @@ public class GroupOrder extends MaterialOrderCollection {
 	}
 
 	/**
-	 * @param material
-	 * @return
-	 * @throws UnsupportedOperationException
+	 * @param material the (complex)material to assign
+	 * @return true if the material was assigned
+	 * @throws UnsupportedOperationException if this operation is not supported
 	 */
 	@Override
 	public boolean assign(Material material) throws UnsupportedOperationException {
-		throw new UnsupportedOperationException("not supportet yet");
+		if (!(material instanceof ComplexMaterial complexMaterial)) {
+			return false;
+		}
+		assignComplex(complexMaterial);
+		return true;
 	}
 
 	/**
@@ -152,7 +161,21 @@ public class GroupOrder extends MaterialOrderCollection {
 			taskOrder.removeIf(it -> it.getId().equals(partId));
 			return true;
 		}
+		// complex material
+		if (getComplexMaterials().removeIf(it -> it.getId().equals(partId))) {
+			return true;
+		}
 		return taskOrder.stream().anyMatch(t -> t.remove(partId));
+	}
+
+	//region setter/getter
+
+	@Override
+	public Collection<NameAndId> collectionsNameAndId() {
+		var back = new LinkedList<NameAndId>();
+		back.add(new NameAndId(getName(), getId()));
+		taskOrder.forEach(t -> back.addAll(t.collectionsNameAndId()));
+		return back;
 	}
 
 	@Override
@@ -169,8 +192,10 @@ public class GroupOrder extends MaterialOrderCollection {
 	public Spliterator<MaterialOrderPart> spliterator() {
 		return taskOrder.stream().map(it -> (MaterialOrderPart) it).spliterator();
 	}
-
-	//region setter/getter
+	@Override
+	public List<Material> getMaterials() {
+		return taskOrder.stream().map(TaskOrder::getMaterials).flatMap(Collection::stream).toList();
+	}
 
 	/**
 	 * Get the relevance of this part.
@@ -180,6 +205,14 @@ public class GroupOrder extends MaterialOrderCollection {
 	@Override
 	public Relevance getRelevance() {
 		return taskOrder.stream().map(TaskOrder::getRelevance).max(Comparator.naturalOrder()).orElse(Relevance.TO_SET);
+	}
+
+	@Override
+	public List<UUID> getCollectionIds() {
+		var back = new LinkedList<UUID>();
+		back.add(getId());
+		taskOrder.forEach(t -> back.addAll(t.getCollectionIds()));
+		return back;
 	}
 
 	/**

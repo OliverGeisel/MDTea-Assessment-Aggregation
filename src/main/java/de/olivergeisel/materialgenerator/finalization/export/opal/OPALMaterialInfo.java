@@ -23,7 +23,7 @@ import static de.olivergeisel.materialgenerator.finalization.export.ExportUtils.
  * @since 1.1.0
  */
 @Getter
-class OPALMaterialInfo extends Material {
+public class OPALMaterialInfo extends Material {
 
 	private static final String FILE_ENDING = ".html";
 
@@ -52,6 +52,7 @@ class OPALMaterialInfo extends Material {
 		var context = courseOrganizer.getContext();
 		context.setVariable("material", originalMaterial);
 		context.setVariable("title", relatedTaskName);
+		context.setVariable("rootPath", ".");
 		String htmlString = courseOrganizer.getTemplateEngine().process(materialType(), context);
 		// todo think about using the node id
 		saveToFile(htmlString, targetDirectory, completeFileName());

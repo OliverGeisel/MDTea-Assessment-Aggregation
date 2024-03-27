@@ -12,6 +12,9 @@
         <h1 th:text="#{knowledgemodel.element.title}">Elements</h1>
     </header>
     <section class="mt-2">
+        <article class="alert alert-success" th:if="${added} != null">
+            Element wurde erfolgreich hinzugefügt.
+        </article>
         <article class="m-2">
             <header><h2>Neu</h2></header>
             <a th:href="@{elements/add}">
@@ -35,6 +38,14 @@
                     <span th:text="#{knowledgemodel.element.edit}">Edit</span>
                 </button>
             </form>
+        </article>
+        <article class="m-2">
+            <header><h2>Verlinken</h2></header>
+            <a th:href="@{/knowledge-model/elements/link}">
+                <button class="btn btn-info">
+                    <i class="bi bi-link"></i> Verlinken
+                </button>
+            </a>
         </article>
     </section>
 </main>

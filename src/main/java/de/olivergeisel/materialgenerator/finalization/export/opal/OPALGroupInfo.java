@@ -1,7 +1,9 @@
 package de.olivergeisel.materialgenerator.finalization.export.opal;
 
+import de.olivergeisel.materialgenerator.finalization.export.opal.test.OPALTestExporter;
 import de.olivergeisel.materialgenerator.finalization.parts.GroupOrder;
 import de.olivergeisel.materialgenerator.finalization.parts.TaskOrder;
+import de.olivergeisel.materialgenerator.generation.material.assessment.TestMaterial;
 import lombok.Getter;
 
 import java.io.File;
@@ -13,11 +15,12 @@ import java.util.List;
 class OPALGroupInfo extends GroupOrder
 		implements MaterialCollectionOPAL<GroupOrder, OPALTaskInfo> {
 
-	private final CourseOrganizerOPAL courseOrganizer;
-	private final String              groupName;
-	private final List<OPALTaskInfo>  tasks = new ArrayList<>();
-	private final long                nodeId;
-	private final GroupOrder          originalGroup;
+	private final CourseOrganizerOPAL           courseOrganizer;
+	private final String                        groupName;
+	private final List<OPALTaskInfo>            tasks                = new ArrayList<>();
+	private final List<OPALComplexMaterialInfo> complexMaterialInfos = new ArrayList<OPALComplexMaterialInfo>();
+	private final long                          nodeId;
+	private final GroupOrder                    originalGroup;
 
 	OPALGroupInfo(GroupOrder group, CourseOrganizerOPAL courseOrganizer) {
 		this.groupName = group.getName();
@@ -28,16 +31,34 @@ class OPALGroupInfo extends GroupOrder
 			var newTask = new OPALTaskInfo(task, courseOrganizer);
 			tasks.add(newTask);
 		}
+		for (var complex : group.getComplexMaterials()) {
+			if (complex instanceof TestMaterial testMaterial) {
+				var testInfo = new OPAlTestMaterialInfo(testMaterial, courseOrganizer);
+				complexMaterialInfos.add(testInfo);
+			} else {
+				complexMaterialInfos.add(new OPALComplexMaterialInfo<>(complex, courseOrganizer));
+			}
+		}
 	}
 
 	public void createMaterials(File targetDirectory) {
-		// todo change inner parts to a collection (tasks and groups)
+		// todo change inner parts to a collection (itemConfigurations and groups)
 			/*var groupDirectory = new File(targetDirectory, groupName);
 			if (!groupDirectory.exists()) {
 				groupDirectory.mkdirs();
 			}*/
 		for (var task : tasks) {
 			task.createMaterials(targetDirectory);
+		}
+		var testExporter = new OPALTestExporter();
+		for (var complex : complexMaterialInfos) {
+			if (complex.getOriginalMaterial() instanceof TestMaterial) {
+				var dir = new File(targetDirectory, STR."../export/\{Long.toString(complex.getNodeId())}");
+				if (!dir.exists()) {
+					dir.mkdirs();
+				}
+				testExporter.completeExport(complex, dir);
+			}
 		}
 	}
 

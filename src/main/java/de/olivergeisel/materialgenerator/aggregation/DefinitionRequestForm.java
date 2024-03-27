@@ -12,12 +12,14 @@ public class DefinitionRequestForm extends AggregationConfigForm {
 	}
 
 	public DefinitionRequestForm(String connectionType, String modelName, String url, String apiKey, String fragment,
-			int retries, int maxTokens, double temperature, double topP, Set<String> terms) {
-		super(connectionType, modelName, url, apiKey, fragment, retries, maxTokens, temperature, topP);
+			int retries, int maxTokens, double temperature, double topP, Set<String> terms,
+			String fragmentLanguage, String targetLanguage) {
+		super(connectionType, modelName, url, apiKey, fragment, retries, maxTokens, temperature, topP,
+				fragmentLanguage, targetLanguage);
 		this.terms = terms;
 	}
 
-//region setter/getter
+	//region setter/getter
 	public Set<String> getTerms() {
 		return terms;
 	}

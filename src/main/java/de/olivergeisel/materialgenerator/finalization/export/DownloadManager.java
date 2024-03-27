@@ -3,6 +3,7 @@ package de.olivergeisel.materialgenerator.finalization.export;
 import de.olivergeisel.materialgenerator.finalization.export.opal.OPAL_Exporter;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourse;
 import de.olivergeisel.materialgenerator.generation.material.Material;
+import de.olivergeisel.materialgenerator.generation.material.assessment.TestMaterial;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +66,27 @@ public class DownloadManager {
 		try {
 			tempDir = zipService.createTempDirectory();
 			exporter.export(course, templateSetName, tempDir);
+			zipFile = zipService.createZipArchive(name, tempDir);
+			writeZipFileToResponse(name, zipFile, response);
+		} catch (IOException e) {
+			logger.error(e.toString());
+		} finally {
+			try {
+				zipService.cleanupTemporaryFiles(tempDir, zipFile);
+			} catch (IOException e) {
+				logger.error(e.toString());
+			}
+		}
+	}
+
+
+	private void createTestInZip(TestMaterial testMaterial, HttpServletResponse response, OPAL_Exporter exporter) {
+		File tempDir = null;
+		File zipFile = null;
+		var name = testMaterial.getName();
+		try {
+			tempDir = zipService.createTempDirectory();
+			exporter.exportTest(testMaterial, tempDir);
 			zipFile = zipService.createZipArchive(name, tempDir);
 			writeZipFileToResponse(name, zipFile, response);
 		} catch (IOException e) {
@@ -145,6 +167,14 @@ public class DownloadManager {
 		};
 		createCourseInZip(name, templateSetName, course, response, exporter);
 	}
+
+	public void downloadTest(Material material, HttpServletResponse response) throws IllegalArgumentException {
+		if (!(material instanceof TestMaterial testMaterial)) {
+			throw new IllegalArgumentException("Material is not a TestMaterial");
+		}
+		createTestInZip(testMaterial, response, opalExporter);
+	}
+
 
 	/**
 	 * The supported export formats for the course. The matching exporter is used to create the zip file.

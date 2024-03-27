@@ -5,6 +5,7 @@ import de.olivergeisel.materialgenerator.core.courseplan.structure.Relevance;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.StructureTask;
 import de.olivergeisel.materialgenerator.finalization.material_assign.MaterialAssigner;
 import de.olivergeisel.materialgenerator.generation.material.Material;
+import de.olivergeisel.materialgenerator.generation.material.assessment.ItemMaterial;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
@@ -40,7 +41,7 @@ public class TaskOrder extends MaterialOrderCollection {
 		setName(relatedTask.getName());
 		var taskTopic = relatedTask.getTopic();
 		var topic = goals.stream().flatMap(goal -> goal.getTopics().stream().filter(t -> t.isSame(taskTopic)))
-						 .findFirst().orElse(null);
+						 .findFirst().orElse(Topic.empty());
 		setTopic(topic);
 		relevance = relatedTask.getRelevance();
 		relatedTask.getAlternatives().forEach(this::appendAlias);
@@ -85,6 +86,10 @@ public class TaskOrder extends MaterialOrderCollection {
 
 	@Override
 	public Material findMaterial(UUID materialId) {
+		var filter = getComplexMaterials().stream().filter(m -> m.getId().equals(materialId)).findFirst();
+		if (filter.isPresent()) {
+			return filter.orElseThrow();
+		}
 		return materialOrder.stream().filter(m -> m.getId().equals(materialId)).findFirst().orElse(null);
 	}
 
@@ -140,13 +145,26 @@ public class TaskOrder extends MaterialOrderCollection {
 	}
 
 	private boolean isAssignable(Material material) {
+		if (material instanceof ItemMaterial)
+			return false;
 		return getAlias().stream().anyMatch(alias -> alias.contains(material.getStructureId()))
 			   || getAlias().stream().anyMatch(alias -> alias.contains(material.getStructureId().split("-")[0].trim()));
 	}
 
 	@Override
 	public boolean remove(UUID partId) {
-		return materialOrder.removeIf(m -> m.getId().equals(partId));
+		if (materialOrder.removeIf(m -> m.getId().equals(partId))) {
+			return true;
+		}
+		return getComplexMaterials().removeIf(m -> m.getId().equals(partId));
+	}
+
+	@Override
+	public Collection<NameAndId> collectionsNameAndId() {
+		var back = new LinkedList<NameAndId>();
+		back.add(new NameAndId(getName(), getId()));
+		materialOrder.forEach(m -> back.add(new NameAndId(m.getName(), m.getId())));
+		return back;
 	}
 
 	@Override
@@ -170,6 +188,14 @@ public class TaskOrder extends MaterialOrderCollection {
 		return relevance;
 	}
 
+	@Override
+	public List<UUID> getCollectionIds() {
+		var back = new LinkedList<UUID>();
+		back.add(getId());
+		materialOrder.forEach(m -> back.add(m.getId()));
+		return back;
+	}
+
 	public void setRelevance(Relevance relevance) {
 		this.relevance = relevance;
 	}
@@ -189,8 +215,14 @@ public class TaskOrder extends MaterialOrderCollection {
 		};
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @return {@inheritDoc}
+	 */
+	@Override
 	public List<Material> getMaterials() {
-		return materialOrder;
+		return Collections.unmodifiableList(materialOrder);
 	}
 //endregion
 

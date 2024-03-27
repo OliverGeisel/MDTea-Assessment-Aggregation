@@ -14,9 +14,10 @@ import java.util.Collection;
  * @version 1.1.0
  * @see KnowledgeElement
  * @see SimpleElement
- * @since 1.0.0
+ * @since 0.2.0
  */
 @Node
+@Deprecated
 public class NodeElement extends KnowledgeElement {
 
 	protected NodeElement() {

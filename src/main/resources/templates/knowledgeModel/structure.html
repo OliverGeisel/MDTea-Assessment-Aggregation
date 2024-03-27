@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Struktur des Modells</title>
+    <th:block th:replace="~{main::head-tag}"></th:block>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div th:replace="~{main::navigation}"></div>
+<main class="flex-grow-1 container">
+    <header><h1>Struktur des Modells</h1></header>
+    <div th:if="${edited} != null">
+        <div class="alert alert-success" role="alert">
+            Der Knoten wurde erfolgreich bearbeitet.
+        </div>
+    </div>
+    <div th:if="${message} != null">
+        <div class="alert alert-warning" role="alert">
+            <span th:text="${message}"></span>
+        </div>
+    </div>
+    <section>
+        Neuen Knoten erstellen
+        <form method="post" onsubmit="return check()" th:action="@{structure/add}">
+            <label class="form-control"> Name
+                <input id="id-input" name="id" pattern="[\w_-]{2,}" required>
+            </label>
+            <label class="form-control"> In welchem Bereich soll es erstellt werden?
+                <input id="parent-input" list="areas" name="parent" required>
+            </label>
+            <datalist id="areas">
+                <option th:each="area : ${structure}" th:text="${area.name}" th:value="${area.id}"></option>
+            </datalist>
+            <label class="form-control"> Ist es ein Blatt?
+                <input checked name="leaf" type="checkbox">
+            </label>
+            <label class="form-control"> Soll ein Term dazu erstellt werden?
+                <input name="withTerm" type="checkbox">
+            </label>
+            <button class="btn btn-primary mt-2" type="submit">Neuen Knoten erstellen</button>
+        </form>
+    </section>
+    <section>
+        <header><h3>Struktur bearbeiten</h3></header>
+        <form th:action="@{structure/edit}">
+            <label class="form-control">Struktur auswählen:
+                <input class="form-control" list="areas" name="id" placeholder="Name der Struktur eingeben" required>
+            </label>
+            <div class="pt-2">
+                <button class="btn btn-warning" type="submit">Umbenennen</button>
+            </div>
+        </form>
+        <hr>
+        <header><h3>Struktur verschieben</h3></header>
+        <form th:action="@{/knowledge-model/structure/move-to}">
+            <label class="form-control">Struktur:
+                <input list="areas" name="id" required>
+            </label>
+            <div class="pt-2">
+                <input class="btn btn-info" type="submit" value="Verschieben">
+            </div>
+        </form>
+    </section>
+</main>
+<footer th:replace="~{main::footer}"></footer>
+<script>
+    function check() {
+        const alreadyUsed = document.getElementById('areas').getElementsByTagName('option');
+        const inputText = document.getElementById('id-input').value.toLowerCase();
+        const parent = document.getElementById('parent-input').value.toLowerCase();
+        let parentCorrect = false;
+        for (let i = 0; i < alreadyUsed.length; i++) {
+            if (inputText === alreadyUsed[i].value.toLocaleLowerCase()) {
+                alert('Der eingegebene Name ist nicht erlaubt, da er bereits existiert.');
+                return false;
+            }
+            if (parent === alreadyUsed[i].value.toLocaleLowerCase()) {
+                parentCorrect = true;
+            }
+        }
+        if (!parentCorrect) {
+            alert('Der eingegebene Eltern-Bereich existiert nicht.');
+            return false;
+        }
+        return true;
+    }
+</script>
+</body>
+</html>

@@ -46,7 +46,7 @@ public class ChapterOrder extends MaterialOrderCollection {
 		setName(stChapter.getName());
 		var chapterTopic = stChapter.getTopic();
 		var topic = goals.stream().flatMap(goal -> goal.getTopics().stream().filter(t -> t.isSame(chapterTopic)))
-						 .findFirst().orElse(null);
+						 .findFirst().orElse(Topic.empty());
 		setTopic(topic);
 		stChapter.getAlternatives().forEach(this::appendAlias);
 	}
@@ -95,6 +95,10 @@ public class ChapterOrder extends MaterialOrderCollection {
 
 	@Override
 	public Material findMaterial(UUID materialId) {
+		var filter = getComplexMaterials().stream().filter(m -> m.getId().equals(materialId)).findFirst();
+		if (filter.isPresent()) {
+			return filter.orElseThrow();
+		}
 		return groupOrder.stream().map(g -> g.findMaterial(materialId)).filter(Objects::nonNull).findFirst()
 						 .orElse(null);
 	}
@@ -147,7 +151,19 @@ public class ChapterOrder extends MaterialOrderCollection {
 			groupOrder.removeIf(it -> it.getId().equals(partId));
 			return true;
 		}
+		// complex material
+		if (getComplexMaterials().removeIf(it -> it.getId().equals(partId))) {
+			return true;
+		}
 		return groupOrder.stream().anyMatch(g -> g.remove(partId));
+	}
+
+	@Override
+	public Collection<NameAndId> collectionsNameAndId() {
+		var names = new LinkedList<NameAndId>();
+		names.add(new NameAndId(getName(), getId()));
+		groupOrder.forEach(g -> names.addAll(g.collectionsNameAndId()));
+		return names;
 	}
 
 	@Override
@@ -166,6 +182,10 @@ public class ChapterOrder extends MaterialOrderCollection {
 	}
 
 	//region setter/getter
+	@Override
+	public List<Material> getMaterials() {
+		return groupOrder.stream().map(GroupOrder::getMaterials).flatMap(Collection::stream).toList();
+	}
 
 	/**
 	 * Get the relevance of the chapter.
@@ -176,6 +196,14 @@ public class ChapterOrder extends MaterialOrderCollection {
 	public Relevance getRelevance() {
 		return groupOrder.stream().map(GroupOrder::getRelevance).max(Comparator.comparingInt(Enum::ordinal))
 						 .orElse(Relevance.TO_SET);
+	}
+
+	@Override
+	public List<UUID> getCollectionIds() {
+		var ids = new LinkedList<UUID>();
+		ids.add(getId());
+		groupOrder.forEach(g -> ids.addAll(g.getCollectionIds()));
+		return ids;
 	}
 
 	/**

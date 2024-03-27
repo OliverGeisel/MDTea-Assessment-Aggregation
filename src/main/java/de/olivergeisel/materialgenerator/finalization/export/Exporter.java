@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 
@@ -78,7 +80,14 @@ public abstract class Exporter {
 	 */
 	public abstract void export(RawCourse rawCourse, String templateSetName, File targetDirectory) throws IOException;
 
-	protected void loadImage(String image, File outputDir) {
+	/**
+	 * Copy an image from the {@link ImageService} to the output directory.
+	 * If the image does not exist, a warning is logged.
+	 *
+	 * @param image     the name of the image
+	 * @param outputDir the output directory
+	 */
+	protected void copyImage(String image, File outputDir) {
 		try {
 			var imageFile = getImage(image);
 			Files.copy(imageFile.getInputStream(), new File(outputDir, image).toPath(),
@@ -88,8 +97,50 @@ public abstract class Exporter {
 		}
 	}
 
+	/**
+	 * Get an image from the {@link ImageService}.
+	 * @param name the name of the image
+	 * @return the image
+	 * @throws StorageFileNotFoundException if the image does not exist
+	 */
 	protected Resource getImage(String name) throws StorageFileNotFoundException {
 		return imageService.loadAsResource(name);
+	}
+
+	/**
+	 * Saves the include-folder of the template set to the output directory.
+	 *
+	 * @param outputDir   The directory to save the includes to.
+	 * @param templateSet Name of the template set.
+	 */
+	protected void saveIncludes(File outputDir, String templateSet) throws URISyntaxException {
+		var classloader = this.getClass().getClassLoader();
+		var classPathRoot = classloader.getResource("").toURI();
+		var includeURI = classPathRoot.resolve(STR."templateSets/\{templateSet}/include");
+		var outPath = outputDir.toPath();
+		File sourceCopy = new File(includeURI);
+		if (!sourceCopy.exists()) {
+			logger.info(STR."No includes found for template set \{templateSet}");
+			return;
+		}
+		var copyPath = sourceCopy.toPath();
+		var out = outPath.resolve(copyPath.relativize(copyPath));
+		try (var files = Files.walk(copyPath)) {
+			files.forEach(source -> {
+				try {
+					Path destination = out.resolve(copyPath.relativize(source));
+					if (Files.isDirectory(source)) {
+						Files.createDirectories(destination);
+					} else {
+						Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
+					}
+				} catch (IOException e) {
+					logger.warn(e.toString());
+				}
+			});
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

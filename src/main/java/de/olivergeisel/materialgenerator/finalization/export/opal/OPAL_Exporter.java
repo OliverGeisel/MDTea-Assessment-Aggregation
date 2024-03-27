@@ -3,7 +3,11 @@ package de.olivergeisel.materialgenerator.finalization.export.opal;
 import de.olivergeisel.materialgenerator.finalization.export.DownloadManager;
 import de.olivergeisel.materialgenerator.finalization.export.Exporter;
 import de.olivergeisel.materialgenerator.finalization.export.ImageService;
+import de.olivergeisel.materialgenerator.finalization.export.opal.test.OPALTestExporter;
 import de.olivergeisel.materialgenerator.finalization.parts.RawCourse;
+import de.olivergeisel.materialgenerator.generation.material.assessment.TestMaterial;
+import de.olivergeisel.materialgenerator.generation.material.transfer.ExampleMaterial;
+import de.olivergeisel.materialgenerator.generation.material.transfer.ImageMaterial;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -16,6 +20,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -51,10 +56,12 @@ import static de.olivergeisel.materialgenerator.finalization.export.opal.BasicEl
 @Service
 public class OPAL_Exporter extends Exporter {
 
-	private static final Logger logger = LoggerFactory.getLogger(OPAL_Exporter.class);
+	private static final Logger           logger = LoggerFactory.getLogger(OPAL_Exporter.class);
+	private final        OPALTestExporter testExport;
 
-	public OPAL_Exporter(ImageService imageService) {
+	public OPAL_Exporter(ImageService imageService, OPALTestExporter testExport) {
 		super(imageService);
+		this.testExport = testExport;
 	}
 
 	/**
@@ -86,6 +93,29 @@ public class OPAL_Exporter extends Exporter {
 		// materials
 		var courseDir = new File(targetDirectory, "coursefolder");
 		organizer.creatMaterials(courseDir);
+		// write images
+		organizer.getOriginalCourse().getMaterials().stream()
+				 .filter(it -> it instanceof ImageMaterial)
+				 .forEach(material -> {
+					 var imageMaterial = (ImageMaterial) material;
+					 copyImage(imageMaterial.getImageName(), courseDir);
+				 });
+
+		organizer.getOriginalCourse().getMaterials().stream()
+				 .filter(it -> it instanceof ExampleMaterial)
+				 .forEach(material -> {
+					 var exampleMaterial = (ExampleMaterial) material;
+					 if (exampleMaterial.isImageExample()) {
+						 copyImage(exampleMaterial.getImageName(), courseDir);
+					 }
+				 });
+		// copy include files
+		try {
+			saveIncludes(courseDir, organizer.getOriginalCourse().getTemplateName());
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+
 		// config
 		writeCourseConfig(targetDirectory);
 		writeEditorTreeModel(targetDirectory, organizer);
@@ -95,6 +125,17 @@ public class OPAL_Exporter extends Exporter {
 		createExportFile(exportDirectory, "learninggroupexport");
 		createExportFile(exportDirectory, "rightgroupexport");
 		createRepoFile(exportDirectory, rawCourse);
+	}
+
+	/**
+	 * Exports the test to the desired format.
+	 *
+	 * @param testMaterial the test to be exported
+	 * @param tempDir      the directory where the test should be exported to. Normally a temporary directory.
+	 */
+	public void exportTest(TestMaterial testMaterial, File tempDir) {
+		var testInfo = new OPAlTestMaterialInfo(testMaterial);
+		testExport.createTestSingle(testInfo, tempDir);
 	}
 
 	private void writeBasicDirectories(File directory) {

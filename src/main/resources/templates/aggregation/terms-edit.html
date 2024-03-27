@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Term - Edit</title>
+    <th:block th:replace="~{main::head-tag}"></th:block>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div th:replace="~{main::navigation}"></div>
+<main class="flex-grow-1">
+    <header><h1 th:text="${term.id}">Term</h1></header>
+    <section>
+        <form method="post" th:action="@{edit}">
+            <input name="id" th:value="${term.id}" type="hidden">
+            <div>
+                <label class="form-control"> Term:
+                    <input name="content" th:value="${term.content}">
+                </label>
+            </div>
+            <label class="form-control"> Structure-Id:
+                <input list="structures" name="structureId" th:value="${term.structureId}" type="text">
+                <datalist id="structures">
+                    <option th:each="structure : ${structures}" th:text="${structure}" th:value="${structure}"></option>
+                </datalist>
+            </label>
+            <label class="form-control"> Knowledge-Id:
+                <input name="newId" required th:value="${term.id}" type="text">
+            </label>
+            <input class="btn btn-success" type="submit" value="Save">
+        </form>
+    </section>
+    <section>
+        <a href="../">
+            <button class="btn btn-check" type="submit">Zurück</button>
+        </a>
+    </section>
+</main>
+<footer th:replace="~{main::footer}"></footer>
+</body>
+</html>

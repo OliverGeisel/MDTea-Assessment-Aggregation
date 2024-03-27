@@ -1,11 +1,10 @@
 package de.olivergeisel.materialgenerator.generation.generator;
 
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeModel;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.*;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.Relation;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationType;
-import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.KnowledgeModel;
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
-import de.olivergeisel.materialgenerator.core.courseplan.content.ContentTarget;
 import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
 import de.olivergeisel.materialgenerator.generation.generator.transfer_assamble.TransferAssembler;
 import de.olivergeisel.materialgenerator.generation.material.Material;
@@ -52,39 +51,34 @@ public class TransferGenerator extends AbstractGenerator {
 		super(templateSet, model, plan);
 	}
 
-	private static MaterialAndMapping createAcronymInternal(List<String> acronyms, KnowledgeElement mainTerm) {
-		Material material = new AcronymMaterial(acronyms, false, TemplateType.ACRONYM, mainTerm);
-		String name = STR."Akronyme für \{mainTerm.getContent()}";
-		material.setName(name);
-		MaterialMappingEntry mapping = new MaterialMappingEntry(material);
-		mapping.add(mainTerm);
-		var back = new MaterialAndMapping(material, mapping);
-		back.material().setValues(Map.of("term", mainTerm.getContent()));
-		return back;
+
+	protected List<MaterialAndMapping> materialForComment(Set<KnowledgeNode> knowledge) {
+		return materialForCreate(knowledge);
 	}
 
-	protected static MaterialAndMapping createListMaterialCore(String headline, String materialName,
-			RelationType relationType, TemplateType templateInfo, KnowledgeNode mainKnowledge,
-			KnowledgeElement mainTerm) {
-		var partRelations = mainKnowledge.getWantedRelationsFromRelated(relationType);
-		var mainId = mainTerm.getId();
-		var partNames = partRelations.stream().filter(it -> it.getToId().equals(mainId))
-									 .map(it -> it.getFrom().getContent()).toList();
-		if (partNames.isEmpty()) {
-			return null;
+	protected List<MaterialAndMapping> materialForCreate(Set<KnowledgeNode> knowledge) {
+		return materialForControl(knowledge);
+	}
+
+	protected List<MaterialAndMapping> materialForControl(Set<KnowledgeNode> knowledge) {
+		return materialForUse(knowledge);
+	}
+
+	protected List<MaterialAndMapping> materialForUse(Set<KnowledgeNode> knowledge) {
+		return materialForTranslate(knowledge);
+	}
+
+	protected List<MaterialAndMapping> materialForTranslate(Set<KnowledgeNode> knowledge) {
+		// materials.add(createWikisWithExistingMaterial(knowledge, materials));
+		var firstLookMaterials = materialForKnow(knowledge);
+		for (var node : knowledge) {
+			var assembler = new TransferAssembler(firstLookMaterials, node);
+			var summary = assembler.createSummary();
+			var overview = assembler.createOverview(summary);
+			firstLookMaterials.addAll(summary);
+			firstLookMaterials.addAll(overview);
 		}
-		var partListMaterial = new ListMaterial(headline, partNames);
-		partListMaterial.setTerm(mainTerm.getContent());
-		partListMaterial.setTemplateType(templateInfo);
-		partListMaterial.setTermId(mainTerm.getId());
-		partListMaterial.setName(materialName);
-		partListMaterial.setStructureId(mainTerm.getStructureId());
-		partListMaterial.setValues(Map.of("term", mainTerm.getContent()));
-		var mapping = new MaterialMappingEntry(partListMaterial);
-		mapping.add(mainTerm);
-		mapping.addAll(partRelations.stream().filter(it -> it.getToId().equals(mainId)).map(Relation::getFrom)
-									.toArray(KnowledgeElement[]::new));
-		return new MaterialAndMapping(partListMaterial, mapping);
+		return firstLookMaterials;
 	}
 
 	@Override
@@ -121,82 +115,6 @@ public class TransferGenerator extends AbstractGenerator {
 		return materials;
 	}
 
-	private void createImagesSave(Set<KnowledgeNode> knowledge, List<MaterialAndMapping> materials,
-			String masterKeyword) {
-		try {
-			materials.addAll(createImages(knowledge));
-		} catch (NoSuchElementException e) {
-			logger.info("No image found for {}", masterKeyword);
-		}
-	}
-
-	private List<MaterialAndMapping> createDefinitionsSave(Set<KnowledgeNode> knowledge, String masterKeyword) {
-		try {
-			return createDefinitions(knowledge);
-		} catch (NoSuchElementException | IllegalArgumentException e) {
-			logger.info("No definition found for {}", masterKeyword);
-		}
-		return new LinkedList<>();
-	}
-
-	protected List<MaterialAndMapping> materialForComment(Set<KnowledgeNode> knowledge) {
-		return materialForCreate(knowledge);
-	}
-
-	protected List<MaterialAndMapping> materialForCreate(Set<KnowledgeNode> knowledge) {
-		return materialForControl(knowledge);
-	}
-
-	protected List<MaterialAndMapping> materialForControl(Set<KnowledgeNode> knowledge) {
-		return materialForUse(knowledge);
-	}
-
-	protected List<MaterialAndMapping> materialForUse(Set<KnowledgeNode> knowledge) {
-		return materialForTranslate(knowledge);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @param targets {@inheritDoc}
-	 * @throws IllegalStateException {@inheritDoc}
-	 */
-	@Override
-	protected void processTargets(List<ContentTarget> targets) throws IllegalStateException {
-		if (targets.isEmpty()) {
-			logger.warn("No targets found. This should not happen.");
-			return;
-		}
-		var goal = targets.stream().findFirst().orElseThrow().getRelatedGoal();
-		if (goal == null || targets.stream().anyMatch(it -> !it.getRelatedGoal().equals(goal)))
-			throw new IllegalStateException("Targets with different goals found. This should not happen. Ignoring all"
-											+ " targets.");
-		int emptyTargetCount = 0;
-		for (var target : targets) {
-			var expression = goal.getExpression();
-			var topic = target.getTopic();
-			var aliases = target.getAliases().complete();
-			try {
-				var topicKnowledge = loadKnowledgeForStructure(aliases);
-				if (topicKnowledge.isEmpty()) {
-					logger.info("No knowledge found for Topic {}", target);
-					emptyTargetCount++;
-					continue;
-				}
-				topicKnowledge.forEach(it -> {
-					it.setGoal(goal);
-					it.addTopic(topic);
-				});
-				createMaterialFor(expression, topicKnowledge);
-			} catch (NoSuchElementException e) {
-				logger.info("No knowledge found for Target {}", target);
-			}
-		}
-		if (emptyTargetCount == targets.size()) {
-			logger.warn("No knowledge found for any target. Goal: {} has no materials", goal);
-		}
-	}
-
 	@Override
 	protected List<MaterialAndMapping> materialForFirstLook(Set<KnowledgeNode> knowledge)
 			throws NoSuchElementException {
@@ -227,6 +145,17 @@ public class TransferGenerator extends AbstractGenerator {
 		return materials;
 	}
 
+
+	//region Material Creation
+	private List<MaterialAndMapping> createDefinitionsSave(Set<KnowledgeNode> knowledge, String masterKeyword) {
+		try {
+			return createDefinitions(knowledge);
+		} catch (NoSuchElementException | IllegalArgumentException e) {
+			logger.info("No definition found for {}", masterKeyword);
+		}
+		return new LinkedList<>();
+	}
+
 	/**
 	 * Create Definition Materials for a KnowledgeNode
 	 *
@@ -243,7 +172,7 @@ public class TransferGenerator extends AbstractGenerator {
 		}
 		final var templateInfo = TemplateType.DEFINITION;
 		var firstNode = knowledge.stream().findFirst().orElseThrow();
-		var mainKnowledge = getMainKnowledge(knowledge, firstNode);
+		var mainKnowledge = getTermNode(knowledge, firstNode);
 		List<MaterialAndMapping> back = new LinkedList<>();
 		var mainTerm = mainKnowledge.getMainElement();
 		var definitionRelations = getWantedRelationsKnowledge(knowledge, RelationType.DEFINED_BY);
@@ -264,6 +193,15 @@ public class TransferGenerator extends AbstractGenerator {
 			}
 		});
 		return back;
+	}
+
+	private void createImagesSave(Set<KnowledgeNode> knowledge, List<MaterialAndMapping> materials,
+			String masterKeyword) {
+		try {
+			materials.addAll(createImages(knowledge));
+		} catch (NoSuchElementException e) {
+			logger.info("No image found for {}", masterKeyword);
+		}
 	}
 
 	private MaterialAndMapping createWikisWithExistingMaterial(Set<KnowledgeNode> knowledge,
@@ -310,28 +248,15 @@ public class TransferGenerator extends AbstractGenerator {
 		return back;
 	}
 
-	protected List<MaterialAndMapping> materialForTranslate(Set<KnowledgeNode> knowledge) {
-		// materials.add(createWikisWithExistingMaterial(knowledge, materials));
-		var firstLookMaterials = materialForKnow(knowledge);
-		for (var node : knowledge) {
-			var assembler = new TransferAssembler(firstLookMaterials, node);
-			var summary = assembler.createSummary();
-			var overview = assembler.createOverview(summary);
-			firstLookMaterials.addAll(summary);
-		}
-		return firstLookMaterials;
-	}
 
 	/**
 	 * Create a List Material for a KnowledgeNode with Synonyms
 	 *
 	 * @param knowledge KnowledgeNode to create Material for
 	 * @return A material with synonyms and a mapping. If no synonyms are found, null is returned
-	 * @throws NoTemplateInfoException if no Synonym Template is found
 	 * @throws NoSuchElementException  if no TERM is found that is the mainElement of the KnowledgeNode
 	 */
-	private List<MaterialAndMapping> createSynonyms(Set<KnowledgeNode> knowledge) throws NoTemplateInfoException,
-			NoSuchElementException {
+	private List<MaterialAndMapping> createSynonyms(Set<KnowledgeNode> knowledge) throws NoSuchElementException {
 		var templateInfo = TemplateType.SYNONYM;
 		var back = new LinkedList<MaterialAndMapping>();
 		var masterKeyword = knowledge.stream().findFirst().orElseThrow().getMasterKeyWord().orElseThrow();
@@ -368,15 +293,12 @@ public class TransferGenerator extends AbstractGenerator {
 	 *
 	 * @param knowledge KnowledgeNode to create Material for
 	 * @return A material with acronyms and a mapping. If no acronyms are found, an empty list is returned
-	 * @throws NoTemplateInfoException if no Acronym Template is found
 	 * @throws NoSuchElementException  if no TERM is found that is the mainElement of the KnowledgeNode
 	 */
-	private List<MaterialAndMapping> createAcronyms(Set<KnowledgeNode> knowledge) throws NoTemplateInfoException,
-			NoSuchElementException {
-		var templateInfo = TemplateType.ACRONYM;
+	private List<MaterialAndMapping> createAcronyms(Set<KnowledgeNode> knowledge) throws NoSuchElementException {
 		var back = new LinkedList<MaterialAndMapping>();
 		var first = knowledge.stream().findFirst().orElseThrow();
-		var mainKnowledge = getMainKnowledge(knowledge, first);
+		var mainKnowledge = getTermNode(knowledge, first);
 		var mainTerm = mainKnowledge.getMainElement();
 		var acryRelations = getWantedRelationsKnowledge(knowledge, RelationType.IS_ACRONYM_FOR);
 		var acronyms = new HashMap<KnowledgeElement, List<KnowledgeElement>>();
@@ -564,7 +486,43 @@ public class TransferGenerator extends AbstractGenerator {
 		return back;
 	}
 
+	private MaterialAndMapping createAcronymInternal(List<String> acronyms, KnowledgeElement mainTerm) {
+		Material material = new AcronymMaterial(acronyms, false, TemplateType.ACRONYM, mainTerm);
+		String name = STR."Akronyme für \{mainTerm.getContent()}";
+		material.setName(name);
+		MaterialMappingEntry mapping = new MaterialMappingEntry(material);
+		mapping.add(mainTerm);
+		var back = new MaterialAndMapping(material, mapping);
+		back.material().setValues(Map.of("term", mainTerm.getContent()));
+		return back;
+	}
 
+	protected MaterialAndMapping createListMaterialCore(String headline, String materialName,
+			RelationType relationType, TemplateType templateInfo, KnowledgeNode mainKnowledge,
+			KnowledgeElement mainTerm) {
+		var partRelations = mainKnowledge.getWantedRelationsFromRelated(relationType);
+		var mainId = mainTerm.getId();
+		var partNames = partRelations.stream().filter(it -> it.getToId().equals(mainId))
+									 .map(it -> it.getFrom().getContent()).toList();
+		if (partNames.isEmpty()) {
+			return null;
+		}
+		var partListMaterial = new ListMaterial(headline, partNames);
+		partListMaterial.setTerm(mainTerm.getContent());
+		partListMaterial.setTemplateType(templateInfo);
+		partListMaterial.setTermId(mainTerm.getId());
+		partListMaterial.setName(materialName);
+		partListMaterial.setStructureId(mainTerm.getStructureId());
+		partListMaterial.setValues(Map.of("term", mainTerm.getContent()));
+		var mapping = new MaterialMappingEntry(partListMaterial);
+		mapping.add(mainTerm);
+		mapping.addAll(partRelations.stream().filter(it -> it.getToId().equals(mainId)).map(Relation::getFrom)
+									.toArray(KnowledgeElement[]::new));
+		return new MaterialAndMapping(partListMaterial, mapping);
+	}
+	//endregion
+
+	//region helper methods
 	private Set<KnowledgeNode> loadKnowledgeForStructure(String structureId, Collection<String> extra) {
 		return loadKnowledgeForStructure(structureId, extra.toArray(new String[0]));
 	}
@@ -582,6 +540,7 @@ public class TransferGenerator extends AbstractGenerator {
 		}
 		return back;
 	}
+	//endregion
 
 	/**
 	 * Initial method to set the input for the generator. All parameters cant be null.
@@ -608,17 +567,23 @@ public class TransferGenerator extends AbstractGenerator {
 	}
 
 	/**
-	 * Method to start the generation process. This method should be called after the input method.
+	 * {@inheritDoc}
 	 *
-	 * @return True if the generation was successful, false if not.
+	 * @return {@inheritDoc}
 	 */
 	@Override
-	public boolean update() {
-		if (!isReady() || isUnchanged()) {
-			return false;
-		}
-		process();
-		setUnchanged(true);
-		return true;
+	public boolean createSimpleMaterial() {
+		return false;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @return {@inheritDoc}
+	 */
+	@Override
+	public boolean createComplexMaterial() {
+		return false;
+	}
+
 }

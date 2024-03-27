@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{aggregation.items.add.title}"></title>
+    <th:block th:replace="~{main::head-tag}"></th:block>
+    <script src="/js/element-add.js"></script>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div th:replace="~{main::navigation}"></div>
+<main class="flex-grow-1 container">
+    <header><h1>Edit Item</h1></header>
+    <section>
+        <header><h3 th:text="#{aggregation.items.add.header}">Element Wahl</h3></header>
+        <article id="element-fields">
+            <form method="post">
+                <p class="mb-2"> Type:
+                    <span th:text="${item.itemType.type}"></span>
+                    <input name="type" type="hidden" value="ITEM">
+                    <input id="itemtype-input" name="itemType" th:value="${item.itemType.type}" type="hidden">
+                </p>
+                <label> Short Name/Id:
+                    <input class="form-control" disabled name="headline" placeholder="Short Name eingeben" required
+                           th:value="${item.id}">
+                </label>
+                <label class="form-control mt-3">Question:
+                    <textarea class="form-control" cols="80" id="question-input"
+                              name="content" placeholder="Frage/Aufgabe eingeben"
+                              required rows="4" th:text="${item.content}"></textarea>
+                </label>
+                <div th:switch="${item.itemType.type}">
+                    <div th:case="TRUE_FALSE">
+                        <label class="form-control mt-3">
+                            <input name="isTrue" th:checked="${item.correct}"
+                                   type="checkbox" value="True"> Ist korrekt!
+                        </label>
+                    </div>
+                    <div th:case="SINGLE_CHOICE">
+                        <label class="form-control mt-3"> Correct Answer:
+                            <input list="structure-list" name="correctAnswers"
+                                   placeholder="Korrekte Antwort eingeben" required th:value="${item.correctAnswer}">
+                        </label>
+                        <div class="form-control mt-3" id="wrong-answers">Wrong Answers:
+
+                            <input name="wrongAnswers" placeholder="Falsche Antwort eingeben"
+                                   th:each="answer:${item.alternativeAnswers}"
+                                   th:value="${answer}">
+                        </div>
+                        <button class="btn btn-warning mt-3" onclick="addWrongAnswer()" type="button">Falsche Antwort
+                            hinzufügen
+                        </button>
+                    </div>
+                    <div th:case="MULTIPLE_CHOICE">
+                        <label class="form-control mt-3" id="correct-answers"> Correct Answers:
+                            <input name="correctAnswers" placeholder="Korrekte Antwort eingeben"
+                                   th:each="answer : ${item.correctAnswers}" th:value="${answer}">
+                        </label>
+                        <label class="form-control mt-3" id="wrong-answers">Wrong Answers:
+                            <input name="wrongAnswers" placeholder="Falsche Antwort eingeben"
+                                   th:each="answer:${item.alternativeAnswers}"
+                                   th:value="${answer}">
+                        </label>
+                        <button class="btn btn-success mt-3" onclick="addCorrectAnswer()" type="button">Korrekte
+                            Antwort hinzufügen
+                        </button>
+                        <button class="btn btn-warning mt-3" onclick="addWrongAnswer()" type="button">Falsche Antwort
+                            hinzufügen
+                        </button>
+                    </div>
+                    <div th:case="FILL_OUT_BLANKS">
+                        <p>Schreibe eine Lücke durch: &lt;_____&gt;</p>
+                        <div class="form-control mt-3" id="blanks-answers">
+                            Blanks Answers:
+                            <input name="blanks" placeholder="Lücke eingeben" th:each="blank:${item.blanks}"
+                                   th:value="${blank}">
+                        </div>
+                        <p>Im Text sind <span id="blank-count"></span> Blanks.</p>
+                        <button class="btn btn-warning mt-3" onclick="addBlankAnswer()" type="button">Lücke
+                            hinzufügen
+                        </button>
+                        <button class="btn btn-danger mt-3" onclick="removeBlankAnswer()" type="button">Lücke
+                            entfernen
+                        </button>
+                    </div>
+                </div>
+                <label class="form-control mt-3">Structure:
+                    <input class="form-control" list="structure-list" name="structureId" placeholder="Struktur eingeben"
+                           required th:value="${item.structureId}">
+                </label>
+                <button class="btn btn-primary mt-3" th:text="#{general.save}" type="submit">Save</button>
+            </form>
+            <datalist id="structure-list">
+                <option th:each="structure: ${structures}" th:text="${structure}" th:value="${structure}"></option>
+            </datalist>
+        </article>
+    </section>
+</main>
+<footer th:replace="~{main::footer}"></footer>
+<script>
+    function countBlanksInText() {
+        const text = document.getElementById('question-input').value;
+        return text.split("<_____>").length - 1;
+    }
+
+    if (document.getElementById("itemtype-input").getAttribute("value") === "FILL_OUT_BLANKS") {
+        document.getElementById("question-input").addEventListener("change", function () {
+            document.getElementById("blank-count").innerText = countBlanksInText();
+        });
+        document.getElementById("blank-count").innerText = countBlanksInText();
+    }
+</script>
+</body>
+</html>

@@ -41,6 +41,11 @@ public class MaterialMappingEntry {
 		add(elements);
 	}
 
+	public MaterialMappingEntry(Material material, String[] elementIds) {
+		this.material = material;
+		relatedElements.addAll(Arrays.asList(elementIds));
+	}
+
 	public MaterialMappingEntry(Material material, Collection<KnowledgeElement> elements) {
 		this.material = material;
 		add(elements.toArray(new KnowledgeElement[0]));

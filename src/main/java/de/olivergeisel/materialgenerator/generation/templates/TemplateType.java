@@ -26,8 +26,17 @@ public class TemplateType {
 	public static final TemplateType LIST       = new TemplateType("LIST");
 	public static final TemplateType EXAMPLE    = new TemplateType("EXAMPLE");
 	public static final TemplateType PROOF      = new TemplateType("PROOF");
-	public static final TemplateType TASK       = new TemplateType("TASK");
-	public static final TemplateType SUMMARY = new TemplateType("SUMMARY");
+	public static final TemplateType TEST     = new TemplateType("TEST");
+	public static final TemplateType SUMMARY  = new TemplateType("SUMMARY");
+	public static final TemplateType OVERVIEW = new TemplateType("OVERVIEW");
+
+	// ItemMaterials
+	public static final TemplateType ITEM = new TemplateType("ITEM");
+	public static final TemplateType TRUE_FALSE      = new TemplateType("TRUE_FALSE");
+	public static final TemplateType SINGLE_CHOICE   = new TemplateType("SINGLE_CHOICE");
+	public static final TemplateType MULTIPLE_CHOICE = new TemplateType("MULTIPLE_CHOICE");
+	public static final TemplateType FILL_OUT_BLANKS = new TemplateType("FILL_OUT_BLANKS");
+
 
 	private String type;
 
@@ -68,8 +77,14 @@ public class TemplateType {
 			case "ACRONYM" -> ACRONYM;
 			case "SYNONYM" -> SYNONYM;
 			case "PROOF" -> PROOF;
-			case "TASK" -> TASK;
+			case "TEST" -> TEST;
 			case "SUMMARY" -> SUMMARY;
+			case "OVERVIEW" -> OVERVIEW;
+			case "ITEM" -> ITEM;
+			case "TRUE_FALSE" -> TRUE_FALSE;
+			case "SINGLE_CHOICE" -> SINGLE_CHOICE;
+			case "MULTIPLE_CHOICE" -> MULTIPLE_CHOICE;
+			case "FILL_OUT_BLANKS" -> FILL_OUT_BLANKS;
 			default -> new TemplateType(typeString);
 		};
 	}
@@ -99,6 +114,6 @@ public class TemplateType {
 
 	@Override
 	public String toString() {
-		return STR."TemplateType{type='\{type}\{'\''}\{'}'}";
+		return STR."TemplateType{type='\{type}'}";
 	}
 }

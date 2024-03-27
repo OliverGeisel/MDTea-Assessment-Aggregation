@@ -76,6 +76,13 @@
     <header class=" pb-2">
         <h1 th:text="#{knowledgemodel.headline}">Internes Wissensmodell</h1>
     </header>
+    <article class="mb-2">
+        Zur Struktur
+        <form th:action="@{/knowledge-model/structure}">
+            <button class="btn btn-primary" type="submit">Struktur bearbeiten</button>
+        </form>
+    </article>
+    <hr>
     <article>
         <div class="row">
             <div class="col-md-7">
@@ -88,7 +95,6 @@
                     <div id="elements"> Bereich für die Elemente, die mit der Struktur verbunden sind</div>
                 </aside>
             </div>
-
         </div>
     </article>
 </main>
