@@ -132,13 +132,16 @@ public class AggregationProcess {
 	 *
 	 * @param elements The elements to add.
 	 * @param <T>      The type of the elements.
-	 * @throws IllegalArgumentException if the type of the elements is not supportet.
+	 * @throws IllegalArgumentException if the type of the elements is not supportet or if the elements in the list
+	 * are different types.
 	 */
 	public <T extends KnowledgeElement> void add(List<T> elements) throws IllegalArgumentException {
 		if (elements == null || elements.isEmpty()) {
 			return;
 		}
 		var first = elements.getFirst();
+		if (elements.stream().anyMatch(it-> !it.getClass().equals(first.getClass())))
+			throw new IllegalArgumentException("All elements must be of the same type.");
 		switch (first.getType()) {
 			case TERM -> terms.addAll((Collection<Term>) elements);
 			case DEFINITION -> definitions.addAll((Collection<Definition>) elements);

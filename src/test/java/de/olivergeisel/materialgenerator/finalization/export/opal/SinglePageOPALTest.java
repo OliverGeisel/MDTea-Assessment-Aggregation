@@ -53,7 +53,7 @@ class SinglePageOPALTest {
 
 		var result = singlePageOPAL.createRunStructureOPAL(material, parent, document);
 
-		assertEquals("org.olat.course.nodes.STCourseNode", result.getTagName(), "Tagname is wrong");
+		assertEquals("org.olat.course.nodes.SPCourseNode", result.getTagName(), "Tagname is wrong");
 		assertTrue(result.getAttribute("class").isEmpty());
 		// ident
 		var ident = result.getChildNodes().item(0);

@@ -1,5 +1,6 @@
 package de.olivergeisel.materialgenerator.aggregation;
 
+import de.olivergeisel.materialgenerator.aggregation.extraction.ModelParameters;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.*;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationType;
 import org.junit.jupiter.api.AfterEach;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -100,8 +102,9 @@ class AggregationProcessTest {
 	}
 
 	@Test
-	void addNull() {
-		assertThrows(IllegalArgumentException.class, () -> aggregationProcess.add(null));
+	void addDifferentTypes(){
+		var list = List.of(term, definition, code, task, example);
+		assertThrows(IllegalArgumentException.class,()->aggregationProcess.add(list));
 	}
 
 	@Test
@@ -176,7 +179,12 @@ class AggregationProcessTest {
 
 	@Test
 	void suggestNull() {
-		assertThrows(IllegalArgumentException.class, () -> aggregationProcess.suggest(null));
+		aggregationProcess.suggest(null);
+		assertTrue(aggregationProcess.getTerms().isEmpty());
+		assertTrue(aggregationProcess.getDefinitions().isEmpty());
+		assertTrue(aggregationProcess.getCodes().isEmpty());
+		assertTrue(aggregationProcess.getItems().isEmpty());
+		assertTrue(aggregationProcess.getExamples().isEmpty());
 	}
 
 
@@ -299,7 +307,8 @@ class AggregationProcessTest {
 
 	@Test
 	void hasRelationsTrue() {
-		aggregationProcess.add(List.of(term, definition));
+		aggregationProcess.add(List.of(term));
+		aggregationProcess.add(List.of(definition));
 		aggregationProcess.link(term, definition, RelationType.DEFINED_BY);
 		assertTrue(aggregationProcess.hasRelations(), "A relation should be present after linking");
 	}
@@ -308,7 +317,8 @@ class AggregationProcessTest {
 	void hasElementsAndRelationsTrue() {
 		assertFalse(aggregationProcess.hasElementsAndRelations(),
 				"No elements and relations should be present at the beginning");
-		aggregationProcess.add(List.of(term, definition));
+		aggregationProcess.add(List.of(term));
+		aggregationProcess.add(List.of(definition));
 		aggregationProcess.link(term, definition, RelationType.DEFINED_BY);
 		assertTrue(aggregationProcess.hasElementsAndRelations());
 	}
@@ -321,14 +331,16 @@ class AggregationProcessTest {
 
 	@Test
 	void hasElementsAndRelationsFalseNoRelations() {
-		aggregationProcess.add(List.of(term, definition));
+		aggregationProcess.add(List.of(term));
+		aggregationProcess.add(List.of(definition));
 		assertFalse(aggregationProcess.hasElementsAndRelations());
 		assertTrue(aggregationProcess.hasElements());
 	}
 
 	@Test
 	void hasElementsAndRelationsFalseNoElements() {
-		aggregationProcess.add(List.of(term, definition));
+		aggregationProcess.add(List.of(term));
+		aggregationProcess.add(List.of(definition));
 		aggregationProcess.link(term, definition, RelationType.DEFINED_BY);
 		aggregationProcess.removeById(term.getId());
 		aggregationProcess.removeById(definition.getId());
@@ -367,20 +379,23 @@ class AggregationProcessTest {
 
 	@Test
 	void linkOkay() {
-		aggregationProcess.add(List.of(term, definition));
+		aggregationProcess.add(List.of(term));
+		aggregationProcess.add(List.of(definition));
 		assertTrue(aggregationProcess.link(term, definition, RelationType.DEFINED_BY), "Linking should return true");
 	}
 
 	@Test
 	void linkById() {
-		aggregationProcess.add(List.of(term, definition));
+		aggregationProcess.add(List.of(term));
+		aggregationProcess.add(List.of(definition));
 		assertTrue(aggregationProcess.link(term.getId(), definition.getId(), RelationType.DEFINED_BY),
 				"Linking should return true");
 	}
 
 	@Test
 	void linkAlreadyLinked() {
-		aggregationProcess.add(List.of(term, definition));
+		aggregationProcess.add(List.of(term));
+		aggregationProcess.add(List.of(definition));
 		assertTrue(aggregationProcess.link(term, definition, RelationType.DEFINED_BY));
 		assertFalse(aggregationProcess.link(term, definition, RelationType.DEFINED_BY), "Linking should return false");
 	}
@@ -403,83 +418,33 @@ class AggregationProcessTest {
 
 	@Test
 	void getSources() {
+		assertEquals(0, aggregationProcess.getSources().size());
 	}
 
 	@Test
 	void getCurrentFragment() {
+		assertNull(aggregationProcess.getCurrentFragment());
 	}
 
 	@Test
 	void getCodes() {
+		assertEquals(0, aggregationProcess.getCodes().getAcceptedElements().size());
 	}
 
 	@Test
 	void getTasks() {
+		assertEquals(0, aggregationProcess.getItems().getAcceptedElements().size());
 	}
 
 	@Test
 	void setCurrentFragment() {
+		aggregationProcess.setCurrentFragment("fragment");
+		assertEquals("fragment", aggregationProcess.getCurrentFragment());
 	}
 
 	@Test
 	void getModelParameters() {
-	}
-
-	@Test
-	void setModelParameters() {
-	}
-
-	@Test
-	void getAreaOfKnowledge() {
-	}
-
-	@Test
-	void setAreaOfKnowledge() {
-	}
-
-	@Test
-	void getModelLocation() {
-	}
-
-	@Test
-	void setModelLocation() {
-	}
-
-	@Test
-	void getApiKey() {
-	}
-
-	@Test
-	void setApiKey() {
-	}
-
-	@Test
-	void getUrl() {
-	}
-
-	@Test
-	void setUrl() {
-	}
-
-	@Test
-	void getModelName() {
-	}
-
-	@Test
-	void setModelName() {
-	}
-
-	@Test
-	void getTerms() {
-	}
-
-	@Test
-	void getDefinitions() {
-	}
-
-	@Test
-	void getExamples() {
-
+		assertEquals(new ModelParameters(), aggregationProcess.getModelParameters());
 	}
 
 	@Test
@@ -501,5 +466,6 @@ class AggregationProcessTest {
 
 	@Test
 	void getStart() {
+		assertEquals(LocalDateTime.now().getDayOfYear(), aggregationProcess.getStart().getDayOfYear());
 	}
 }

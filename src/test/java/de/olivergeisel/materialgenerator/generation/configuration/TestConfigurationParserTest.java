@@ -20,6 +20,8 @@ class TestConfigurationParserTest {
 				},
 				"numberItems": 5,
 				"markSchema": "NUMBERS",
+				"marks": [1,2,3,4,5],
+				"markMappingPercentage":{},
 				"sorting": "RANDOM",
 				"items": [
 			      {

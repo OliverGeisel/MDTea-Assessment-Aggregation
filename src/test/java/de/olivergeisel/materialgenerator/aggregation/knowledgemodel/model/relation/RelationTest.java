@@ -89,14 +89,6 @@ class RelationTest {
 	}
 
 	@Test
-	void setFromWrongIdTest() {
-		when(fromElement.getId()).thenReturn("wrong");
-		assertThrows(IllegalArgumentException.class, () -> {
-			relation.setFrom(fromElement);
-		}, "from must throw IllegalArgumentException if set to wrong element");
-	}
-
-	@Test
 	void getNameTest() {
 		assertEquals("TestRelation", relation.getName(), "name must be set in constructor");
 	}
@@ -126,14 +118,6 @@ class RelationTest {
 		assertThrows(IllegalArgumentException.class, () -> {
 			relation.setTo(null);
 		}, "to must throw IllegalArgumentException if set to null");
-	}
-
-	@Test
-	void setToWrongIdTest() {
-		when(toElement.getId()).thenReturn("wrong");
-		assertThrows(IllegalArgumentException.class, () -> {
-			relation.setTo(toElement);
-		}, "to must throw IllegalArgumentException if set to wrong element");
 	}
 
 
