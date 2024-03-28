@@ -8,42 +8,43 @@ erklären.
 
 <!-- TOC -->
 * [MDTea-Aggregation-Assessment Benutzerhandbuch](#mdtea-aggregation-assessment-benutzerhandbuch)
-    * [Über die Software](#über-die-software)
-    * [Hardware-Anforderungen](#hardware-anforderungen)
-        * [Minimal (wenn GPT4All genutzt)](#minimal-wenn-gpt4all-genutzt)
-        * [Empfohlen](#empfohlen)
-    * [Installation und Konfiguration](#installation-und-konfiguration)
-        * [Programmierumgebungen](#programmierumgebungen)
-        * [Neo4J](#neo4j)
-        * [GPT4All](#gpt4all)
-            * [Remote Nutzung](#remote-nutzung)
-            * [Lokale Nutzung](#lokale-nutzung)
-    * [Nutzung](#nutzung)
-        * [Programmparameter](#programmparameter)
-        * [Das erste Mal Starten](#das-erste-mal-starten)
-        * [Aggregation (Wissensmodell bearbeiten)](#aggregation-wissensmodell-bearbeiten)
-            * [Wissen aus einem Fragment (Text)](#wissen-aus-einem-fragment-text)
-                * [1. Fragmenteingabe und Konfiguration](#1-fragmenteingabe-und-konfiguration)
-                * [2. Extraktion von Termen](#2-extraktion-von-termen)
-                * [3. Extraktion und Bearbeiten von Definitionen](#3-extraktion-und-bearbeiten-von-definitionen)
-                * [4. Extraktion und Bearbeiten von Beispielen](#4-extraktion-und-bearbeiten-von-beispielen)
-                * [5. Extraktion und Bearbeiten von Code](#5-extraktion-und-bearbeiten-von-code)
-                * [6. Extraktion und Bearbeiten von Items (Fragen)](#6-extraktion-und-bearbeiten-von-items-fragen)
-                * [7. Integration ins Wissensmodell](#7-integration-ins-wissensmodell)
-            * [Einbinden von einzelnen Elementen](#einbinden-von-einzelnen-elementen)
-        * [Generation (Generierung von Material/Kursen)](#generation-generierung-von-materialkursen)
-            * [Wahl der Vorlage](#wahl-der-vorlage)
-            * [Wahl des Kurses](#wahl-des-kurses)
-            * [Generierung](#generierung)
-        * [Finalization (Bearbeiten und Export von Kursen)](#finalization-bearbeiten-und-export-von-kursen)
-            * [Bearbeiten](#bearbeiten)
-                * [Metadaten bearbeiten](#metadaten-bearbeiten)
-                * [Reihenfolge ändern](#reihenfolge-ändern)
-                * [Assign und Unassign](#assign-und-unassign)
-                * [Export eines Kurses](#export-eines-kurses)
-            * [Test-Export](#test-export)
-            * [Export-Übersicht](#export-übersicht)
-    * [Technische Details](#technische-details)
+  * [Über die Software](#über-die-software)
+  * [Hardware-Anforderungen](#hardware-anforderungen)
+    * [Minimal (wenn GPT4All genutzt)](#minimal-wenn-gpt4all-genutzt)
+    * [Empfohlen](#empfohlen)
+  * [Installation und Konfiguration](#installation-und-konfiguration)
+    * [Programmierumgebungen](#programmierumgebungen)
+    * [Neo4J](#neo4j)
+    * [GPT4All](#gpt4all)
+      * [Remote Nutzung](#remote-nutzung)
+      * [Lokale Nutzung](#lokale-nutzung)
+  * [Nutzung](#nutzung)
+    * [Bauen](#bauen)
+    * [Programmparameter](#programmparameter)
+    * [Das erste Mal Starten](#das-erste-mal-starten)
+    * [Aggregation (Wissensmodell bearbeiten)](#aggregation-wissensmodell-bearbeiten)
+      * [Wissen aus einem Fragment (Text)](#wissen-aus-einem-fragment-text)
+        * [1. Fragmenteingabe und Konfiguration](#1-fragmenteingabe-und-konfiguration)
+        * [2. Extraktion von Termen](#2-extraktion-von-termen)
+        * [3. Extraktion und Bearbeiten von Definitionen](#3-extraktion-und-bearbeiten-von-definitionen)
+        * [4. Extraktion und Bearbeiten von Beispielen](#4-extraktion-und-bearbeiten-von-beispielen)
+        * [5. Extraktion und Bearbeiten von Code](#5-extraktion-und-bearbeiten-von-code)
+        * [6. Extraktion und Bearbeiten von Items (Fragen)](#6-extraktion-und-bearbeiten-von-items-fragen)
+        * [7. Integration ins Wissensmodell](#7-integration-ins-wissensmodell)
+      * [Einbinden von einzelnen Elementen](#einbinden-von-einzelnen-elementen)
+    * [Generation (Generierung von Material/Kursen)](#generation-generierung-von-materialkursen)
+      * [Wahl der Vorlage](#wahl-der-vorlage)
+      * [Wahl des Kurses](#wahl-des-kurses)
+      * [Generierung](#generierung)
+    * [Finalization (Bearbeiten und Export von Kursen)](#finalization-bearbeiten-und-export-von-kursen)
+      * [Bearbeiten](#bearbeiten)
+        * [Metadaten bearbeiten](#metadaten-bearbeiten)
+        * [Reihenfolge ändern](#reihenfolge-ändern)
+        * [Assign und Unassign](#assign-und-unassign)
+        * [Export eines Kurses](#export-eines-kurses)
+      * [Test-Export](#test-export)
+      * [Export-Übersicht](#export-übersicht)
+  * [Technische Details](#technische-details)
 <!-- TOC -->
 
 ## Über die Software
@@ -124,6 +125,7 @@ werden.
 Es gibt 2 Möglichkeiten, wie die Anwendung mit GPT4All arbeiten kann.
 Entweder *Remote* oder *Lokal*.
 Für beide Varianten sind einige Python-Packages notwendig. Diese sind
+
 ```bash
 argparse
 openai 0.28.1
@@ -177,6 +179,23 @@ Die Modelle können aber auch vorher heruntergeladen werden und in den Ordner hi
 
 Die Anwendung kann 3 Teile von MDTea bedienen. Das sind **Aggregation**, **Generation** und **Finalization**.
 
+### Bauen
+
+Am besten wird die Anwendung mit dem Maven-Wrapper gebaut.
+Dazu einfach im Root-Verzeichnis folgenden Befehl ausführen:
+
+```bash
+./mvnw clean package
+```
+
+Wenn es Fehler in den Tests gibt, kann auch der folgende Befehl genutzt werden:
+
+```bash
+./mvnw clean package -DskipTests
+```
+
+Die Anwendung wird dann im `target`-Ordner als `MDTea-Assessment-Aggregation-1.1.0-SNAPSHOT.jar` zu finden sein.
+
 ### Programmparameter
 
 Es gibt 3 Flags, die beim Start der Anwendung angegeben werden können.
@@ -186,7 +205,7 @@ Jedes Flag sollte mit bedacht gewählt werden und nur in Ausnahmen zum Einsatz k
 
 * `--init` - Baut die Neo4J-Datenbank mit minimaler Struktur auf
 * `--load` - Läd das Wissensmodell aus `src/main/resources/data/knowledge/knowledgedata.json` in die Datenbank
-* `--clean` - **löscht** die gesamte Neo4J-Datenbank!
+* `--CLEAN` - **löscht** die gesamte Neo4J-Datenbank!
 
 ### Das erste Mal Starten
 
@@ -210,19 +229,20 @@ In der Navigation sind folgende Punkte aufgelistet:
 ### Aggregation (Wissensmodell bearbeiten)
 
 Die Aggregation hat als zentrale Komponente das Wissensmodell.
-Die Anwendung bietet folgende Möglichkeiten:
+Die Anwendung bietet über die Navigation folgende Möglichkeiten:
 
-+ Ein Fragment analysieren und Wissen extrahieren. Hierfür ist GPT4All notwendig.
-+ Das Modell bearbeiten
-+ Neue (einzelne) Elemente hinzufügen
-+ Informationen/Statistik über das Modell
++ _Neues Wissen_ + _Ein Fragment dazu_ ➡ Ein Fragment analysieren und Wissen extrahieren. Hierfür ist GPT4All notwendig.
++ _Neues Wissenselement_ ➡ Neue (einzelne) Elemente hinzufügen
++ _Modell ansehen_ ➡ Struktur ansehen (Fehlerhaft)
++ _Statistik_ ➡ Das Modell bearbeiten + Informationen/Statistik über das Modell
+
+![Navigation für Aggregation](images/navigation-aggregation.png)
 
 #### Wissen aus einem Fragment (Text)
 
 Der Prototyp unterstützt zurzeit nur die Verarbeitung von Texten.
 Die Verarbeitung des Fragmentes geschieht in mehreren einzelnen Schritten.
-Um ein Fragment zu verarbeiten, muss der Nutzer auf den Button "Fragment hinzufügen" in der Navigation klicken.
-![Fragment hinzufügen](images/add-fragment.png)
+Um ein Fragment zu verarbeiten, muss der Nutzer auf den Button "Ein Fragment dazu" in der Navigation klicken.
 
 Danach müssen die folgenden Schritte durchgeführt werden:
 
@@ -258,7 +278,7 @@ Nach der Extraktion werden die Terme als Vorschlag in der GUI der Anwendung ange
 Hier kann der Nutzer nun die Terme bearbeiten und entscheiden welche Terme behalten werden sollen und welche nicht
 angenommen
 werden.
-Es ist aber auch möglich die Anaylse erneut zu starten.
+Es ist aber auch möglich die Analyse erneut zu starten.
 Hierfür kann auf den Button "Erneut Scannen" geklickt werden.
 ![Akzeptierte und vorgeschlagene Terme](images/acceptet-terms.png)
 In der Abbildung ist zu sehen wie auf der linken Seite die vorgeschlagenen und auf der rechten Seite die akzeptierten
@@ -275,8 +295,10 @@ Nur sind in diesem Fall die akzeptierten Terme entscheidend, welche Definitionen
 Die Definitionen können auch "außerhalb" des Fragmentes extrahiert werden.
 Je nach Modell kann es sein, das der vordefinierte Prompt nicht perfekt verarbeitet wird und die Definition für
 einen Term aus dem "Wissen des GPT-Modells" geholt wird.
+Die Abbildung zeigt, wie die Definitionen z.B. wie die Definition für den Term "Java" extrahiert wurde, obwohl im
+Fragment keine Definition für "Java" vorhanden war.
 ![Definitionen mit Wissen außerhalb des Fragmentes](images/definition-bad.png)
-Auch hier wird der Button "Anaylsieren" geklickt und die Definitionen werden extrahiert.
+Hier wird der Button "Definitionen Suchen" geklickt und die Definitionen werden extrahiert.
 Genau wie bei den Termen werden die Definitionen als Vorschlag angezeigt und können bearbeitet werden.
 Zusätzlich kann jeder Definition auch eine Vielzahl von Termen zugeordnet werden.
 Im Normalfall ist bereits der Term, welcher durch die Definition erklärt wird, zugeordnet.
@@ -294,8 +316,10 @@ Beispiel-Elemente für das Wissensmodell zu finden.
 Dementsprechend gibt es auch zwei Sektionen in der GUI.
 Die erste ist genauso wie schon bei den Definitionen, eine Auflistung von Vorschlägen und akzeptierten Beispielen.
 ![Beispiele](images/examples.png)
+
 Darunter befindet sich eine Sektion, in der die Relationen zwischen den Elementen angezeigt werden.
 ![Beispiele und Relationen](images/examples-relations.png)
+
 Es kann sein, dass durch den Prozess auch neue Terme gefunden werden.
 Diese werden automatisch in die Liste der akzeptierten Terme eingefügt.
 
@@ -324,38 +348,46 @@ angenommen.
 Zudem kann der Nutzer selbst eigene Fragen hinzufügen.
 ![Hinzufügen von Fragen](images/item-add.png)
 Die Maske ist identisch, wenn eine Frage direkt in das Modell eingefügt werden sollte.
+In diesem Fall ist es eine Single-Choice-Frage.
 (siehe [Einbinden von einzelnen Elementen](#einbinden-von-einzelnen-elementen))
 
 ##### 7. Integration ins Wissensmodell
 
 Das ist der letzte Schritt, der das Wissen in das Wissensmodell integriert.
+
 ![Integration des neuen Wissens](images/integration.png)
+
 Durch das Klicken auf den Button "Integrieren" wird das Wissen in das Wissensmodell integriert.
 Nach Abschluss wird man automatisch zur Übersicht des Modells weitergeleitet.
-![Übersicht der Wissensmodells nach integration](images/integration-uebersicht.png)
+![Übersicht der Wissensmodells nach integration](images/integration-overview.png)
+Links ist zu sehen wie die Statistik des Modells vor der Integration aussah und rechts danach.
+
 In der Konsole kann ein Log gefunden werden, welches eine kurze Übersicht über die integrierten Elemente gibt.
-![Log der Integration in der Konsole](images/integation-konsole.png)
+![Log der Integration in der Konsole](images/integration-console.png)
+
 Nun kann das Wissen in der Generation-Phase genutzt werden.
 
 #### Einbinden von einzelnen Elementen
 
 Wenn nur ein einzelnes Element hinzugefügt werden soll, kann das einfach über eine Maske gemacht werden.
 Hierzu geht man in der Navigation auf den Unterpunkt "einzelnes Element hinzufügen" im Bereich
-Aggregation. ![Einzelnes Element hinzufügen](images/add-single-element.png)
+Aggregation. 
 Auf der auftauchenden Seite ist zunächst nur ein Dropdown-Menü zu sehen.
 Durch Anklicken des gewünschten Types wird automatisch darunter ein Formular angezeigt, in dem die entsprechenden
 Daten eingetragen werden können.
+![Einzelnes Element hinzufügen](images/add-single-element.png)
 Nicht jeder Typ wird unterstützt.
 Jedes Element hat dabei eine eigene Maske, die spezifisch für das Element ist.
 Folgende Tabelle zeigt die Elemente und die entsprechenden Felder (Ohne Items):
 
-| **Term**    | **Definition** | **Code** | **Text** | **Bild** |
-|-------------|----------------|----------|----------|----------|
-| Struktur-Id |
-| Term-Name   | Definition     | Headline | Headline | Headline |
-|             |                | Code     |          | File     |
-|             |                | Sprache  |          |          |
-|             |                |          |          |          |
+| **Term**     | **Definition** | **Fact**     | **Code**     | **Text**     | **Bild**     |
+|--------------|----------------|--------------|--------------|--------------|--------------|
+| Struktur-Id  | Struktur-Id    | Struktur-Id  | Struktur-Id  | Struktur-Id  | Struktur-Id  |
+| Id-Vorschlag | Id-Vorschlag   | Id-Vorschlag | Id-Vorschlag | Id-Vorschlag | Id-Vorschlag |
+| Term-Name    | Definition     | Text-Fact    | Headline     | Headline     | Headline     |
+| Id-Vorschlag |                |              | Code         |              | File         |
+|              |                |              | Sprache      |              |              |
+|              |                |              |              |              |              |
 
 Es gibt einen Typ bei Wissenselementen, der Aufgaben, Fragen und ähnliches zusammenfasst.
 Dieser Typ ist "Item".
@@ -374,6 +406,7 @@ Folgende Felder können bei Items angezeigt werden:
 
 Die Felder mit einem * sind mehrfach vorhanden und durch einen Klick auf einen Button können weitere Felder
 hinzugefügt werden.
+
 ![Beispiel der Maske für Fill Out Blanks Frage](images/add-fill-out.png)
 
 ### Generation (Generierung von Material/Kursen)
@@ -381,8 +414,11 @@ hinzugefügt werden.
 Die Generation ist die zweite Phase von MDTea.
 Hier wird das Wissen aus dem Wissensmodell genutzt, um Materialien zu generieren.
 In dem Prototypen werden mit dem Wissen aus dem Wissensmodell, einem Kursplan und einer Vorlage Kurse generiert.
+Sie ist entweder über den Pfad "/generator" oder über die Navigation über den Punkt "Generieren" erreichbar.
 
 #### Wahl der Vorlage
+
+Zuerst muss eine Vorlage ausgewählt werden.
 
 ![Wahl der Vorlage](images/choose-template.png)
 In der Abbildung ist zu sehen, wie eine Vorlage ausgewählt wird.
@@ -394,19 +430,23 @@ Zurzeit sind nur die 2 Vorlagen *blank* und *color* verfügbar.
 Nach der Wahl der Vorlage muss ein Kursplan ausgewählt werden.
 Hier kann entweder ein bereits existierender Kurplan ausgewählt werden oder ein neuer Kursplan hochgeladen in Form
 einer JSON-Datei hochgeladen werden.
-Danach wird der Inhalt des Kursplanes angezeigt. ![Kursplan](images/courseplan.png)
-Mit einem Klick auf den Button "Generieren" wird der Kurs generiert.
+![Wahl des Kursplanes](images/choose-courseplan.png)
+Danach wird der Inhalt des Kursplanes angezeigt. ![Kursplan Ausschnitt](images/courseplan.png)
+Mit einem Klick auf den Button "Generieren" am Ende des Kursplans, wird der Kurs generiert.
 
 #### Generierung
 
 Nachdem der Kurs generiert wurde, wird der Nutzer auf eine neue Seite weitergeleitet.
-Hier wird der initiale Kurs angezeigt. ![Kurs](images/course.png)
+Hier wird der initiale Kurs angezeigt.
+![Kurs](images/course.png)
 Ab hier beginnt die Finalization-Phase. Für weitere Informationen siehe
 [Finalization - Bearbeiten](#bearbeiten).
 
 ### Finalization (Bearbeiten und Export von Kursen)
 
-Die Finalization ist die dritte Phase von MDTea. Hier wird der Kurs bearbeitet und exportiert.
+Die Finalization ist die dritte Phase von MDTea.
+Hier wird der Kurs bearbeitet und exportiert.
+Erreicht werden kann die Finalization über die Navigation "Bearbeiten" oder über den Pfad "/edit".
 Es kann entweder über die Navigation oder über die Generierung auf die entsprechende Funktion zugegriffen werden.
 
 #### Bearbeiten
@@ -482,8 +522,9 @@ Alle Meta-Attribute werden erst gespeichert, wenn der Button "Speichern" geklick
 
 Alle Elemente können auf der entsprechenden Ebene bzw. in der Sammlung, in der sie sich befinden, ihre Reihenfolge
 ändern.
-Dazu hat jedes Element in der Struktur zwei Buttons. Einen nach oben und einen nach unten. Durch das Klicken auf
-einen der beiden Buttons wird das Element eine Position nach oben oder unten verschoben.
+Dazu hat jedes Element in der Struktur zwei Buttons.
+Einen nach oben und einen nach unten.
+Durch das Klicken auf einen der beiden Buttons wird das Element eine Position nach oben oder unten verschoben.
 ![Änderung der Reihenfolge](images/change-order.png)
 
 ##### Assign und Unassign
@@ -499,7 +540,8 @@ geklickt werden.
 Ein Test kann nicht einem Task zugewiesen werden.
 Tests können nur in Gruppen eingefügt werden.
 Auch wenn in den Vorschlägen Kapitel auftauchen, so wird bei der Zuweisung nichts passieren.
-![Ein nicht zugewiesener Test](images/assign-test.png)
+
+![Ein nicht zugewiesener Test](images/unassign.png)
 
 ##### Export eines Kurses
 
@@ -515,26 +557,29 @@ Die Werte sind in absteigender Reihenfolge:
 * Informational - Material ist nur informativ (kann leer sein)
 * irgendwas - Material ist nicht relevant (kann leer sein)
 
-![](images/relevanz.png)
-In der Abbildung ist zu sehen, wie die Relevanz eines Tasks bearbeitet wird und dadurch ein Kurs gültig wird und
-exportiert werden kann.
+![](images/relevance.png)
+In der Abbildung ist zu sehen, wie die Relevanz eines Tasks bearbeitet wird.
 
 #### Test-Export
 
 Jeder Test kann separat heruntergeladen werden.
 Dafür muss lediglich aud dem Button mit dem Download-Symbol geklickt werden.
-Das Format ist dabei immer das OPAL-Format (OpenOlat).
-![](images/test-export.png)
+Das Format ist dabei immer das Format für OPAL (OpenOlat bzw. QTI).
+
+![Export von einem Test](images/test-in-course.png)
 
 #### Export-Übersicht
 
 ![Export](images/export.png)
+
 In der Abbildung ist zu sehen, welche Kurse exportiert werden können.
-Durch den Klick auf den Button "Exportieren" wird der Kurs exportiert und kann heruntergeladen werden.
+Durch den Klick auf einen der Buttons wird der Kurs in dem entsprechenden Format exportiert und kann heruntergeladen
+werden.
 Es wird eine ZIP-Datei heruntergeladen.
 Je nach gewähltem Export-Format kann die ZIP-Datei unterschiedlich aufgebaut sein.
 Bei der Wahl von "HTML" wird der Kurs als eine Menge von HTML-Dateien exportiert, die in Ordnern strukturiert sind.
 Bei der Wahl von "OPAL" wird der Kurs als eine ZIP-Datei exportiert, die in OPAL importiert werden kann.
+PDF-Export ist noch **nicht vorhanden**.
 
 Alternativ kann das auch in der Bearbeitungsansicht des Kurses gemacht werden.
 Siehe dazu [Bearbeiten](#bearbeiten).

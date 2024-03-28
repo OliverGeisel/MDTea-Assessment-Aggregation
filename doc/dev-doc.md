@@ -90,6 +90,24 @@ Zudem gibt es noch ein Package `core`, welches von den anderen Packages benutzt 
 Es enthält unter anderem die Klassen für die Struktur des Kurses und einen Kursplan.
 Dieses Package ist aber veraltet und sollte in die anderen Packages überführt werden.
 
+Wichtig ist der Aufbau eines Kurses.
+Die Struktur eines Kurses ist allgemein wie folgt aufgebaut:
+
+* Kurs
+  * Kapitel 1
+    * Gruppe 1
+      * Task 1
+        * Material 1-1
+        * Material 1-2
+      * Task 2
+        * Material 2-1
+      * Komplexes Material (Test)
+    * Gruppe 2
+      * Task 1
+        * Material 1-1
+  * Kapitel 2
+  * ...
+
 #### Aggregation
 
 Die Abbildung zeigt die Packages des Aggregations-Teils.
