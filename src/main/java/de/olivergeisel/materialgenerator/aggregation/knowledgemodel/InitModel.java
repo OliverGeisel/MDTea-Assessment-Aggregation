@@ -6,6 +6,7 @@ import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relati
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.RelationRepository;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.*;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.old_version.KnowledgeModelLoader;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -28,6 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @Component
 @Order(2) // Run after cleaning the database
+@Transactional
 public class InitModel implements CommandLineRunner {
 
 	private static final Logger logger = LoggerFactory.getLogger(InitModel.class);
@@ -72,6 +74,7 @@ public class InitModel implements CommandLineRunner {
 			relationRepository.saveAll(relations);
 			// Structure
 			var rootOfNewModel = model.getRoot();
+			logger.info(STR."Root of new model: \{rootOfNewModel.getName()}");
 			// replace root with a fragment
 			var rootFragment = new KnowledgeFragment(rootOfNewModel.getName());
 			for (var child : rootOfNewModel.getChildren()) {
@@ -80,22 +83,31 @@ public class InitModel implements CommandLineRunner {
 			AtomicReference<KnowledgeObject> rootToSave = new AtomicReference<>(rootFragment);
 			var fragmentInModel = structureRepository.findById(rootFragment.getName());
 			fragmentInModel.ifPresentOrElse(it -> {
-				if (it instanceof RootStructureElement root) {
+				if (it instanceof RootStructureElement root) { // root is a fragment
 					for (var child : rootOfNewModel.getChildren()) {
 						root.addObject(child);
 					}
-				} else if (it instanceof KnowledgeFragment fragment) {
+				} else if (it instanceof KnowledgeFragment fragment) { // root of new model exists as fragment
+					logger.info("Root of new model exists as fragment. Add children to it");
 					for (var child : rootOfNewModel.getChildren()) {
 						fragment.addObject(child);
 					}
-				} else {
+				} else { // root of new model exists as leaf -> replace it with a fragment
+					logger.info("Root of new model is a leaf. Replace with fragment");
 					knowledgeModelService.leafToNode(it.getName());
+					var newLeaf = (KnowledgeFragment) structureRepository.findById(it.getName()).get();
+					for (var child : rootOfNewModel.getChildren()) {
+						newLeaf.addObject(child);
+					}
+					rootToSave.set(newLeaf);
+					return;
 				}
 				rootToSave.set(it);
-			}, () -> {
+			}, () -> { // root of new model does not exist in the database -> append it
+				logger.info("new root not in model. Append to root");
 				var correctRoot = knowledgeModelService.getRoot();
 				correctRoot.addObject(rootFragment);
-				structureRepository.save(correctRoot);
+				rootToSave.set(correctRoot);
 			});
 			saveStructure(rootToSave.get());
 			logger.info("Model from json loaded");

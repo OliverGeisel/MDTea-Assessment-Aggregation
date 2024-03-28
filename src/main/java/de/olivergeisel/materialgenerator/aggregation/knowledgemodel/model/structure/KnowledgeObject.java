@@ -76,9 +76,8 @@ public abstract class KnowledgeObject {
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (!(o instanceof KnowledgeObject that)) return false;
-
-		if (Objects.equals(id, that.id) && id != null) return true;
-		return linkedElements.equals(that.linkedElements);
+		if(id == null && that.id==null) return linkedElements.equals(that.linkedElements);
+		return Objects.equals(id, that.id);
 	}
 
 	@Override

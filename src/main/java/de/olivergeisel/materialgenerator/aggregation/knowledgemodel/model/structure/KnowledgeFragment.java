@@ -73,6 +73,12 @@ public class KnowledgeFragment extends KnowledgeObject {
 		throw new NoSuchElementException(STR."No element with id \{id} found");
 	}
 
+	/**
+	 * Adds the given object to the children of this object.
+	 * If the object is null, this object or already a child of this object, nothing happens.
+	 * @param object the object to add
+	 * @return whether the object was added
+	 */
 	public boolean addObject(KnowledgeObject object) {
 		if (object == null || this == object || children.contains(object)) {
 			return false;
@@ -80,6 +86,12 @@ public class KnowledgeFragment extends KnowledgeObject {
 		return children.add(object);
 	}
 
+	/**
+	 * Checks if the given object is a child of this object. This is done recursively.
+	 * So it also checks if the object exists anywhere in the children of the children.
+	 * @param object the object to check
+	 * @return whether the object is a child of this object
+	 */
 	public boolean contains(KnowledgeObject object) {
 		if (object == null) {
 			return false;
