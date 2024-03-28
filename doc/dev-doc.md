@@ -46,11 +46,20 @@ Die dabei entstandene Zip kann dann in OPAL importiert werden.
 <hr>
 
 ## 2. Architektur
+Das gesamte System ist in dem gesamten Kontext mit dem C4-Modell beschrieben.
+![](images/system-overview-c4.svg)
+
+Ein Nutzer benutzt den Prototypen für die Generierung von Materialien/Kursen und die Aggregation von Wissen.
+Zudem wird für die Aggregation das GPT4All-Backend benutzt.
+Ein Kurs kann dann exportiert werden und in OPAL importiert werden.
+
 
 Dieser Prototyp benötigt für die vollständige Funktionalität drei Komponenten: Die compilierte **MDTea-Software**, ein
 **GPT4All-Backend** und eine **Neo4j-Datenbank**.
 Die folgende Abbildung zeigt die Architektur des Systems.
-![Das MDTea System](images/system-overview-c4.png)
+
+![Das MDTea System](images/container-c4.svg)
+
 Die H2-Datenbank wird automatisch beim Start der MDTea-Software erstellt.
 <span style="color:darkred">**Achtung:**</span> Die Datenbank wird bei jedem Start der MDTea-Software neu erstellt.
 Das bedeutet, dass alle Daten verloren gehen.
@@ -78,7 +87,8 @@ Es werden zu viele Anfragen gestellt, die nicht effizient sind.
 
 ### Backend
 
-![C4 Ansicht zum Backend](images/backend-c4.png)
+![C4 Ansicht zum Backend](images/backend-c4.svg)
+
 Das Bild zeigt die grobe Architektur des Backends.
 Es gibt 3 Hauptkomponenten:
 
@@ -90,28 +100,15 @@ Zudem gibt es noch ein Package `core`, welches von den anderen Packages benutzt 
 Es enthält unter anderem die Klassen für die Struktur des Kurses und einen Kursplan.
 Dieses Package ist aber veraltet und sollte in die anderen Packages überführt werden.
 
-Wichtig ist der Aufbau eines Kurses.
-Die Struktur eines Kurses ist allgemein wie folgt aufgebaut:
+Alle Packges des Backends sind hier abgebildet.
 
-* Kurs
-  * Kapitel 1
-    * Gruppe 1
-      * Task 1
-        * Material 1-1
-        * Material 1-2
-      * Task 2
-        * Material 2-1
-      * Komplexes Material (Test)
-    * Gruppe 2
-      * Task 1
-        * Material 1-1
-  * Kapitel 2
-  * ...
+![C4 Ansicht zum Backend](images/Package-diagram.svg)
 
 #### Aggregation
 
 Die Abbildung zeigt die Packages des Aggregations-Teils.
-![Ansicht zum Aggregations-Teil](images/aggregation-packages.png)
+
+![Ansicht zum Aggregations-Teil](images/aggregation-packages.svg)
 
 Dieses besteht aus den Teilen:
 
@@ -128,21 +125,29 @@ Es enthält alle Klassen, die für das Wissensmodell benötigt werden.
 Hier sind alle Klassen enthalten, die für das Wissensmodell benötigt werden.
 Alle Klassen des Wissensmodells haben eine `@Node`-Annotation.
 Damit sind sie in der Neo4j-Datenbank speicherbar.
-Es gibt noch ein `old_version`-Package, dies enthält die Version des Wissensmodells, welche mit jGraphT umgesetzt
+Es gibt noch ein `old_version`-Package, dies enthält die Version des Wissensmodells, welche mit jGrapht umgesetzt
 wurde.
 Diese hält das gesamte Wissensmodell in einem Objekt im Speicher.
 Das Modell kann noch gut für das Laden von Wissensmodellen in Form von json-Dateien benutzt werden.
 Ansonsten sollte aber das neue Modell mit dem Zugriff auf die Datenbank benutzt werden.
 
 `extraction` ist für die Extraktion des Wissens aus einem Textfragment zuständig.
+Hier wird auch der Zugriff auf das GPT4All-Backend gemacht. 
+Dazu wird das python-Modul `gpt-connection` benutzt.
+Zentral arbeiten dabei die Klassen PromptRequest und PromptResponse.
+Diese bilden zusammen eine Anfrage an das GPT4All-Backend und die Antwort darauf ab.
+Die Antwort wird dann an einen Extractor weitergegeben.
+Dieser erstellt Vorschläge für Wissenselemente.
 
-`source` ist für die Quellen des Wissens zuständig. Dieses Package ist noch nicht vollständig implementiert und wird
-auch nicht wirklich benutzt.
+`source` ist für die Quellen des Wissens zuständig. 
+Dieses Package ist noch nicht vollständig implementiert und wird auch nicht wirklich benutzt.
 
 #### Generation
 
 Die Abbildung zeigt die Packages des Generations-Teils.
-![Ansicht zum Generations-Teil](images/generation-packages.png)
+
+![Ansicht zum Generations-Teil](images/generation-packages.svg)
+
 Es gibt 4 Packages:
 
 1. configuration
@@ -157,7 +162,9 @@ Es sind aber auch die entsprechenden Klassen für das Parsen der Konfigurationen
 In `generator` sind die namensgebenden Generatoren.
 Das sind die Klassen, die die Materialien generieren.
 Die Abbildung zeigt das Klassendiagramm für das Package.
-![Klassendiagramm für das generator Package](images/generator-class-diagram.png)
+
+![Klassendiagramm für das generator Package](images/generator-class-diagram.svg)
+
 Neben den _großen_ Generatoren gibt es noch Subgeneratoren.
 Diese generieren nur ein bestimmtes Material.
 Diese lassen sich entweder in ein Extractor oder Assembler zuordnen.
@@ -187,15 +194,36 @@ Dies können z.B. HTML-Vorlagen sein, die von Thymeleaf in die HTML-Datei eingeb
 
 In der Finalization werden zum einen die Materialien aus der Generation zu einem Kurs zusammengefasst.
 Dafür sind die packages material_assign und parts zuständig (siehe Abbildung).
-![Ansicht zum Finalization Package](images/finalization-packages.png)
+
+![Ansicht zum Finalization Package](images/finalization-packages.svg)
+
 Folgende Packages sind enthalten;
 
-1. structure
+1. parts
 2. material_assign
 3. export
 
-`strcture` ist dabei die Repräsentation des Kurses. Hier sind alle Klassen enthalten, die einen Rohkurs (RawCourse)
-zusammenbauen.
+Wichtig ist der Aufbau eines Kurses.
+Die Struktur eines Kurses ist allgemein wie folgt aufgebaut:
+
+* Kurs
+  * Kapitel 1
+    * Gruppe 1
+      * Task 1
+        * Material 1-1
+        * Material 1-2
+      * Task 2
+        * Material 2-1
+      * Komplexes Material (Test)
+    * Gruppe 2
+      * Task 1
+        * Material 1-1
+  * Kapitel 2
+  * ...
+
+
+`parts` ist dabei die Repräsentation des Kurses. 
+Hier sind alle Klassen enthalten, die einen Rohkurs (RawCourse) zusammenbauen.
 Besonders ist dabei, dass alle Klassen aus den `core/courseplan`-Package überführbar sind.
 Also fast jede Klasse besitzt einen Konstruktor, der aus der entsprechenden Klasse aus dem `core/courseplan`-Package
 erstellt werden kann.
@@ -330,7 +358,7 @@ Es kann daher auch sein, dass die Probleme, die hier beschrieben sind, nicht meh
 
 ### Webanwendung
 
-* Stackoverflow bei anfrage der Elemente der Struktur -> in `/knowledge-model` kommt es vermehrt zu einem Stackoverflow.
+* Stackoverflow bei Anfrage der Elemente der Struktur -> in `/knowledge-model` kommt es vermehrt zu einem Stackoverflow.
   Das liegt an der Verlinkung der Wissenselemente. Durch die Anfrage, die Elemente der Struktur zu laden, kann es sein,
   dass die Elemente zu sehr verlinkt sind und dadurch ein Stackoverflow entsteht.
 * Lange Ladezeiten -> Die Anwendung ist nicht für den produktiven Einsatz gedacht. Es kann sein, dass die Anwendung
