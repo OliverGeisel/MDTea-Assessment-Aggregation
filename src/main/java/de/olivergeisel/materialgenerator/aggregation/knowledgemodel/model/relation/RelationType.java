@@ -1,8 +1,10 @@
 package de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation;
 
+import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
+
 /**
  * Relation types between two
- * {@link de.olivergeisel.materialgenerator.core.knowledge.metamodel.element.KnowledgeElement KnowledgeElements}
+ * {@link  KnowledgeElement}s
  *
  * @author Oliver Geisel
  * @version 1.1
@@ -11,7 +13,7 @@ package de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relat
 public enum RelationType {
 	/**
 	 * A synonym relation between two
-	 * {@link de.olivergeisel.materialgenerator.core.knowledge.metamodel.element.KnowledgeElement KnowledgeElements}
+	 * {@link KnowledgeElement}s
 	 */
 	RELATED,
 	IS,

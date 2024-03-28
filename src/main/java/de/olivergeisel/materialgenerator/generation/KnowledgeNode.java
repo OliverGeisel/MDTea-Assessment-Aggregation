@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * Contains all Knowledge from a {@link KnowledgeModel}, that is related to a specific topic in the structure. This
  * is the {@link KnowledgeObject} where the {@link KnowledgeElement}s are linked to.
  * Each Node has a main {@link KnowledgeElement}. It should be a {@link Term}.
- * Furthermore it contains a list of related {@link KnowledgeElement}s and the {@link Relation}s between them. The
+ * Furthermore, it contains a list of related {@link KnowledgeElement}s and the {@link Relation}s between them. The
  * related {@link KnowledgeElement}s are the ones that have a Relation with one of to linked {@link KnowledgeElement}s.
  * <br>
  * Normally a KnowledgeNode is used to find {@link Material} for a {@link Course}. So it can contain a {@link ContentGoal}
