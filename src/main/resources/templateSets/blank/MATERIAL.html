@@ -34,7 +34,7 @@
 </nav>
 <main>
     <section>
-        <div th:replace="~{${material.abstractTemplateCategory.abstractTemplateCategory.type} :: content}"></div>
+        <div th:replace="~{${material.templateType.type} :: content}"></div>
     </section>
     <section id="task-navigation">
         <a th:href="${navigation.previousMaterial}+'.html'" th:if="${navigation.hasPrevious}">
