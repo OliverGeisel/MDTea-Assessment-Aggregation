@@ -101,38 +101,45 @@ public class GeneratorController {
 
 	@PostMapping("overview")
 	public String overviewGeneration(@RequestParam MultipartFile plan, @RequestParam String curriculum,
-			@RequestParam String template, Model model)
+			@RequestParam String template, Model model, RedirectAttributes redirectAttributes)
 			throws FileNotFoundException, WrongFileTypeException, IncompleteJSONException {
 		String planName;
-		if (curriculum.isBlank() || curriculum.equals(UPLOAD)) {
+		try {
+			if (curriculum.isBlank() || curriculum.equals(UPLOAD)) {
+				CoursePlanParser parser = new CoursePlanParser();
+				if (plan == null || plan.isEmpty()) {
+					throw new IllegalArgumentException("No plan uploaded");
+				}
+				var planType = plan.getContentType();
+				if (planType == null || !planType.equals("application/json")) {
+					throw new WrongFileTypeException(
+							String.format("Wrong file type. Must be application/json. But was %s",
+									plan.getContentType()));
+				}
+				try {
+					parser.parseFromFile(plan.getInputStream());
+				} catch (IOException | CoursePlanParserException e) {
+					throw new IncompleteJSONException(e);
+				}
+				storageService.store(plan);
+				planName = plan.getOriginalFilename();
+				storageService.store(plan);
+			} else {
+				planName = storageService.load(curriculum).getFileName().toString();
+			}
+			model.addAttribute("plan", planName);
+			model.addAttribute("template", template);
 			CoursePlanParser parser = new CoursePlanParser();
-			if (plan == null || plan.isEmpty()) {
-				throw new IllegalArgumentException("No plan uploaded");
-			}
-			var planType = plan.getContentType();
-			if (planType == null || !planType.equals("application/json")) {
-				throw new WrongFileTypeException(
-						String.format("Wrong file type. Must be application/json. But was %s", plan.getContentType()));
-			}
-			try {
-				parser.parseFromFile(plan.getInputStream());
-			} catch (IOException | CoursePlanParserException e) {
-				throw new IncompleteJSONException(e);
-			}
-			storageService.store(plan);
-			planName = plan.getOriginalFilename();
-			storageService.store(plan);
-		} else {
-			planName = storageService.load(curriculum).getFileName().toString();
+			var completePlan = parser.parseFromFile(storageService.load(planName).toFile());
+			model.addAttribute("structure", completePlan.getStructure());
+			model.addAttribute("meta", completePlan.getMetadata());
+			model.addAttribute("testConfiguration", completePlan.getTestConfiguration());
+			return PATH + "overview-all";
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("error", STR."Error: \{e.getMessage()}");
+			return STR."redirect:/generator/plan-selection?template=\{template}";
 		}
-		model.addAttribute("plan", planName);
-		model.addAttribute("template", template);
-		CoursePlanParser parser = new CoursePlanParser();
-		var completePlan = parser.parseFromFile(storageService.load(planName).toFile());
-		model.addAttribute("structure", completePlan.getStructure());
-		model.addAttribute("meta", completePlan.getMetadata());
-		model.addAttribute("testConfiguration", completePlan.getTestConfiguration());
-		return PATH + "overview-all";
+
 	}
 
 	@GetMapping("tests/generate")

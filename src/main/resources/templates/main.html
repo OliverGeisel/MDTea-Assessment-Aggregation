@@ -64,6 +64,16 @@
     </div>
 </nav>
 
+<section th:fragment="message-and-error">
+    <div th:if="${message}">
+        <div class="alert alert-success alert-dismissible fade show mb-0" role="alert" th:text="${message}">
+        </div>
+    </div>
+    <div th:if="${error}">
+                <div class="alert alert-danger alert-dismissible fade show mb-0" role="alert" th:text="${error}"></div>
+    </div>
+</section>
+
 <div th:fragment="aggregationProgress">
     <div class="progress shadow bg-primary-light" th:if="${process}">
         <div class="progress-bar bg-success-light" role="progressbar"
