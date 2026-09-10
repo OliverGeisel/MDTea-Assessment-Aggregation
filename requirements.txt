@@ -1,0 +1,3 @@
+openai == 0.28.1
+gpt4all ~= 2.8.0
+requests
