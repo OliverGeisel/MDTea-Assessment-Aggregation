@@ -7,14 +7,19 @@ import de.olivergeisel.materialgenerator.generation.configuration.TestConfigurat
 import de.olivergeisel.materialgenerator.generation.configuration.TestPer;
 import de.olivergeisel.materialgenerator.generation.configuration.TrueFalseConfiguration;
 import de.olivergeisel.materialgenerator.generation.material.assessment.TestMaterial;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.neo4j.AutoConfigureDataNeo4j;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.data.neo4j.test.autoconfigure.AutoConfigureDataNeo4j;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.neo4j.Neo4jContainer;
 
 import java.util.List;
 import java.util.Map;
@@ -25,22 +30,35 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @AutoConfigureDataNeo4j
+@Testcontainers
 @Tag("Integration")
 class MaterialRepositoryTest {
 
-	@MockBean
+
+	@Container
+	static Neo4jContainer neo4jContainer = new Neo4jContainer("neo4j:2026-community");
+
+	@MockitoBean
 	ImageService imageService;
 	@Autowired
 	private MaterialRepository       materialRepository;
-	@Autowired
-	private TestEntityManager        entityManager;
-	@MockBean
+	@MockitoBean
 	private StorageProperties        storageProperties;
-	@MockBean
+	@MockitoBean
 	private FileSystemStorageService fileSystemStorageService;
+
+	@DynamicPropertySource
+	static void neo4jProperties(DynamicPropertyRegistry registry) {
+		registry.add("spring.neo4j.uri", neo4jContainer::getBoltUrl);
+		registry.add(
+				"spring.neo4j.authentication.password",
+				neo4jContainer::getAdminPassword
+		);
+	}
 
 	@BeforeEach
 	void setUp() {
+
 	}
 
 	@Test
