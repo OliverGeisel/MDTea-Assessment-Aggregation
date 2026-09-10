@@ -1,10 +1,11 @@
 package de.olivergeisel.materialgenerator;
 
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 
 /**
@@ -12,14 +13,15 @@ import org.springframework.context.annotation.PropertySource;
  * Set the upload location for a {@link CoursePlan} and the location for images.
  *
  * @author Oliver Geisel
- * @version 1.1.0
+ * @version 1.2.0
  * @see CoursePlan
  * @since 0.2.0
  */
+@Getter
+@Setter
 @Configuration
 @PropertySource("classpath:/application.properties")
 @ConfigurationProperties("application")
-@Primary
 public class StorageProperties {
 
 	/**
@@ -29,23 +31,4 @@ public class StorageProperties {
 	private String uploadLocation = "upload-dir";
 	@Value("${application.images:images}")
 	private String imageLocation  = "";
-
-	//region setter/getter
-	public String getImageLocation() {
-		return imageLocation;
-	}
-
-	public void setImageLocation(String imageLocation) {
-		this.imageLocation = imageLocation;
-	}
-
-	public String getUploadLocation() {
-		return uploadLocation;
-	}
-
-	public void setUploadLocation(String uploadLocation) {
-		this.uploadLocation = uploadLocation;
-	}
-//endregion
-
 }

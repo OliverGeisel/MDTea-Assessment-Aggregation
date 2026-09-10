@@ -173,7 +173,7 @@ public class CoursePlanParser {
 		String topicName = chapterJSON.get(STRUCTURE_TOPIC) != null ? chapterJSON.get(STRUCTURE_TOPIC).toString() : "";
 		var topic = findTopic(topicName);
 		var back = new StructureChapter(topic, name, Double.parseDouble(weight), alternatives);
-		topic.getAliases().addAliases(back.getName(), alternatives);
+		topic.addAlias(back.getName(), alternatives);
 		for (var group : groups) {
 			try {
 				back.add(createGroup(group));
@@ -198,7 +198,7 @@ public class CoursePlanParser {
 		var topic = findTopic(topicName);
 		var alternatives = crateAlias(name, ((List<String>) groupJSON.get(ALTERNATIVES)));
 		var back = new StructureGroup(topic, Relevance.TO_SET, name, alternatives);
-		topic.getAliases().addAliases(back.getName(), alternatives);
+		topic.addAlias(back.getName(), alternatives);
 		List<Map<String, ?>> tasks = (List<Map<String, ?>>) groupJSON.get(STRUCTURE_TASKS);
 		for (var task : tasks) {
 			// Todo decide between sub-group and task!
@@ -231,7 +231,7 @@ public class CoursePlanParser {
 			throw new CoursePlanParserException(String.format("Could not parse task %s", name), e);
 		}
 		var back = new StructureTask(topic, relevance, name, alternatives);
-		topic.getAliases().addAliases(back.getName(), alternatives);
+		topic.addAlias(back.getName(), alternatives);
 		return back;
 	}
 

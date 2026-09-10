@@ -9,7 +9,14 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
-
+/**
+ * Initializes the {@link TemplateSet}s from the `resources` folder.
+ * It is used to load the template sets into the database on startup.
+ *
+ * @author Oliver Geisel
+ * @version 1.0.0
+ * @since 1.0.0
+ */
 @Component
 public class TemplateSetInitializer implements CommandLineRunner {
 
@@ -30,7 +37,7 @@ public class TemplateSetInitializer implements CommandLineRunner {
 			throw new IllegalArgumentException("Template path not found");
 		}
 		templatePath = new File(baseURI.toURI());
-		for (File file : templatePath.listFiles()) {
+		for (File file : Objects.requireNonNull(templatePath.listFiles())) {
 			if (file.isDirectory()) {
 				var tempSet = new TemplateSet(file.getName());
 				tempSet.addAllTemplates(getExtraTemplates(file));

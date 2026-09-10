@@ -2,6 +2,7 @@ package de.olivergeisel.materialgenerator;
 
 import de.olivergeisel.materialgenerator.generation.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,8 @@ public class FileSystemStorageService implements StorageService {
 	private final Path rootLocation;
 
 	@Autowired
-	public FileSystemStorageService(StorageProperties properties) {
+	public FileSystemStorageService(
+			@Qualifier("storageProperties") StorageProperties properties) {
 		this.rootLocation = Paths.get(properties.getUploadLocation());
 	}
 

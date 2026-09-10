@@ -2,6 +2,7 @@ package de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.eleme
 
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.relation.Relation;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeObject;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
@@ -25,12 +26,15 @@ import java.util.*;
 @Node
 public abstract class KnowledgeElement {
 
+	@Relationship
+	private final Set<Relation> relations = new HashSet<>();
+
 	/**
 	 * The id of the structure point this element belongs to.
 	 */
 	protected String        structureId;
-	@Relationship
-	private   Set<Relation> relations = new HashSet<>();
+	@Version
+	protected Long          version;
 	/**
 	 * The id of the element in the knowledge base.
 	 */
@@ -121,6 +125,8 @@ public abstract class KnowledgeElement {
 		}
 		this.id = id;
 	}
+
+	//region setter/getter
 	public String getStructureId() {
 		return structureId;
 	}
@@ -149,8 +155,6 @@ public abstract class KnowledgeElement {
 	public String getId() {
 		return id;
 	}
-
-	//region setter/getter
 
 	public KnowledgeType getType() {
 		return type;

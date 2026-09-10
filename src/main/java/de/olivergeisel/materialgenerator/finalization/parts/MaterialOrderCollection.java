@@ -30,11 +30,11 @@ import java.util.*;
 public abstract class MaterialOrderCollection extends MaterialOrderPart implements Iterable<MaterialOrderPart> {
 
 	@ElementCollection
-	private List<String>          alias            = new ArrayList<>(); // KnowledgeObject (Structure) ids
+	private final List<String>          alias            = new ArrayList<>(); // KnowledgeObject (Structure) ids
 	@ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-	private List<ComplexMaterial> complexMaterials = new ArrayList<>();
+	private final List<ComplexMaterial> complexMaterials = new ArrayList<>();
 	@ManyToOne(cascade = CascadeType.ALL)
-	private Topic                 topic;
+	private       Topic                 topic;
 
 	protected MaterialOrderCollection() {
 		super();

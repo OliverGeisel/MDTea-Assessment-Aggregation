@@ -11,28 +11,32 @@ import java.util.Arrays;
 
 /**
  * Cleans the Neo4J database on start if the --CLEAN argument is passed.
+ *
+ * @author Oliver Geisel
+ * @version 1.2
+ * @since 1.0.0
  */
 @Component
 @Order(1)
-public class Neo4J_Clean_On_Start implements CommandLineRunner {
+public class Neo4JCleanOnStart implements CommandLineRunner {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(Neo4J_Clean_On_Start.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(Neo4JCleanOnStart.class);
 
 	private final Driver neo4jDriver;
 
-	public Neo4J_Clean_On_Start(Driver neo4jDriver) {
+	public Neo4JCleanOnStart(Driver neo4jDriver) {
 		this.neo4jDriver = neo4jDriver;
 	}
 
 	@Override
 	public void run(String... args) throws Exception {
 		if (Arrays.stream(args).toList().contains("--CLEAN")) {
-			LOGGER.info("Cleaning Neo4J database");
+			LOGGER.warn("Cleaning Neo4J database");
 			try (var session = neo4jDriver.session()) {
 				session.run("MATCH (n)-[r]-() DETACH DELETE r");
 				session.run("MATCH (n) DELETE n");
 			}
-			LOGGER.info("Neo4J database cleaned");
+			LOGGER.warn("Neo4J database cleaned");
 		}
 	}
 }

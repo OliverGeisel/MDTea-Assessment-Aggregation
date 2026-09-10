@@ -2,8 +2,7 @@ package de.olivergeisel.materialgenerator.core.courseplan.content;
 
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.StructureElement;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.*;
 
 import java.util.*;
 
@@ -20,19 +19,24 @@ import java.util.*;
  * @since 1.1.0
  */
 @Embeddable
+@Deprecated(since = "1.2.0", forRemoval = true)
 public class TopicStructureAliasMappings {
 
+	/**
+	 * The mapping of aliases to structures. The key is the structure, the value is a list of aliases.
+	 */
+	@CollectionTable(name = "topic_structure_alias_mappings", joinColumns = @JoinColumn(name = "topic_id"))
 	@ElementCollection
-	private Map<String, List<String>> aliasMappings = new HashMap<>();
+	private Map<String, AliasList> aliasMappings = new HashMap<>();
 
 	public TopicStructureAliasMappings() {
 	}
 
-	public TopicStructureAliasMappings(Map<String, List<String>> aliasMappings) {
+	public TopicStructureAliasMappings(Map<String, AliasList> aliasMappings) {
 		this.aliasMappings = aliasMappings;
 	}
 
-	public List<String> getAliasesFor(String structure) {
+	public AliasList getAliasesFor(String structure) {
 		return aliasMappings.get(structure);
 	}
 
@@ -46,14 +50,14 @@ public class TopicStructureAliasMappings {
 		if (structure == null || alias == null) {
 			return;
 		}
-		aliasMappings.computeIfAbsent(structure, k -> new LinkedList<>()).add(alias);
+		aliasMappings.computeIfAbsent(structure, k -> new AliasList()).add(alias);
 	}
 
 	public void addAliases(String structure, List<String> aliases) {
 		if (structure == null || aliases == null) {
 			return;
 		}
-		aliasMappings.computeIfAbsent(structure, k -> new LinkedList<>()).addAll(aliases);
+		aliasMappings.computeIfAbsent(structure, k -> new AliasList()).addAll(aliases);
 	}
 
 	public void removeAlias(String structure, String alias) {
@@ -69,12 +73,12 @@ public class TopicStructureAliasMappings {
 	}
 
 	/**
-	 * Returns a list of all aliases.
+	 * Returns a list of all aliases. The list is a flat list of all aliases for all structures.
 	 *
 	 * @return a list of all aliases
 	 */
 	public List<String> complete() {
-		return aliasMappings.values().stream().flatMap(Collection::stream)
+		return aliasMappings.values().stream().flatMap(it-> it.getAliases().stream())
 							.toList();
 	}
 
@@ -82,7 +86,7 @@ public class TopicStructureAliasMappings {
 		return aliasMappings.containsKey(structure);
 	}
 
-	public Set<Map.Entry<String, List<String>>> entrySet() {
+	public Set<Map.Entry<String, AliasList>> entrySet() {
 		return aliasMappings.entrySet();
 	}
 
@@ -90,8 +94,7 @@ public class TopicStructureAliasMappings {
 		return aliasMappings.keySet();
 	}
 
-	public Collection<List<String>> values() {
-		return aliasMappings.values();
+	public Collection<AliasList> values() {return aliasMappings.values();
 	}
 
 	//region setter/getter

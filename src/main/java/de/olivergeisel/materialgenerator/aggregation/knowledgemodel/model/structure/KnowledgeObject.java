@@ -2,7 +2,7 @@ package de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.struc
 
 
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
-import org.springframework.data.neo4j.core.schema.GeneratedValue;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
@@ -16,19 +16,17 @@ import java.util.Set;
 public abstract class KnowledgeObject {
 
 	@Relationship("LINKED_TO")
-	private Set<KnowledgeElement> linkedElements;
+	private final Set<KnowledgeElement> linkedElements = new HashSet<>();
+	@Version
+	protected long   version;
 	@Id
-	@GeneratedValue(GeneratedValue.UUIDGenerator.class)
-	private String id;
+	private   String id;
 
 	protected KnowledgeObject() {
-		this.id = "";
-		this.linkedElements = new HashSet<>();
 	}
 
 	protected KnowledgeObject(String id) {
 		this.id = id;
-		linkedElements = new HashSet<>();
 	}
 
 	/**
@@ -74,17 +72,18 @@ public abstract class KnowledgeObject {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (!(o instanceof KnowledgeObject that)) return false;
-		if(id == null && that.id==null) return linkedElements.equals(that.linkedElements);
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof KnowledgeObject that)) {
+			return false;
+		}
 		return Objects.equals(id, that.id);
 	}
 
 	@Override
 	public int hashCode() {
-		int result = linkedElements != null ? linkedElements.hashCode() : 0;
-		result = 31 * result + id.hashCode();
-		return result;
+		return Objects.hash(id);
 	}
 
 	@Override

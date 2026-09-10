@@ -1,5 +1,6 @@
 package de.olivergeisel.materialgenerator.core.courseplan.content;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -25,10 +26,9 @@ public class ContentTarget {
 	 * An empty ContentTarget.
 	 */
 	public static final ContentTarget EMPTY = new ContentTarget("NO_TARGET");
-
-	private String      mainTopicName;
-	private ContentGoal relatedGoal;
-	private TopicStructureAliasMappings topicStructureAliasMappings = new TopicStructureAliasMappings();
+	private final List<StructureAliasElement> topicStructureAliasMappings = new ArrayList<>();
+	private       String                      mainTopicName;
+	private       ContentGoal                 relatedGoal;
 
 	protected ContentTarget() {
 	}
@@ -47,21 +47,46 @@ public class ContentTarget {
 		this.relatedGoal = relatedGoal;
 	}
 
-	public ContentTarget(String mainTopicName, ContentGoal relatedGoal, TopicStructureAliasMappings aliases) {
+	public ContentTarget(String mainTopicName, ContentGoal relatedGoal, List<StructureAliasElement> aliases) {
 		this.mainTopicName = mainTopicName;
 		this.relatedGoal = relatedGoal;
-		this.topicStructureAliasMappings = aliases;
+		this.topicStructureAliasMappings.addAll(aliases);
+	}
+
+	/**
+	 * Add an alias for a structure. If the structure already exists, the alias will be added to the existing structure.
+	 *
+	 * @param structureName the name of the structure
+	 * @param alternatives  the list of aliases for the structure
+	 */
+	public void addAlias(String structureName, List<String> alternatives) {
+		if (structureName == null || alternatives == null) {
+			return;
+		}
+		if (containsStructure(structureName)) {
+			topicStructureAliasMappings.stream()
+									   .filter(e -> e.getStructureName().equals(structureName))
+									   .findFirst()
+									   .ifPresent(e -> e.getAliases().addAll(alternatives));
+			return;
+		}
+		topicStructureAliasMappings.add(new StructureAliasElement(structureName, alternatives));
+	}
+
+	public boolean containsStructure(String structureName) {
+		return topicStructureAliasMappings.stream().anyMatch(e -> e.getStructureName().equals(structureName));
 	}
 
 	//region setter/getter
-	public TopicStructureAliasMappings getAliases() {
+	public List<StructureAliasElement> getAliases() {
 		return topicStructureAliasMappings;
 	}
 
 	public List<String> getAllAliases() {
 		var back = new LinkedList<String>();
 		back.add(mainTopicName);
-		back.addAll(topicStructureAliasMappings.complete());
+		back.addAll(topicStructureAliasMappings.stream().map(StructureAliasElement::getAliases).flatMap(List::stream)
+		                                       .toList());
 		return back;
 	}
 

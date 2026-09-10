@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class GeneratorController {
 	private final FileSystemStorageService storageService;
 	private final TemplateSetRepository    templateSetRepository;
 	private final MaterialRepository       materialRepository;
-	private final KnowledgeModelService knowledgeModelService;
+	private final KnowledgeModelService    knowledgeModelService;
 
 	public GeneratorController(GeneratorService service, FileSystemStorageService storageService,
 			TemplateSetRepository templateSetRepository, MaterialRepository materialRepository,

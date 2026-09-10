@@ -94,7 +94,7 @@ public class BasicCriteriaSelector implements CriteriaSelector {
 	@Override
 	public boolean satisfies(Material material, Topic target) throws IllegalArgumentException {
 		if (target == null) throw new IllegalArgumentException("target must not be null");
-		for (var alias : target.getTopicStructureAliasMappings().complete()) {
+		for (var alias : target.allAlias()) {
 			if (satisfies(material, alias)) return true;
 		}
 		return false;
@@ -113,13 +113,21 @@ public class BasicCriteriaSelector implements CriteriaSelector {
 			throw new IllegalArgumentException("collection must have a topic");
 		}
 		var mappings = collection.getTopic().getTopicStructureAliasMappings();
+		var flattedMappings = mappings.stream().flatMap(it -> it.getAliases().stream()).toList();
 		var structure = material.getStructureId();
-		for (var criteria : mappings.complete()) {
+		for (var criteria : flattedMappings) {
 			if (strictMatchExceptCase(structure, criteria)) return true;
 		}
 		return false;
 	}
 
+	/**
+	 * Checks if the material matches the criteria strictly except for case sensitivity.
+	 * It use the equalsIgnoreCase method to compare the material and criteria.
+	 * @param material the material to check
+	 * @param criteria the criteria to check against
+	 * @return true if the material matches the criteria, false otherwise
+	 */
 	private boolean strictMatchExceptCase(String material, String criteria) {
 		if (material == null || criteria == null) return false;
 		return material.equalsIgnoreCase(criteria);

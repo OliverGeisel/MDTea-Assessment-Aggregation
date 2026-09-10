@@ -2,11 +2,13 @@ package de.olivergeisel.materialgenerator.finalization.parts;
 
 import de.olivergeisel.materialgenerator.core.course.Course;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentTarget;
-import de.olivergeisel.materialgenerator.core.courseplan.content.TopicStructureAliasMappings;
+import de.olivergeisel.materialgenerator.core.courseplan.content.StructureAliasElement;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -37,8 +39,10 @@ public class Topic {
 	private UUID                        id;
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Goal                        goal;
-	@Embedded
-	private TopicStructureAliasMappings topicStructureAliasMappings = new TopicStructureAliasMappings();
+	@ManyToMany(targetEntity = StructureAliasElement.class)
+	@JoinTable(name = "topic_structure_alias_mappings")
+	@Getter
+	private List<StructureAliasElement> topicStructureAliasMappings = new ArrayList<>();
 
 	/**
 	 * Create a new Topic with the given {@link ContentTarget} and {@link Goal}.
@@ -98,15 +102,14 @@ public class Topic {
 		return name.equals(contentTarget.getTopic());
 	}
 
-	//region setter/getter
-	public TopicStructureAliasMappings getTopicStructureAliasMappings() {
-		return topicStructureAliasMappings;
+	public List<String> allAlias() {
+		return topicStructureAliasMappings.stream()
+				.flatMap(e -> e.getAliases().stream())
+				.toList();
 	}
 
-	public void setTopicStructureAliasMappings(
-			TopicStructureAliasMappings topicStructureAliasMappings) {
-		this.topicStructureAliasMappings = topicStructureAliasMappings;
-	}
+	//region setter/getter
+
 
 	public Goal getGoal() {
 		return goal;
