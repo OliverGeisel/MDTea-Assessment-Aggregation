@@ -149,9 +149,7 @@ public class AggregationController {
 		var location = setParamsToProcess(process, form);
 		var prompt = new TermPrompt(form.getFragment(), form.getFragmentLanguage(), form.getTargetLanguage());
 		try {
-			var answer = gptManager.requestTerms(prompt, form.getUrl(),
-					modelListName.get(process.getModelName()), location,
-					form.getMaxTokens(), form.getTemperature(), form.getTopP(), 0.2, form.getRetries());
+			var answer = gptManager.requestTermsOllama(prompt);
 			var extractor = new TermElementExtractor();
 			var terms = extractor.extractAll(answer, process.getModelLocation());
 			terms.forEach(it -> it.setStructureId(process.getAreaOfKnowledge()));
@@ -299,8 +297,7 @@ public class AggregationController {
 		var prompt = new DefinitionPrompt(process.getCurrentFragment(), allTerms,
 				form.getFragmentLanguage(), form.getTargetLanguage());
 		try {
-			var answer = gptManager.requestDefinitions(prompt, form.getUrl(),
-					modelListName.get(process.getModelName()), location, process.getModelParameters());
+			var answer = gptManager.requestDefinitionsOllama(prompt);
 			var extractor = new DefinitonElementExtractor();
 			var definitions = extractor.extractAll(answer, process.getModelLocation());
 			definitions.forEach(it -> it.setStructureId(process.getAreaOfKnowledge()));
@@ -448,8 +445,7 @@ public class AggregationController {
 		var prompt = new ExamplePrompt(form.getFragment(),
 				form.getFragmentLanguage(), form.getTargetLanguage());
 		try {
-			var answer = gptManager.requestExamples(prompt, form.getUrl(),
-					modelListName.get(process.getModelName()), location, process.getModelParameters());
+			var answer = gptManager.requestExamplesOllama(prompt);
 			var allTerms = new ArrayList<>(
 					modelService.findElementByType(KnowledgeType.TERM).stream().map(it -> (Term) it).toList());
 			allTerms.addAll(process.getTerms().getAcceptedElements());
@@ -541,8 +537,7 @@ public class AggregationController {
 		var location = setParamsToProcess(process, form);
 		var prompt = new ItemPrompt(form.getFragment(), form.getFragmentLanguage(), form.getTargetLanguage());
 		try {
-			var answer = gptManager.requestItems(prompt, form.getUrl(), modelListName.get(process.getModelName()),
-					location, process.getModelParameters());
+			var answer = gptManager.requestItemsOllama(prompt);
 			var extractor = new ItemElementExtractor();
 			var items = extractor.extractAll(answer, process.getModelLocation());
 			items.forEach(it -> it.setStructureId(process.getAreaOfKnowledge()));
