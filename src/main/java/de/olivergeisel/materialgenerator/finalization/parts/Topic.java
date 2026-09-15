@@ -39,7 +39,7 @@ public class Topic {
 	private UUID                        id;
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Goal                        goal;
-	@ManyToMany(targetEntity = StructureAliasElement.class)
+	@ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JoinTable(name = "topic_structure_alias_mappings")
 	@Getter
 	private List<StructureAliasElement> topicStructureAliasMappings = new ArrayList<>();

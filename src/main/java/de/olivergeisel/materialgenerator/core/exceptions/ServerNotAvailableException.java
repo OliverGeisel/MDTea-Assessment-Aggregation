@@ -1,4 +1,4 @@
-package de.olivergeisel.materialgenerator.aggregation.extraction;
+package de.olivergeisel.materialgenerator.core.exceptions;
 
 
 /**

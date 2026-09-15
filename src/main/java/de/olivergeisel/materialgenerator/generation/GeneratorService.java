@@ -148,8 +148,9 @@ public class GeneratorService {
 			}
 		}
 		// Save all materials and mappings and templateInfos
-		materialRepository.saveAll(materials.stream().map(MaterialAndMapping::material).toList());
-		mappingRepository.saveAll(materials.stream().map(MaterialAndMapping::mapping).toList());
+		var material = materials.stream().map(MaterialAndMapping::material).toList();
+		materialRepository.saveAll(material);
+		// Todo save mapping again, was removed after saving invalidates rows (StaleObjectStateException)
 		return materials;
 	}
 }

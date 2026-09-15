@@ -150,7 +150,7 @@ public class CoursePlanParser {
 				}
 			}
 		}
-		return back.stream().toList();
+		return new ArrayList<>(back.stream().toList());
 	}
 
 	/**
@@ -363,6 +363,9 @@ public class CoursePlanParser {
 	 * @throws CoursePlanParserException if the input is not valid
 	 */
 	public CoursePlan parseFromFile(File file) throws FileNotFoundException, CoursePlanParserException {
+		if (file == null || !file.exists()) {
+			throw new FileNotFoundException("File not found: " + file);
+		}
 		FileInputStream input = new FileInputStream(file);
 		return parseFromFile(input);
 	}

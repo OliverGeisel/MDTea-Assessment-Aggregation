@@ -31,7 +31,7 @@ public class StructureAliasElement {
 
 	public StructureAliasElement(String structureName, List<String> aliases) {
 		this.structureName = structureName;
-		this.aliases = aliases;
+		this.aliases.addAll(aliases);
 	}
 
 }
