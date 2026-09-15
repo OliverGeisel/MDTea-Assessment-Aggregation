@@ -16,6 +16,8 @@ import java.util.*;
 /**
  * A model of knowledge. It contains structure, all elements, relations and sources.
  *
+ * @author Oliver Geisel
+ * @version 1.1.0
  * @see KnowledgeElement
  * @see Relation
  * @see KnowledgeSource
@@ -23,10 +25,9 @@ import java.util.*;
  * @see KnowledgeFragment
  * @see KnowledgeObject
  * @see RootStructureElement
- *
- * @version 1.1.0
  * @since 0.2.0
- * @author Oliver Geisel
+ *
+ * @param <T> the type of the relation that is used in this model
  */
 public interface KnowledgeModel<T> {
 
@@ -35,6 +36,7 @@ public interface KnowledgeModel<T> {
 	 * If the element is already in the model, nothing happens.
 	 *
 	 * @param element the element to add
+	 *
 	 * @return true if the element was added, false if not (because it was already in the model)
 	 */
 	boolean addKnowledge(KnowledgeElement element);
@@ -45,6 +47,7 @@ public interface KnowledgeModel<T> {
 	 * and described in the relations.
 	 *
 	 * @param elements the elements to add.
+	 *
 	 * @return true if at least one element was added, false if not.
 	 */
 	boolean addKnowledge(Collection<KnowledgeElement> elements);
@@ -53,6 +56,7 @@ public interface KnowledgeModel<T> {
 	 * Adds a source to the model.
 	 *
 	 * @param sources the source to add
+	 *
 	 * @return true if the source was added, false if not
 	 */
 	boolean addSource(KnowledgeSource sources);
@@ -61,6 +65,7 @@ public interface KnowledgeModel<T> {
 	 * Adds a collection of KnowledgeObjects to the model.
 	 *
 	 * @param sources the elements to add.
+	 *
 	 * @return true if at least one element was added, false if not.
 	 */
 	boolean addSource(Collection<KnowledgeSource> sources);
@@ -71,6 +76,7 @@ public interface KnowledgeModel<T> {
 	 *
 	 * @param structure the structure to add
 	 * @param partToAdd the part to add to the structure
+	 *
 	 * @return true if the structure was added, false if not
 	 */
 	boolean addStructureTo(KnowledgeFragment structure, KnowledgeObject partToAdd);
@@ -82,7 +88,9 @@ public interface KnowledgeModel<T> {
 	 * Check if the model contains the given KnowledgeElement.
 	 *
 	 * @param element the element to check
+	 *
 	 * @return true if the model contains the element, false if not
+	 *
 	 * @throws IllegalArgumentException if the element was null
 	 */
 	boolean containsElement(KnowledgeElement element) throws IllegalArgumentException;
@@ -91,7 +99,9 @@ public interface KnowledgeModel<T> {
 	 * Check if the model contains the given KnowledgeElement.
 	 *
 	 * @param elementId the id of the element
+	 *
 	 * @return true if the model contains the element, false if not
+	 *
 	 * @throws IllegalArgumentException if the elementId was null
 	 */
 	boolean containsElement(String elementId) throws IllegalArgumentException;
@@ -100,7 +110,9 @@ public interface KnowledgeModel<T> {
 	 * Returns all elements that connected with the given element in the model.
 	 *
 	 * @param elementId the id of the element
+	 *
 	 * @return a set of all elements that are connected with the given element.
+	 *
 	 * @throws NoSuchElementException if no element with the given id was found
 	 */
 	Set<KnowledgeElement> findRelatedElements(String elementId) throws NoSuchElementException;
@@ -110,6 +122,7 @@ public interface KnowledgeModel<T> {
 	 * Returns the element that connected with the given element in the model.
 	 *
 	 * @param id the id of the element
+	 *
 	 * @return the element that is connected with the given element
 	 */
 	Optional<KnowledgeElement> findElementById(String id);
@@ -121,6 +134,7 @@ public interface KnowledgeModel<T> {
 	 * @param from     the element to link from
 	 * @param to       the element to link to
 	 * @param relation the relation to link with
+	 *
 	 * @return the new created Relation, or null if already linked
 	 */
 	T link(KnowledgeElement from, KnowledgeElement to, RelationType relation);
@@ -129,6 +143,7 @@ public interface KnowledgeModel<T> {
 	 * Removes the given element from the model.
 	 *
 	 * @param element the element to remove
+	 *
 	 * @return true if the element was removed, false if not
 	 */
 	boolean remove(KnowledgeElement element) throws IllegalArgumentException;
@@ -144,6 +159,7 @@ public interface KnowledgeModel<T> {
 	 * Find all elements that are of the given {@link KnowledgeType}.
 	 *
 	 * @param knowledgeType the type of the elements to find
+	 *
 	 * @return a list of all elements that are of the given type. Will newer return null.
 	 */
 	List<KnowledgeElement> findElementByType(KnowledgeType knowledgeType);

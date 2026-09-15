@@ -4,6 +4,7 @@ import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
 import de.olivergeisel.materialgenerator.generation.configuration.TestConfiguration;
 import de.olivergeisel.materialgenerator.generation.configuration.TestPer;
 import de.olivergeisel.materialgenerator.generation.generator.Assembler;
+import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
 import de.olivergeisel.materialgenerator.generation.material.assessment.TestMaterial;
 
@@ -22,13 +23,14 @@ import java.util.List;
  * @see MaterialAndMapping
  * @since 1.1.0
  */
-public class TestAssembler<T extends TestMaterial> implements Assembler<T> {
+public class TestAssembler<T extends TestMaterial> implements Assembler<TestMaterial> {
 
-	private KnowledgeNode     knowledgeNode;
-	private List<MaterialAndMapping> relatedMaterials;
-	private TestConfiguration configuration;
+	private KnowledgeNode                                knowledgeNode;
+	private List<MaterialAndMapping<? extends Material>> relatedMaterials;
+	private TestConfiguration                            configuration;
 
-	public TestAssembler(KnowledgeNode knowledgeNode, List<MaterialAndMapping> relatedMaterials,
+	public TestAssembler(KnowledgeNode knowledgeNode,
+			List<MaterialAndMapping<? extends Material>> relatedMaterials,
 			TestConfiguration configuration) {
 		this.knowledgeNode = knowledgeNode;
 		this.relatedMaterials = relatedMaterials;
@@ -46,20 +48,23 @@ public class TestAssembler<T extends TestMaterial> implements Assembler<T> {
 		};
 	}
 
-	public List<MaterialAndMapping<T>> assemble() {
+	@Override
+	public <CM extends TestMaterial> List<MaterialAndMapping<? extends CM>> assemble() {
 		if (knowledgeNode == null || relatedMaterials == null || configuration == null) {
 			throw new IllegalStateException("Assembler not configured correctly. Please check your configuration.");
 		}
-		var back = new LinkedList<MaterialAndMapping<T>>();
+		List<MaterialAndMapping<? extends CM>> back = new LinkedList<>();
 		// load assemble strategy by configuration
 		var taskPerLevel = configuration.getLevel();
 		for (var level : taskPerLevel) {
-			AssemblerStrategy<TestMaterial> strategy = getStrategy(level);
-			var materials = strategy.assemble(knowledgeNode, relatedMaterials, configuration);
-			var casted = materials.stream().map(m -> (MaterialAndMapping<T>) m).toList();
-			back.addAll(casted);
+			var strategy = getStrategy(level);
+			List<MaterialAndMapping<? extends CM>> materials;
+			materials = strategy.assemble(knowledgeNode, relatedMaterials, configuration);
+
+			back.addAll(materials);
 		}
 		return back;
+
 	}
 
 
@@ -72,12 +77,12 @@ public class TestAssembler<T extends TestMaterial> implements Assembler<T> {
 		this.knowledgeNode = knowledgeNode;
 	}
 
-	public List<MaterialAndMapping> getRelatedMaterials() {
+	public List<MaterialAndMapping<? extends Material>> getRelatedMaterials() {
 		return relatedMaterials;
 	}
 
 	public void setRelatedMaterials(
-			List<MaterialAndMapping> relatedMaterials) {
+			List<MaterialAndMapping<? extends Material>> relatedMaterials) {
 		this.relatedMaterials = relatedMaterials;
 	}
 

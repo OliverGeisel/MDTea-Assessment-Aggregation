@@ -55,7 +55,7 @@ public class RawCourse extends Course {
 	 * @param materials The materials to assign
 	 * @return True if all materials are assigned. False otherwise
 	 */
-	public boolean assignMaterial(Collection<MaterialAndMapping> materials) {
+	public boolean assignMaterial(Collection<MaterialAndMapping<? extends Material>> materials) {
 		var assigner = rawCourseOrder.assignMaterial(materials.stream().map(MaterialAndMapping::material).collect(
 				Collectors.toSet()));
 		// remove all items Todo -> only items, that are assigned to a test

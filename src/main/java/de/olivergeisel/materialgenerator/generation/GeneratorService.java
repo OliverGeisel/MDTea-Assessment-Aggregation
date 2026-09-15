@@ -91,10 +91,11 @@ public class GeneratorService {
 	 * @param templateSet the template set to use for the generation
 	 * @return the created materials
 	 */
-	private List<MaterialAndMapping> createMaterials(CoursePlan coursePlan, TemplateSet templateSet) {
+	private List<MaterialAndMapping<? extends Material>> createMaterials(CoursePlan coursePlan,
+			TemplateSet templateSet) {
 		var transferMaterials = createTransferMaterials(coursePlan, templateSet);
 		var assessmentMaterials = createAssessmentMaterials(coursePlan, templateSet);
-		var materials = new LinkedList<MaterialAndMapping>();
+		var materials = new LinkedList<MaterialAndMapping<? extends Material>>();
 		materials.addAll(transferMaterials);
 		materials.addAll(assessmentMaterials);
 		return materials;
@@ -107,7 +108,8 @@ public class GeneratorService {
 	 * @param templateSet the template set to use for the generation
 	 * @return the created assessment materials
 	 */
-	private List<MaterialAndMapping> createAssessmentMaterials(CoursePlan coursePlan, TemplateSet templateSet) {
+	private List<MaterialAndMapping<? extends Material>> createAssessmentMaterials(CoursePlan coursePlan,
+			TemplateSet templateSet) {
 		var input = new GeneratorInput(templateSet, knowledgeManagement, coursePlan);
 		var generator = new AssessmentGenerator(input);
 		return runGeneration(generator);
@@ -120,7 +122,8 @@ public class GeneratorService {
 	 * @param templateSet the template set to use for the generation
 	 * @return the created transfer materials
 	 */
-	private LinkedList<MaterialAndMapping> createTransferMaterials(CoursePlan coursePlan, TemplateSet templateSet) {
+	private LinkedList<MaterialAndMapping<? extends Material>> createTransferMaterials(CoursePlan coursePlan,
+			TemplateSet templateSet) {
 		TransferGenerator generator = new TransferGenerator();
 		generator.input(templateSet, knowledgeManagement, coursePlan);
 		return runGeneration(generator);
@@ -134,14 +137,15 @@ public class GeneratorService {
 	 * @return the generated materials
 	 * @throws IllegalStateException if the generator is not ready
 	 */
-	private LinkedList<MaterialAndMapping> runGeneration(Generator generator) throws IllegalStateException {
+	private LinkedList<MaterialAndMapping<? extends Material>> runGeneration(Generator generator)
+			throws IllegalStateException {
 		if (!generator.isReady()) {
 			throw new IllegalStateException("Generator is not ready");
 		}
 		generator.update();
 		var output = generator.output();
 		var tempMaterials = output.getMaterialAndMapping();
-		var materials = new LinkedList<MaterialAndMapping>();
+		var materials = new LinkedList<MaterialAndMapping<? extends Material>>();
 		for (var toAdd : tempMaterials) { // Add only if not already in list (prevent duplicates - check by content)
 			if (materials.stream().noneMatch(it -> it.material().isIdentical(toAdd.material()))) {
 				materials.add(toAdd);

@@ -10,43 +10,45 @@ import java.util.*;
  * A Class holding all ids of {@link KnowledgeElement} to a specific {@link Material} that was created with these
  * elements.
  *
+ * @author Oliver Geisel
  * @version 1.1.0
  * @see Material
  * @see KnowledgeElement
  * @since 0.2.0
- * @author Oliver Geisel
  */
 @Entity
-public class MaterialMappingEntry {
+public class MaterialMappingEntry<M extends Material> {
 
-	@ElementCollection
-	private Set<String> relatedElements = new HashSet<>();
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	@Column(name = "id", nullable = false)
-	private UUID     id = UUID.randomUUID();
-	@OneToOne(cascade = CascadeType.ALL)
-	private Material material;
+	private UUID id = UUID.randomUUID();
+
+
+	@ElementCollection
+	private Set<String> relatedElements = new HashSet<>();
+	@OneToOne(cascade = CascadeType.ALL, targetEntity = Material.class)
+	private M           material;
 
 	protected MaterialMappingEntry() {
 
 	}
 
-	public MaterialMappingEntry(Material material) {
+	public <CM extends M> MaterialMappingEntry(CM material) {
 		this.material = material;
 	}
 
-	public MaterialMappingEntry(Material material, KnowledgeElement... elements) {
+	public <CM extends M> MaterialMappingEntry(CM material, KnowledgeElement... elements) {
 		this.material = material;
 		add(elements);
 	}
 
-	public MaterialMappingEntry(Material material, String[] elementIds) {
+	public <CM extends M> MaterialMappingEntry(CM material, String[] elementIds) {
 		this.material = material;
 		relatedElements.addAll(Arrays.asList(elementIds));
 	}
 
-	public MaterialMappingEntry(Material material, Collection<KnowledgeElement> elements) {
+	public <CM extends M> MaterialMappingEntry(CM material, Collection<KnowledgeElement> elements) {
 		this.material = material;
 		add(elements.toArray(new KnowledgeElement[0]));
 	}
@@ -92,11 +94,11 @@ public class MaterialMappingEntry {
 		this.id = id;
 	}
 
-	public Material getMaterial() {
+	public M getMaterial() {
 		return material;
 	}
 
-	public void setMaterial(Material material) {
+	public void setMaterial(M material) {
 		this.material = material;
 	}
 //endregion

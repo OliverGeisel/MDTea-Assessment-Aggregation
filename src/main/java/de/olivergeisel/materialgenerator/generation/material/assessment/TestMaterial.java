@@ -39,7 +39,7 @@ public class TestMaterial extends ComplexMaterial {
 		super(MaterialType.TEST, TemplateType.TEST);
 	}
 
-	public TestMaterial(List<Material> parts, TestConfiguration testConfiguration) {
+	public <M extends Material> TestMaterial(List<M> parts, TestConfiguration testConfiguration) {
 		super(MaterialType.TEST, TemplateType.TEST, parts);
 		this.testConfiguration = testConfiguration;
 		while (getParts().size() > testConfiguration.getNumberTasks()) {

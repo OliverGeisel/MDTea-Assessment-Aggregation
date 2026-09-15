@@ -21,12 +21,12 @@ public class GeneratorOutput {
 		return allMaterial.size();
 	}
 
-	public void add(MaterialAndMapping materialAndMapping) {
+	public void add(MaterialAndMapping<? extends Material> materialAndMapping) {
 		addMapping(materialAndMapping.mapping());
 		addMaterial(materialAndMapping.material());
 	}
 
-	public void addAll(Collection<MaterialAndMapping> materialAndMappings) {
+	public void addAll(Collection<MaterialAndMapping<? extends Material>> materialAndMappings) {
 		for (var materialAndMapping : materialAndMappings) {
 			add(materialAndMapping);
 		}
@@ -73,8 +73,8 @@ public class GeneratorOutput {
 	}
 
 	//region setter/getter
-	public List<MaterialAndMapping> getMaterialAndMapping() {
-		List<MaterialAndMapping> result = new LinkedList<>();
+	public List<MaterialAndMapping<? extends Material>> getMaterialAndMapping() {
+		List<MaterialAndMapping<? extends Material>> result = new LinkedList<>();
 		for (var material : allMaterial) {
 			result.add(new MaterialAndMapping(material,
 					allMappings.stream().filter(m -> m.getMaterial() == material).findFirst()

@@ -20,6 +20,7 @@ import java.util.List;
  * </p>
  *
  * @param <T> is the Type of {@link Material} you get.
+ *
  * @author Oliver Geisel
  * @version 1.1.0
  * @see Material
@@ -36,5 +37,5 @@ public interface Assembler<T extends ComplexMaterial> {
 	 *
 	 * @return The new assembled {@link ComplexMaterial}.
 	 */
-	List<MaterialAndMapping<T>> assemble();
+	<CM extends T> List<MaterialAndMapping<? extends CM>> assemble();
 }

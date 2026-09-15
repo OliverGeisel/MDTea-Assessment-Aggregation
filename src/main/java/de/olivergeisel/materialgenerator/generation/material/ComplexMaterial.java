@@ -30,7 +30,7 @@ public abstract class ComplexMaterial extends Material {
 		super(MaterialType.COMPLEX);
 	}
 
-	protected ComplexMaterial(List<Material> parts) {
+	protected <M extends Material> ComplexMaterial(List<M> parts) {
 		super(MaterialType.COMPLEX);
 		this.parts.addAll(parts);
 	}
@@ -43,7 +43,7 @@ public abstract class ComplexMaterial extends Material {
 		super(type, templateType);
 	}
 
-	protected ComplexMaterial(MaterialType type, TemplateType templateType, List<Material> parts) {
+	protected <M extends Material> ComplexMaterial(MaterialType type, TemplateType templateType, List<M> parts) {
 		super(type, templateType);
 		if (parts != null) {
 			this.parts.addAll(parts);

@@ -4,10 +4,7 @@ import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.elemen
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.structure.KnowledgeObject;
 import de.olivergeisel.materialgenerator.core.courseplan.structure.StructureGroup;
 import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
-import de.olivergeisel.materialgenerator.generation.material.ComplexMaterial;
-import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
-import de.olivergeisel.materialgenerator.generation.material.MaterialMappingEntry;
-import de.olivergeisel.materialgenerator.generation.material.MaterialType;
+import de.olivergeisel.materialgenerator.generation.material.*;
 import de.olivergeisel.materialgenerator.generation.material.transfer.OverviewMaterial;
 import de.olivergeisel.materialgenerator.generation.material.transfer.SummaryMaterial;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateType;
@@ -31,16 +28,17 @@ import java.util.*;
  */
 public class TransferAssembler {
 
-	private List<MaterialAndMapping> materials;
-	private KnowledgeNode knowledgeNode;
+	private List<MaterialAndMapping<? extends Material>> materials;
+	private KnowledgeNode                                knowledgeNode;
 
-	public TransferAssembler(List<MaterialAndMapping> materials, KnowledgeNode knowledgeNode) {
+	public TransferAssembler(List<MaterialAndMapping<? extends Material>> materials, KnowledgeNode knowledgeNode) {
 		this.materials = materials;
 		this.knowledgeNode = knowledgeNode;
 	}
 
 
-	public List<MaterialAndMapping> createOverview(Collection<MaterialAndMapping> summaryMaterials) {
+	public List<MaterialAndMapping<? extends Material>> createOverview(
+			List<MaterialAndMapping<SummaryMaterial>> summaryMaterials) {
 		var structureMapping = new HashMap<String, List<SummaryMaterial>>();
 		var summaries = summaryMaterials.stream().map(it -> (SummaryMaterial) it.material()).toList();
 		for (var m : summaries) {
@@ -51,7 +49,7 @@ public class TransferAssembler {
 				structureMapping.put(key, new LinkedList<>(List.of(m)));
 			}
 		}
-		var back = new ArrayList<MaterialAndMapping>();
+		var back = new ArrayList<MaterialAndMapping<? extends Material>>();
 		for (var entry : structureMapping.entrySet()) {
 			var material = new OverviewMaterial(entry.getKey(), "");
 			material.setStructureId(entry.getKey());
@@ -67,8 +65,8 @@ public class TransferAssembler {
 	 *
 	 * @return list of {@link MaterialAndMapping} that contains the {@link SummaryMaterial}s.
 	 */
-	public List<MaterialAndMapping> createSummary() {
-		var back = new LinkedList<MaterialAndMapping>();
+	public List<MaterialAndMapping<SummaryMaterial>> createSummary() {
+		var back = new LinkedList<MaterialAndMapping<SummaryMaterial>>();
 		if (!(knowledgeNode.getMainElement() instanceof Term term)) {
 			return back;
 		}
@@ -100,16 +98,16 @@ public class TransferAssembler {
 		return back;
 	}
 
-	private MaterialMappingEntry createMappingEntry(ComplexMaterial complexMaterial,
-			Collection<MaterialAndMapping> materials) {
+	private MaterialMappingEntry<? extends ComplexMaterial> createMappingEntry(ComplexMaterial complexMaterial,
+			Collection<? extends MaterialAndMapping<? extends Material>> materials) {
 		if (materials == null) {
 			materials = this.materials;
 		}
-		var collect = new LinkedList<MaterialMappingEntry>();
+		var collect = new LinkedList<MaterialMappingEntry<ComplexMaterial>>();
 		for (var m : complexMaterial.getParts()) {
 			for (var ma : materials) {
 				if (ma.material().equals(m)) { // Equals cant be used
-					collect.add(ma.mapping());
+					collect.add((MaterialMappingEntry<ComplexMaterial>) ma.mapping());
 				}
 			}
 		}

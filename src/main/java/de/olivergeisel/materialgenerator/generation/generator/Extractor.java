@@ -22,6 +22,7 @@ import java.util.List;
  * </p>
  *
  * @param <T> is the Type of {@link Material} you get.
+ *
  * @author Oliver Geisel
  * @version 1.1.0
  * @see KnowledgeNode
@@ -33,5 +34,5 @@ import java.util.List;
  */
 public interface Extractor<T extends Material> {
 
-	List<MaterialAndMapping<T>> extract(KnowledgeNode knowledgeNode, TemplateType templateType);
+	List<? extends MaterialAndMapping<? extends T>> extract(KnowledgeNode knowledgeNode, TemplateType templateType);
 }

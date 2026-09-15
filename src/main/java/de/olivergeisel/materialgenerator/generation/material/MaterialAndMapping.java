@@ -7,10 +7,10 @@ package de.olivergeisel.materialgenerator.generation.material;
  * @param mapping  the mapping to the material
  * @param <M>      the type of the material
  */
-public record MaterialAndMapping<M extends Material>(M material, MaterialMappingEntry mapping) {
+public record MaterialAndMapping<M extends Material>(M material, MaterialMappingEntry<? extends M> mapping) {
 
 
-	public MaterialAndMapping(MaterialMappingEntry mapping) {
-		this((M) mapping.getMaterial(), mapping);
+	public MaterialAndMapping(MaterialMappingEntry<M> mapping) {
+		this(mapping.getMaterial(), mapping);
 	}
 }

@@ -69,42 +69,42 @@ public class AssessmentGenerator extends AbstractGenerator {
 	}
 
 	@Override
-	protected List<MaterialAndMapping> materialForComment(Set<KnowledgeNode> knowledge) {
+	protected List<MaterialAndMapping<? extends Material>> materialForComment(Set<KnowledgeNode> knowledge) {
 		return materialForCreate(knowledge);
 	}
 
 	@Override
-	protected List<MaterialAndMapping> materialForCreate(Set<KnowledgeNode> knowledge) {
+	protected List<MaterialAndMapping<? extends Material>> materialForCreate(Set<KnowledgeNode> knowledge) {
 		return materialForControl(knowledge);
 	}
 
 	@Override
-	protected List<MaterialAndMapping> materialForControl(Set<KnowledgeNode> knowledge) {
+	protected List<MaterialAndMapping<? extends Material>> materialForControl(Set<KnowledgeNode> knowledge) {
 		return materialForUse(knowledge);
 	}
 
 	@Override
-	protected List<MaterialAndMapping> materialForUse(Set<KnowledgeNode> knowledge) {
+	protected List<MaterialAndMapping<? extends Material>> materialForUse(Set<KnowledgeNode> knowledge) {
 		return materialForTranslate(knowledge);
 	}
 
 	@Override
-	protected List<MaterialAndMapping> materialForTranslate(Set<KnowledgeNode> knowledge) {
+	protected List<MaterialAndMapping<? extends Material>> materialForTranslate(Set<KnowledgeNode> knowledge) {
 		// materials.add(createWikisWithExistingMaterial(knowledge, materials));
 		return materialForKnow(knowledge);
 	}
 
 	@Override
-	protected List<MaterialAndMapping> materialForKnow(Set<KnowledgeNode> knowledge) {
+	protected List<MaterialAndMapping<? extends Material>> materialForKnow(Set<KnowledgeNode> knowledge) {
 		return materialForFirstLook(knowledge);
 	}
 
 	@Override
-	protected List<MaterialAndMapping> materialForFirstLook(Set<KnowledgeNode> knowledge)
+	protected List<MaterialAndMapping<? extends Material>> materialForFirstLook(Set<KnowledgeNode> knowledge)
 			throws NoSuchElementException {
 
-		var materials = new LinkedList<>(createTrueFalse(knowledge));
-		var singleChoice =
+		var materials = new LinkedList<MaterialAndMapping<? extends Material>>(createTrueFalse(knowledge));
+		List<MaterialAndMapping<? extends SingleChoiceItemMaterial>> singleChoice =
 				createSingleChoice(knowledge, plan.getTestConfiguration().getConfiguration(ItemType.SINGLE_CHOICE));
 		var multipleChoice =
 				createMultipleChoice(knowledge, plan.getTestConfiguration().getConfiguration(ItemType.MULTIPLE_CHOICE));
@@ -130,15 +130,17 @@ public class AssessmentGenerator extends AbstractGenerator {
 	 * In the blank field the correct answer hast to be filled in.
 	 *
 	 * @param knowledge The knowledge to create the materials for.
+	 *
 	 * @return A list of materials with the questions.
 	 */
-	public List<MaterialAndMapping> createFillOut(Set<KnowledgeNode> knowledge, ItemConfiguration configuration) {
+	public <M extends Material> List<MaterialAndMapping<? extends M>> createFillOut(Set<KnowledgeNode> knowledge,
+			ItemConfiguration configuration) {
 		if (configuration == null || !configuration.getForItemType().equals(ItemType.FILL_OUT_BLANKS)) {
 			throw new IllegalArgumentException("Configuration is not for FillOutBlanks");
 		}
 		var fillOutBlanksConfiguration = (FillOutBlanksConfiguration) configuration;
 
-		var materials = new LinkedList<MaterialAndMapping>();
+		var materials = new LinkedList<MaterialAndMapping<? extends M>>();
 		// collect - get all questions from knowledge
 		final var templateInfo = TemplateType.ITEM;
 		var firstNode = knowledge.stream().findFirst().orElseThrow();
@@ -171,12 +173,13 @@ public class AssessmentGenerator extends AbstractGenerator {
 		// todo get Tasks, that are stored in knowledge (added while aggregation)
 		for (var node : knowledge) {
 			var questions = extractor.extract(node, templateInfo);
-			materials.addAll(questions);
+			materials.addAll((Collection<? extends MaterialAndMapping<? extends M>>) questions);
 		}
 		return materials;
 	}
 
-	private void createFillOutInner(LinkedList<MaterialAndMapping> materials, KnowledgeObject structure,
+	private <M extends Material> void createFillOutInner(LinkedList<MaterialAndMapping<? extends M>> materials,
+			KnowledgeObject structure,
 			KnowledgeElement mainTerm, FillOutBlanksItem item, String structureId,
 			FillOutBlanksConfiguration configuration) {
 		try {
@@ -209,10 +212,11 @@ public class AssessmentGenerator extends AbstractGenerator {
 	 * The student has to decide if the statement is true or false.
 	 *
 	 * @param knowledge The knowledge to create the True/False-questions for.
+	 *
 	 * @return A list of materials with the questions.
 	 */
-	public List<MaterialAndMapping> createTrueFalse(Set<KnowledgeNode> knowledge) {
-		var materials = new LinkedList<MaterialAndMapping>();
+	public List<MaterialAndMapping<? extends TrueFalseItemMaterial>> createTrueFalse(Set<KnowledgeNode> knowledge) {
+		var materials = new LinkedList<MaterialAndMapping<? extends TrueFalseItemMaterial>>();
 		// collect - get all questions from knowledge
 		final var templateInfo = TemplateType.ITEM;
 		var firstNode = knowledge.stream().findFirst().orElseThrow();
@@ -257,7 +261,8 @@ public class AssessmentGenerator extends AbstractGenerator {
 	 * @param item        The item to create the question for.
 	 * @param structureId The id of the structure.
 	 */
-	private void createTrueFalseInner(LinkedList<MaterialAndMapping> materials, KnowledgeObject structure,
+	private <M extends Material> void createTrueFalseInner(LinkedList<MaterialAndMapping<? extends M>> materials,
+			KnowledgeObject structure,
 			KnowledgeElement mainTerm, TrueFalseItem item, String structureId) {
 		try {
 			String name = getUniqueMaterialName(materials, STR."Wahr/Falsch-Frage zu \{mainTerm.getContent()}",
@@ -293,16 +298,19 @@ public class AssessmentGenerator extends AbstractGenerator {
 	 *
 	 * @param knowledge     The knowledge to create the Single-Choice-questions for.
 	 * @param configuration The configuration for the Single-Choice-questions.
+	 *
 	 * @return A list of materials with the questions.
+	 *
 	 * @throws IllegalArgumentException If the configuration is not for Single-Choice-questions.
 	 */
-	public List<MaterialAndMapping> createSingleChoice(Set<KnowledgeNode> knowledge, ItemConfiguration configuration)
+	public List<MaterialAndMapping<? extends SingleChoiceItemMaterial>> createSingleChoice(Set<KnowledgeNode> knowledge,
+			ItemConfiguration configuration)
 			throws IllegalArgumentException {
 		if (configuration == null || !configuration.getForItemType().equals(ItemType.SINGLE_CHOICE)) {
 			throw new IllegalArgumentException("Configuration is not for SingleChoice");
 		}
 		var singleChoiceConfiguration = (SingleChoiceConfiguration) configuration;
-		var materials = new LinkedList<MaterialAndMapping>();
+		var materials = new LinkedList<MaterialAndMapping<? extends SingleChoiceItemMaterial>>();
 		// collect - get all questions from knowledge
 		final var templateInfo = TemplateType.ITEM;
 		var firstNode = knowledge.stream().findFirst().orElseThrow();
@@ -334,7 +342,8 @@ public class AssessmentGenerator extends AbstractGenerator {
 		return materials;
 	}
 
-	private void createSingleChoiceInner(LinkedList<MaterialAndMapping> materials, KnowledgeObject structure,
+	private <M extends Material> void createSingleChoiceInner(LinkedList<MaterialAndMapping<? extends M>> materials,
+			KnowledgeObject structure,
 			KnowledgeElement mainTerm, SingleChoiceItem item, String structureId,
 			SingleChoiceConfiguration configuration) {
 		try {
@@ -358,13 +367,14 @@ public class AssessmentGenerator extends AbstractGenerator {
 		}
 	}
 
-	public List<MaterialAndMapping> createMultipleChoice(Set<KnowledgeNode> knowledge,
+	public List<MaterialAndMapping<? extends MultipleChoiceItemMaterial>> createMultipleChoice(
+			Set<KnowledgeNode> knowledge,
 			ItemConfiguration configuration) {
 		if (configuration == null || !configuration.getForItemType().equals(ItemType.MULTIPLE_CHOICE)) {
 			throw new IllegalArgumentException("Configuration is not for MultipleChoice");
 		}
 		var multipleChoiceConfiguration = (MultipleChoiceConfiguration) configuration;
-		var materials = new LinkedList<MaterialAndMapping>();
+		var materials = new LinkedList<MaterialAndMapping<? extends MultipleChoiceItemMaterial>>();
 		// collect - get all questions from knowledge
 		final var templateInfo = TemplateType.ITEM;
 		var firstNode = knowledge.stream().findFirst().orElseThrow();
@@ -396,7 +406,8 @@ public class AssessmentGenerator extends AbstractGenerator {
 		return materials;
 	}
 
-	private void createMultipleChoiceInner(LinkedList<MaterialAndMapping> materials, KnowledgeObject structure,
+	private void createMultipleChoiceInner(List<MaterialAndMapping<? extends MultipleChoiceItemMaterial>> materials,
+			KnowledgeObject structure,
 			KnowledgeElement mainTerm, MultipleChoiceItem singleChoiceItem, String structureId,
 			MultipleChoiceConfiguration multipleChoiceConfiguration) {
 		try {
@@ -410,8 +421,8 @@ public class AssessmentGenerator extends AbstractGenerator {
 						multipleChoiceConfiguration.clone());
 				material.setName(name);
 				material.setStructureId(structure.getId());
-				var mappingEntry = new MaterialMappingEntry(material, singleChoiceItem, mainTerm);
-				var mapping = new MaterialAndMapping(material, mappingEntry);
+				var mappingEntry = new MaterialMappingEntry<>(material, singleChoiceItem, mainTerm);
+				var mapping = new MaterialAndMapping<>(material, mappingEntry);
 				mapping.material().setStructureId(structureId);
 				materials.add(mapping);
 			} catch (IllegalArgumentException e) {
@@ -428,13 +439,13 @@ public class AssessmentGenerator extends AbstractGenerator {
 	 *
 	 * @param knowledge        The knowledge to create the test for.
 	 * @param relatedMaterials The related materials to the knowledge.
+	 *
 	 * @return A list of tests.
 	 */
-	public List<MaterialAndMapping> createTests(Set<KnowledgeNode> knowledge,
-			LinkedList<MaterialAndMapping> relatedMaterials, TestConfiguration testConfiguration) {
+	public List<MaterialAndMapping<? extends Material>> createTests(Set<KnowledgeNode> knowledge,
+			LinkedList<MaterialAndMapping<? extends Material>> relatedMaterials, TestConfiguration testConfiguration) {
 		var assembler = new TestAssembler<>(knowledge.stream().findFirst().get(), relatedMaterials, testConfiguration);
-		List<MaterialAndMapping<TestMaterial>> tests = assembler.assemble();
-		return new LinkedList<>(tests);
+		return new LinkedList<>(assembler.assemble());
 	}
 
 

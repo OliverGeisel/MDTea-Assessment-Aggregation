@@ -4,6 +4,7 @@ import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.KnowledgeMod
 import de.olivergeisel.materialgenerator.core.courseplan.CoursePlan;
 import de.olivergeisel.materialgenerator.core.courseplan.content.ContentTarget;
 import de.olivergeisel.materialgenerator.generation.KnowledgeNode;
+import de.olivergeisel.materialgenerator.generation.material.Material;
 import de.olivergeisel.materialgenerator.generation.material.MaterialAndMapping;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateSet;
 import org.junit.jupiter.api.AfterEach;
@@ -56,37 +57,37 @@ class AbstractGeneratorTest {
 			}
 
 			@Override
-			protected List<MaterialAndMapping> materialForComment(Set<KnowledgeNode> knowledge) {
+			protected List<MaterialAndMapping<? extends Material>> materialForComment(Set<KnowledgeNode> knowledge) {
 				return null;
 			}
 
 			@Override
-			protected List<MaterialAndMapping> materialForCreate(Set<KnowledgeNode> knowledge) {
+			protected List<MaterialAndMapping<? extends Material>> materialForCreate(Set<KnowledgeNode> knowledge) {
 				return null;
 			}
 
 			@Override
-			protected List<MaterialAndMapping> materialForControl(Set<KnowledgeNode> knowledge) {
+			protected List<MaterialAndMapping<? extends Material>> materialForControl(Set<KnowledgeNode> knowledge) {
 				return null;
 			}
 
 			@Override
-			protected List<MaterialAndMapping> materialForUse(Set<KnowledgeNode> knowledge) {
+			protected List<MaterialAndMapping<? extends Material>> materialForUse(Set<KnowledgeNode> knowledge) {
 				return null;
 			}
 
 			@Override
-			protected List<MaterialAndMapping> materialForTranslate(Set<KnowledgeNode> knowledge) {
+			protected List<MaterialAndMapping<? extends Material>> materialForTranslate(Set<KnowledgeNode> knowledge) {
 				return null;
 			}
 
 			@Override
-			protected List<MaterialAndMapping> materialForKnow(Set<KnowledgeNode> knowledge) {
+			protected List<MaterialAndMapping<? extends Material>> materialForKnow(Set<KnowledgeNode> knowledge) {
 				return null;
 			}
 
 			@Override
-			protected List<MaterialAndMapping> materialForFirstLook(Set<KnowledgeNode> knowledge)
+			protected List<MaterialAndMapping<? extends Material>> materialForFirstLook(Set<KnowledgeNode> knowledge)
 					throws NoSuchElementException {
 				return null;
 			}

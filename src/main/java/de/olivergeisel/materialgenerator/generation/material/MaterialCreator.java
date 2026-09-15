@@ -10,13 +10,15 @@ import java.util.Map;
 
 public class MaterialCreator {
 
-	public MaterialAndMapping createWikiMaterial(KnowledgeElement mainTerm, String name, TemplateType templateType,
+	public MaterialAndMapping<? extends Material> createWikiMaterial(KnowledgeElement mainTerm, String name,
+			TemplateType templateType,
 			Map<String, String> values, KnowledgeElement... relatedElements) {
 		var newMaterial = new Material(MaterialType.WIKI, mainTerm);
 		return fillMaterial(mainTerm, name, templateType, values, newMaterial, relatedElements);
 	}
 
-	public MaterialAndMapping createExampleMaterial(KnowledgeElement example, KnowledgeElement mainTerm, String name,
+	public MaterialAndMapping<? extends ExampleMaterial> createExampleMaterial(KnowledgeElement example,
+			KnowledgeElement mainTerm, String name,
 			TemplateType templateType, Map<String, String> values, KnowledgeElement... relatedElements) {
 		var imagename = "";
 		var data = new HashMap<String, String>();
@@ -28,31 +30,34 @@ public class MaterialCreator {
 		});
 		data.putIfAbsent("text", "");
 		imagename = data.computeIfAbsent("IMAGE", k -> "NO_IMAGE");
-		Material newMaterial;
-		if (imagename.equals("NO_IMAGE")) {
-			newMaterial = new ExampleMaterial(mainTerm.getContent(), mainTerm.getId(), mainTerm.getStructureId());
-		} else newMaterial = new ExampleMaterial(mainTerm.getContent(), mainTerm.getId(), mainTerm.getStructureId(),
-				imagename);
+		ExampleMaterial newMaterial =
+				imagename.equals("NO_IMAGE")
+						? new ExampleMaterial(mainTerm.getContent(), mainTerm.getId(), mainTerm.getStructureId())
+						: new ExampleMaterial(mainTerm.getContent(), mainTerm.getId(), mainTerm.getStructureId(),
+						imagename);
 		var newValues = new HashMap<String, String>();
 		newValues.putAll(data);
 		newValues.putAll(values);
 		return fillMaterial(mainTerm, name, templateType, newValues, newMaterial, relatedElements);
 	}
 
-	public MaterialAndMapping createProofMaterial(KnowledgeElement proof, KnowledgeElement mainTerm, String name,
+	public MaterialAndMapping<? extends Material> createProofMaterial(KnowledgeElement proof, KnowledgeElement mainTerm,
+			String name,
 			de.olivergeisel.materialgenerator.generation.templates.TemplateType templateType,
 			Map<String, String> values, KnowledgeElement... relatedElements) {
+		// Todo Create ProofMaterial class and use it here instead of Material
 		Material newMaterial = new Material(mainTerm.getContent(), mainTerm.getId(), mainTerm.getStructureId(),
 				MaterialType.WIKI, templateType);
 		return fillMaterial(mainTerm, name, templateType, values, newMaterial, relatedElements);
 	}
 
-	private MaterialAndMapping fillMaterial(KnowledgeElement mainTerm, String name, TemplateType templateType,
-			Map<String, String> values, Material newMaterial, KnowledgeElement[] relatedElements) {
+	private <M extends Material> MaterialAndMapping<? extends M> fillMaterial(KnowledgeElement mainTerm, String name,
+			TemplateType templateType,
+			Map<String, String> values, M newMaterial, KnowledgeElement[] relatedElements) {
 		newMaterial.setName(name);
 		newMaterial.setTemplateType(templateType);
 		newMaterial.setValues(values);
-		MaterialMappingEntry mapping = new MaterialMappingEntry(newMaterial);
+		MaterialMappingEntry<? extends Material> mapping = new MaterialMappingEntry<>(newMaterial);
 		mapping.add(mainTerm);
 		mapping.add(relatedElements);
 		return new MaterialAndMapping(newMaterial, mapping);

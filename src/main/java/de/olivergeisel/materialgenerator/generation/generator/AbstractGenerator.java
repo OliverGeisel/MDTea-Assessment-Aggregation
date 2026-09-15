@@ -66,7 +66,9 @@ public abstract class AbstractGenerator implements Generator {
 	}
 
 
-	protected static String getUniqueMaterialName(List<MaterialAndMapping> materials, String startName,
+	protected static <M extends Material> String getUniqueMaterialName
+			(List<? extends MaterialAndMapping<? extends M>> materials,
+					String startName,
 			String alternativeName) {
 		String name = startName;
 		final String finalName = name;
@@ -86,7 +88,9 @@ public abstract class AbstractGenerator implements Generator {
 	 * @param knowledge     Set of KnowledgeNodes to search in
 	 * @param masterKeyword Keyword to search for
 	 * @param topics        List of topics to search for
+	 *
 	 * @return KnowledgeNode that fits the masterKeyword or one of the topics
+	 *
 	 * @throws NoSuchElementException if no KnowledgeNode fits the masterKeyword or one of the topics
 	 */
 	protected static KnowledgeNode getMainKnowledge(Set<KnowledgeNode> knowledge, String masterKeyword,
@@ -100,7 +104,9 @@ public abstract class AbstractGenerator implements Generator {
 	 *
 	 * @param knowledge Set of KnowledgeNodes to search in
 	 * @param node      KnowledgeNode with masterKeyword and topics
+	 *
 	 * @return KnowledgeNode with a mainElement of type {@link Term} that fits the masterKeyword or one of the topics
+	 *
 	 * @throws NoSuchElementException if no KnowledgeNode fits the masterKeyword or one of the topics.
 	 */
 	protected static KnowledgeNode getTermNode(Set<KnowledgeNode> knowledge, KnowledgeNode node)
@@ -114,7 +120,9 @@ public abstract class AbstractGenerator implements Generator {
 	 * @param knowledge Set of KnowledgeNodes to search in
 	 * @param node      KnowledgeNode with masterKeyword and topics
 	 * @param type      KnowledgeType to search for
+	 *
 	 * @return KnowledgeNode that fits the masterKeyword or one of the topics
+	 *
 	 * @throws NoSuchElementException if no KnowledgeNode fits the masterKeyword or one of the topics
 	 */
 	protected static KnowledgeNode getMainKnowledge(Set<KnowledgeNode> knowledge, KnowledgeNode node,
@@ -132,7 +140,9 @@ public abstract class AbstractGenerator implements Generator {
 	 * @param masterKeyword Keyword to search for
 	 * @param topics        List of topics to search for
 	 * @param type          KnowledgeType to search for
+	 *
 	 * @return KnowledgeNode that fits the masterKeyword or one of the topics
+	 *
 	 * @throws NoSuchElementException if no KnowledgeNode fits the masterKeyword or one of the topics
 	 */
 	protected static KnowledgeNode getMainKnowledge(Set<KnowledgeNode> knowledge, String masterKeyword,
@@ -154,7 +164,9 @@ public abstract class AbstractGenerator implements Generator {
 	 *
 	 * @param knowledge     Set of KnowledgeNodes to search in
 	 * @param masterKeyword Keyword to search for
+	 *
 	 * @return KnowledgeNode that fits the mainKeyword
+	 *
 	 * @throws NoSuchElementException if no KnowledgeNode fits the mainKeyword or no KnowledgeNode is a Term
 	 */
 	protected static KnowledgeNode getMainKnowledge(Set<KnowledgeNode> knowledge, String masterKeyword) {
@@ -168,7 +180,9 @@ public abstract class AbstractGenerator implements Generator {
 	 * Get a {@link KnowledgeNode} that fits the mainKeyword. The node is a {@link Term}.
 	 *
 	 * @param knowledge Set of KnowledgeNodes to search in
+	 *
 	 * @return {@link KnowledgeNode} that is the first TERM element
+	 *
 	 * @throws NoSuchElementException if no KnowledgeNode is a {@link Term}
 	 */
 	protected static KnowledgeNode getMainKnowledge(Set<KnowledgeNode> knowledge) {
@@ -221,6 +235,7 @@ public abstract class AbstractGenerator implements Generator {
 	 * Load all {@link KnowledgeNode}s for a given structureId. It includes similar structureIds.
 	 *
 	 * @param structureId structureId to load the KnowledgeNodes for
+	 *
 	 * @return Set of KnowledgeNodes for the given structureId. If no KnowledgeNode is found, an empty unmodifiable
 	 * Set is returned.
 	 */
@@ -236,6 +251,7 @@ public abstract class AbstractGenerator implements Generator {
 	 * The first structureId that has a KnowledgeNode is used.
 	 *
 	 * @param structureIds structureIds to load the KnowledgeNodes for
+	 *
 	 * @return a Set of KnowledgeNodes for the given structureIds. If no KnowledgeNode is found, an empty unmodifiable
 	 */
 	protected Set<KnowledgeNode> loadKnowledgeForStructureComplete(List<String> structureIds) {
@@ -344,6 +360,7 @@ public abstract class AbstractGenerator implements Generator {
 	 * </p>
 	 *
 	 * @param targets List of {@link ContentTarget}s to create {@link Material} for
+	 *
 	 * @throws IllegalStateException if the targets have different {@link ContentGoal}s.
 	 */
 	protected void processTargets(List<ContentTarget> targets) throws IllegalStateException {
@@ -380,19 +397,19 @@ public abstract class AbstractGenerator implements Generator {
 		}
 	}
 
-	protected abstract List<MaterialAndMapping> materialForComment(Set<KnowledgeNode> knowledge);
+	protected abstract List<MaterialAndMapping<? extends Material>> materialForComment(Set<KnowledgeNode> knowledge);
 
-	protected abstract List<MaterialAndMapping> materialForCreate(Set<KnowledgeNode> knowledge);
+	protected abstract List<MaterialAndMapping<? extends Material>> materialForCreate(Set<KnowledgeNode> knowledge);
 
-	protected abstract List<MaterialAndMapping> materialForControl(Set<KnowledgeNode> knowledge);
+	protected abstract List<MaterialAndMapping<? extends Material>> materialForControl(Set<KnowledgeNode> knowledge);
 
-	protected abstract List<MaterialAndMapping> materialForUse(Set<KnowledgeNode> knowledge);
+	protected abstract List<MaterialAndMapping<? extends Material>> materialForUse(Set<KnowledgeNode> knowledge);
 
-	protected abstract List<MaterialAndMapping> materialForTranslate(Set<KnowledgeNode> knowledge);
+	protected abstract List<MaterialAndMapping<? extends Material>> materialForTranslate(Set<KnowledgeNode> knowledge);
 
-	protected abstract List<MaterialAndMapping> materialForKnow(Set<KnowledgeNode> knowledge);
+	protected abstract List<MaterialAndMapping<? extends Material>> materialForKnow(Set<KnowledgeNode> knowledge);
 
-	protected abstract List<MaterialAndMapping> materialForFirstLook(Set<KnowledgeNode> knowledge)
+	protected abstract List<MaterialAndMapping<? extends Material>> materialForFirstLook(Set<KnowledgeNode> knowledge)
 			throws NoSuchElementException;
 
 	/**

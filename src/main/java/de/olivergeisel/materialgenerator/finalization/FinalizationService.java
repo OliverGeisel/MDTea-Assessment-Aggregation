@@ -62,7 +62,8 @@ public class FinalizationService {
 		this.materialRepository = materialRepository;
 	}
 
-	public RawCourse createRawCourse(CoursePlan coursePlan, String template, Collection<MaterialAndMapping> materials) {
+	public RawCourse createRawCourse(CoursePlan coursePlan, String template,
+			Collection<MaterialAndMapping<? extends Material>> materials) {
 		var cGoals = coursePlan.getGoals();
 		var goals = createGoals(cGoals);
 		var rawCourse = new RawCourse(coursePlan, template, goals);

@@ -28,11 +28,11 @@ import java.util.Random;
 public class TrueFalseExtractor implements Extractor<TrueFalseItemMaterial> {
 
 	@Override
-	public List<MaterialAndMapping<TrueFalseItemMaterial>> extract(KnowledgeNode knowledgeNode,
+	public List<? extends MaterialAndMapping<? extends TrueFalseItemMaterial>> extract(KnowledgeNode knowledgeNode,
 			final TemplateType templateType) {
 		var mainElement = knowledgeNode.getMainElement();
 		knowledgeNode.getMasterKeyWord();
-		var back = new LinkedList<MaterialAndMapping<TrueFalseItemMaterial>>();
+		List<MaterialAndMapping<? extends TrueFalseItemMaterial>> back = new LinkedList<>();
 
 		var allIsRelations = knowledgeNode.getWantedRelationsFrom(RelationType.IS);
 		Random random = new Random();
@@ -52,7 +52,7 @@ public class TrueFalseExtractor implements Extractor<TrueFalseItemMaterial> {
 					new StatementParts(correctSubject.getContent(), correctPredicate.getContent()));
 			var question = new TrueFalseItemMaterial(statement, true);
 			question.setStructureId(knowledgeNode.getStructurePoint().getId());
-			var mappingEntry = new MaterialMappingEntry(question, correctSubject, correctPredicate);
+			var mappingEntry = new MaterialMappingEntry<>(question, correctSubject, correctPredicate);
 			var mapping = new MaterialAndMapping<>(question, mappingEntry);
 			back.add(mapping);
 		}
