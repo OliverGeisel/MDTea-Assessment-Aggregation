@@ -134,6 +134,12 @@
     <script src="/js/bold-and-dark.js"></script>
 </footer>
 
+<div th:fragment="scripts">
+    <script src="/webjars/htmx.org/4.0.0-beta6/dist/htmx.js"
+            th:href="@{/webjars/htmx.org/dist/htmx.js}"></script>
+    <script src="/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/js/bold-and-dark.js"></script>
+</div>
 
 </body>
 </html>

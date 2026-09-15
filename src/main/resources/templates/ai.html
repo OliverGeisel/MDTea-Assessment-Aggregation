@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{default-layout}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>KI und LLMs</title>
+    <style>
+        .chat-question {
+            display: block;
+            background-color: #0d2430;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            white-space: pre-wrap;
+            color: #e6f0ff;
+            text-align: right;
+            width: -webkit-fit-content;
+            width: -moz-fit-content;
+            width: fit-content;
+            max-width: 80%;
+            margin-left: auto;
+            word-break: break-word;
+        }
+
+        .chat-response {
+            display: block;
+            background-color: #071428;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            white-space: pre-wrap;
+            color: #e6f0ff;
+            text-align: left;
+            width: -webkit-fit-content;
+            width: -moz-fit-content;
+            width: fit-content;
+            max-width: 80%;
+            margin-right: auto;
+            word-break: break-word;
+        }
+
+        /* Scrollbar styling */
+        #response-container {
+            max-height: 360px;
+        }
+
+        #response-container::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        #response-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+        }
+
+        #response-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+        }
+
+        #response-container {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.08) rgba(255, 255, 255, 0.02);
+        }
+    </style>
+</head>
+<body>
+<nav th:replace="~{main::navigation}"></nav>
+<header class="bg-dark" layout:fragment="header">
+    <div class="container pt-4 pt-xl-5">
+        <div class="row pt-5">
+            <div class="col-md-8 col-xl-6 text-center text-md-start mx-auto">
+                <h1>AI und LLMs</h1>
+            </div>
+        </div>
+    </div>
+</header>
+<main layout:fragment="content">
+    <section id="info-section">
+        <header>
+            <h3 class="toast-header">Allgemeine Informationen</h3>
+        </header>
+        <article class="text-body">
+            Dies ist eine interaktive Seite für das Experimentieren mit KI und LLMs, die im System integriert sind.
+            Hier eine kleine Versuchsanordnung. Geben Sie in das Textfeld einen Text ein und klicken Sie auf "Senden".
+            <form hx-indicator="#loadingIndicator" hx-post="/api/ai/generate"
+                  hx-swap="beforeend"
+                  hx-target="#response"
+                  id="aiForm"
+                  method="post">
+                <div class="form-label">
+                    <label class="form-text" for="message-input">Eingabetext:</label>
+                    <input class="form-control" id="message-input" minlength="5" name="message" placeholder="Geben Sie hier Ihren Text ein..." required
+                           type="text">
+                </div>
+                <div class="form-group mt-2">
+                    <button class="btn btn-outline-primary" type="submit">Senden</button>
+                </div>
+            </form>
+            <hr>
+            <div class="htmx-indicator text-muted" id="loadingIndicator">
+                Antwort wird generiert. Bitte warten...
+                <!-- By Sam Herbert (@sherb), for everyone. More @ http://goo.gl/7AJzbL -->
+                <svg fill="#FFF" height="80" viewBox="0 0 55 80" width="55" xmlns="http://www.w3.org/2000/svg">
+                    <g transform="matrix(1 0 0 -1 0 80)">
+                        <rect height="20" rx="3" width="10">
+                            <animate attributeName="height"
+                                     begin="0s" calcMode="linear"
+                                     dur="4.3s"
+                                     repeatCount="indefinite"
+                                     values="20;45;57;80;64;32;66;45;64;23;66;13;64;56;34;34;2;23;76;79;20"/>
+                        </rect>
+                        <rect height="80" rx="3" width="10" x="15">
+                            <animate attributeName="height"
+                                     begin="0s" calcMode="linear"
+                                     dur="2s" repeatCount="indefinite"
+                                     values="80;55;33;5;75;23;73;33;12;14;60;80"/>
+                        </rect>
+                        <rect height="50" rx="3" width="10" x="30">
+                            <animate attributeName="height"
+                                     begin="0s" calcMode="linear"
+                                     dur="1.4s" repeatCount="indefinite"
+                                     values="50;34;78;23;56;23;34;76;80;54;21;50"/>
+                        </rect>
+                        <rect height="30" rx="3" width="10" x="45">
+                            <animate attributeName="height"
+                                     begin="0s" calcMode="linear"
+                                     dur="2s" repeatCount="indefinite"
+                                     values="30;45;13;80;56;72;45;76;34;23;67;30"/>
+                        </rect>
+                    </g>
+                </svg>
+            </div>
+        </article>
+    </section>
+    <hr>
+    <section id="response-section">
+        <h3>Antworten</h3>
+        <div class="overflow-auto rounded border p-3 bg-dark text-light" id="response-container">
+            <div class="pt-2" id="response"></div>
+        </div>
+    </section>
+</main>
+
+<div layout:fragment="scripts">
+    <script src="/webjars/htmx.org/4.0.0-beta6/dist/htmx.js"
+            th:src="@{/webjars/htmx.org/dist/htmx.js}"></script>
+
+    <script>
+        // Keep the response container scrolled to bottom when new content is added
+        function scrollResponseToBottom() {
+            const container = document.getElementById('response-container');
+            if (!container) return;
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // HTMX event: afterSwap fires when content has been swapped into the DOM
+        document.addEventListener('htmx:afterSwap', function (evt) {
+            // only scroll when swap affected the response container
+            const container = document.getElementById('response-container');
+            if (!container) return;
+            // small timeout to ensure images/fonts/layout have settled
+            setTimeout(scrollResponseToBottom, 10);
+        });
+
+        // also ensure smooth scroll to bottom
+        function scrollResponseToBottomSmooth() {
+            const container = document.getElementById('response-container');
+            if (!container) return;
+            container.scrollTo({top: container.scrollHeight, behavior: 'smooth'});
+        }
+
+        // Also scroll when page loads if there is content
+        document.addEventListener('DOMContentLoaded', function () {
+            scrollResponseToBottom();
+            // ensure smooth final position
+            scrollResponseToBottomSmooth();
+        });
+    </script>
+    <script>
+        document.getElementById('aiForm').addEventListener('submit', function (event) {
+                const messageInput = document.getElementById('message-input');
+                const message = messageInput.value.trim();
+                if (message.length < 5) {
+                    alert("Bitte geben Sie eine längere Nachricht ein (mindestens 5 Zeichen).");
+                    return;
+                }
+            }
+        )
+    </script>
+
+</div>
+</body>
+</html>

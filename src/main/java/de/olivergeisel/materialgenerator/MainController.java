@@ -27,4 +27,8 @@ public class MainController {
 		return "info";
 	}
 
+	@GetMapping("ai")
+	String ai() {
+		return "ai";
+	}
 }
