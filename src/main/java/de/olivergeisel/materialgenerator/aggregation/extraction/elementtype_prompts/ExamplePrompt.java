@@ -52,6 +52,22 @@ public class ExamplePrompt extends ElementPrompt<Example> {
 		super(DEFAULT_INSTRUCTIONS, DEFAULT_FORMAT, fragment, DeliverType.MULTIPLE, fragmentLanguage, targetLanguage);
 	}
 
+	public static ExamplePrompt fromDisk(String userInput) throws RuntimeException {
+		try {
+			java.io.InputStream inputStream =
+					new java.io.FileInputStream(java.nio.file.Path.of("/prompts/example.json").toFile());
+			org.apache.tomcat.util.json.JSONParser parser = new org.apache.tomcat.util.json.JSONParser(inputStream);
+			@SuppressWarnings("unchecked")
+			java.util.Map<String, Object> value = (java.util.Map<String, Object>) parser.parse();
+			String instructions = (String) value.get("instructions");
+			String format = (String) value.get("format");
+			return new ExamplePrompt(userInput, instructions, format, DeliverType.MULTIPLE);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("Could not load prompt from disk");
+		}
+	}
+
 //region setter/getter
 	@Override
 	public String getPrompt() {

@@ -3,12 +3,14 @@ package de.olivergeisel.materialgenerator.aggregation.extraction;
 import de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_prompts.TermPrompt;
 import de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_prompts.TermPromptAnswer;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.ai.chat.model.ChatModel;
 
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
@@ -30,11 +32,13 @@ class GPT_SessionTest {
 	private TermPromptAnswer termPromptAnswer;
 	@Mock
 	private GPT_Request      gpt_request;
+	@Mock
+	private ChatModel chatModel;
 
 
 	@BeforeEach
 	void setUp() {
-		gpt_session = new GPT_Session();
+		gpt_session = new GPT_Session(chatModel);
 	}
 
 	@Test
@@ -59,5 +63,11 @@ class GPT_SessionTest {
 		} catch (TimeoutException e) {
 			fail();
 		}
+	}
+
+	@Test
+	@Disabled
+	void requestOllama() {
+		fail("Not yet implemented");
 	}
 }

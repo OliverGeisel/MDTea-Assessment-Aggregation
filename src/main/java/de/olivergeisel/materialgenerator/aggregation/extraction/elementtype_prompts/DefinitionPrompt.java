@@ -54,6 +54,22 @@ public class DefinitionPrompt extends ElementPrompt<Definition> {
 		this.terms = terms;
 	}
 
+	public static DefinitionPrompt fromDisk(String userInput, java.util.List<String> terms) throws RuntimeException {
+		try {
+			java.io.InputStream inputStream =
+					new java.io.FileInputStream(java.nio.file.Path.of("/prompts/definition.json").toFile());
+			org.apache.tomcat.util.json.JSONParser parser = new org.apache.tomcat.util.json.JSONParser(inputStream);
+			@SuppressWarnings("unchecked")
+			java.util.Map<String, Object> value = (java.util.Map<String, Object>) parser.parse();
+			String instructions = (String) value.get("instructions");
+			String format = (String) value.get("format");
+			return new DefinitionPrompt(userInput, instructions, format, DeliverType.MULTIPLE, terms, null, null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("Could not load prompt from disk");
+		}
+	}
+
 	//region setter/getter
 	public List<String> getTerms() {
 		return terms;

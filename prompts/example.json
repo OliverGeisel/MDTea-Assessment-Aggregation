@@ -1,0 +1,46 @@
+{
+  "instructions": [
+    "List all examples to a Topic/Term in the following query.",
+    "Terms are subjects in the query.",
+    "Terms are single words in singular.",
+    "Examples can be a single word (Term) or a sentence/short text.",
+    "If the example is a Term annotate it with 'TERM', if a sentence annotate it with 'EXAMPLE'.",
+    "Read the example section."
+  ],
+  "deliverType": "multiple",
+  "format": "{\"type\": \"object\",\"properties\": {  \"examples\": {\"type\": \"array\",\"items\": {  \"type\": \"object\",  \"properties\": {\"term\": {  \"type\": \"string\"},\"example\": {  \"type\": \"string\"},\"kind\": {  \"type\": \"string\",\"enum\":[\"TERM\",\"EXAMPLE\"]}  },  \"required\": [\"term\",\"example\"]}  },  \"required\": [\"examples\"]} ",
+  "example-input": "- query: 'A fish is an animal that lives in the water. A salmon is a fish. A shark is a fish too.'\n- language: 'The language of the query is english; the language of the answer is english'\n+ Fish | Salmon | TERM\n+ Fish | Shark | TERM",
+  "format-object": {
+    "type": "object",
+    "properties": {
+      "examples": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "term": {
+              "type": "string"
+            },
+            "example": {
+              "type": "string"
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "TERM",
+                "EXAMPLE"
+              ]
+            }
+          },
+          "required": [
+            "term",
+            "example"
+          ]
+        }
+      }
+    },
+    "required": [
+      "examples"
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "instructions": [
+    "List all definitions for a list of terms in the following query, separated by new line and every definition start with a \"+\".",
+    "Definitions are the explanation of a term.",
+    "Definitions can be multiple sentences.",
+    "Only the definitions in the query are used.",
+    "No duplications of definitions.",
+    "Skip a term in the answer, if no definition is found in the query.",
+    "Follow the pattern: [Term] , [Definition]",
+    "in example section you can see an example.",
+    "You are not allowed to bring any new information, only the definitions in the query are used.",
+    "Dont copy the definitions 1:1 from the query. Look if the definition can be formulated more concise and clear."
+  ],
+  "deliverType": "multiple",
+  "format": "{\"type\": \"object\",\"properties\": {  \"definitions\": {\"type\": \"array\",\"items\": {  \"type\": \"object\",  \"properties\": {\"term\": {  \"type\": \"string\"},\"definition\": {  \"type\": \"string\"}  },  \"required\": [\"term\",\"definition\"  ]}  },  \"language\": {\"type\": \"string\"  }},\"required\": [  \"definitions\",  \"language\"]  }",
+  "example-input": "- terms: fish, animal, water, gill\n\t\t\t- language: 'the language of the query is english; the language of the answer is english'\n\t\t\t- query: 'A fish is an animal that lives in the water. It has shed, fins and gills. A fish use gills to breathe. Gills are organs that are really thin and filter the O2 out of the water.'\n\t\t\t+ fish | A fish is an animal that lives in the water. It has shed, fins and gills.\n\t\t\t+ gill | A breathing organ, that filters oxygen from the water.\n\t\t\t",
+  "format-object": {
+    "type": "object",
+    "properties": {
+      "definitions": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "term": {
+              "type": "string"
+            },
+            "definition": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "term",
+            "definition"
+          ]
+        }
+      },
+      "language": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "definitions",
+      "language"
+    ]
+  }
+}

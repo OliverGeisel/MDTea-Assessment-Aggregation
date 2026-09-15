@@ -50,6 +50,22 @@ public class ItemPrompt extends ElementPrompt<Item> {
 		super(DEFAULT_INSTRUCTION, DEFAULT_FORMAT, fragment, DeliverType.MULTIPLE, fragmentLanguage, targetLanguage);
 	}
 
+	public static ItemPrompt fromDisk(String userInput) throws RuntimeException {
+		try {
+			java.io.InputStream inputStream =
+					new java.io.FileInputStream(java.nio.file.Path.of("/prompts/item.json").toFile());
+			org.apache.tomcat.util.json.JSONParser parser = new org.apache.tomcat.util.json.JSONParser(inputStream);
+			@SuppressWarnings("unchecked")
+			java.util.Map<String, Object> value = (java.util.Map<String, Object>) parser.parse();
+			String instructions = (String) value.get("instructions");
+			String format = (String) value.get("format");
+			return new ItemPrompt(userInput, instructions, format, DeliverType.MULTIPLE);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("Could not load prompt from disk");
+		}
+	}
+
 //region setter/getter
 	/**
 	 * Create the Prompt for the GPT-Model. The Prompt is a string with the instruction, the fragment and the wanted format.

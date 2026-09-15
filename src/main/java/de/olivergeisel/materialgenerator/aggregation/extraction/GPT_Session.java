@@ -2,8 +2,11 @@ package de.olivergeisel.materialgenerator.aggregation.extraction;
 
 import de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_prompts.PromptAnswer;
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
+import de.olivergeisel.materialgenerator.ai.llm.LlmSession;
+import de.olivergeisel.materialgenerator.core.exceptions.ServerNotAvailableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.model.ChatModel;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,7 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
-public class GPT_Session {
+public class GPT_Session extends LlmSession {
 
 	private static final Logger logger = LoggerFactory.getLogger(GPT_Session.class);
 
@@ -77,6 +80,10 @@ public class GPT_Session {
 			logger.info(STR."Connection-(Python) was closed with code: \{exitCode}");
 		}
 		return answer;
+	}
+
+	public GPT_Session(ChatModel chatModel) {
+		super(chatModel);
 	}
 
 	public <T extends KnowledgeElement, A extends PromptAnswer<T>> String requestLocalModel(

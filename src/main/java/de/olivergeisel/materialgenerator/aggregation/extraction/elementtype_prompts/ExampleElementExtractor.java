@@ -49,6 +49,7 @@ public class ExampleElementExtractor extends ElementExtractor<Example, ExamplePr
 	 * Returns the term for a given example.
 	 *
 	 * @param example The example that is linked to the term you want.
+	 *
 	 * @return The term that is linked to the example.
 	 */
 	public String getTermFor(Example example) {
@@ -85,6 +86,66 @@ public class ExampleElementExtractor extends ElementExtractor<Example, ExamplePr
 			text = getChoices(answers).getFirst().get("text").toString();
 		}
 		List<Example> back = new LinkedList<>();
+
+		// Try JSON new format
+		try {
+			var parsed = net.minidev.json.JSONValue.parseWithException(text);
+			if (parsed instanceof java.util.Map) {
+				@SuppressWarnings("unchecked")
+				var map = (java.util.Map<String, Object>) parsed;
+				if (map.containsKey("examples")) {
+					var examples = (java.util.List<Object>) map.get("examples");
+					for (var o : examples) {
+						if (o instanceof java.util.Map) {
+							@SuppressWarnings("unchecked")
+							var obj = (java.util.Map<String, Object>) o;
+							var term = obj.getOrDefault("term", "").toString();
+							var exampleContent = obj.getOrDefault("example", "").toString();
+							var kind = obj.getOrDefault("kind", "EXAMPLE").toString();
+							if (kind.equals("EXAMPLE")) {
+								var id = STR."\{term}-EXAMPLE";
+								int i = 0;
+								var check = true;
+								while (check) {
+									var tempId = id;
+									var result =
+											termExampleMap.keySet().stream().anyMatch(e -> e.getId().equals(tempId));
+									if (!result) break;
+									id = STR."\{term}-\{++i}-EXAMPLE";
+									if (i > 100) {
+										check = false;
+									}
+								}
+								termExampleMap.put(new Example(exampleContent, id, "example"), term);
+								back.add(new Example(exampleContent, id, "example"));
+							} else if (kind.equals("TERM")) {
+								AtomicReference<Term> from = new AtomicReference<>();
+								var fromTerm = terms.stream().filter(e -> e.getContent().equals(term)).findFirst();
+								fromTerm.ifPresentOrElse(from::set, () -> {
+									var newTerm = new Term(term, STR."\{term}-TERM", "term");
+									newTerms.add(newTerm);
+									from.set(newTerm);
+								});
+								AtomicReference<Term> to = new AtomicReference<>();
+								var toTerm =
+										terms.stream().filter(e -> e.getContent().equals(exampleContent)).findFirst();
+								toTerm.ifPresentOrElse(to::set, () -> {
+									var newTerm = new Term(exampleContent, STR."\{exampleContent}-TERM", "term");
+									newTerms.add(newTerm);
+									to.set(newTerm);
+								});
+								relations.add(new BasicRelation(RelationType.EXAMPLE_FOR, from.get(), to.get()));
+								relations.add(new BasicRelation(RelationType.HAS_EXAMPLE, to.get(), from.get()));
+							}
+						}
+					}
+					return back;
+				}
+			}
+		} catch (Exception ignored) {
+		}
+
+		// Old format parsing
 		final var rawPotentialExampleLines = text.split("\\\\n");
 		for (var line : rawPotentialExampleLines) {
 			if (line.strip().isBlank()) continue;

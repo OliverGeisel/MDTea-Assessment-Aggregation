@@ -1,0 +1,48 @@
+{
+  "instructions": [
+    "List all questions in the following query, separated by new line and every question start with a '+'.",
+    "Questions can be one of the following types: SINGLE_CHOICE, MULTIPLE_CHOICE, TRUE_FALSE, FILL_OUT_BLANKS.",
+    "Follow the pattern: + [Type] | [Question] | [Options].",
+    "If the question is SINGLE_CHOICE, options are separated by a semicolon; the first option is the correct one.",
+    "If MULTIPLE_CHOICE, mark correct options with '(c)' at the end.",
+    "If TRUE_FALSE, use 'true' or 'false' as option.",
+    "If FILL_OUT_BLANKS, replace blanks in the text with '<_____>' and list parts for blanks separated by ';' in order.",
+    "Consider the language of the query and the language of the answers as given in the 'language' section.",
+    "Read the example section."
+  ],
+  "deliverType": "multiple",
+  "format": "{\"type\": \"object\",\"properties\": {  \"items\": {\"type\": \"array\",\"items\": {  \"type\": \"object\",  \"properties\": {\"type\": { \"type\": \"string\" },\"question\": { \"type\": \"string\" },\"options\": { \"type\": \"array\", \"items\": { \"type\": \"string\" } }  },  \"required\": [\"type\", \"question\"]}  }},\"required\": [\"items\"]  }",
+  "example-input": "- query: 'The capital of Germany is Berlin. Germany is a country in Europe.'- language: 'The language of the query is english; the language of the answers should be in english'+ SINGLE_CHOICE | What is the capital of Germany? | Berlin; Munich; Hamburg; Frankfurt+ TRUE_FALSE | The capital of Germany is Dresden. | false+ FILL_OUT_BLANKS | The capital of Germany is <_____>. | Berlin+ MULTIPLE_CHOICE | What is a country in europe? | Germany(c); Canada; China; France(c)",
+  "format-object": {
+    "type": "object",
+    "properties": {
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "question": {
+              "type": "string"
+            },
+            "options": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "type",
+            "question"
+          ]
+        }
+      }
+    },
+    "required": [
+      "items"
+    ]
+  }
+}

@@ -33,7 +33,32 @@ public class TermElementExtractor extends ElementExtractor<Term, TermPromptAnswe
 			text = getChoices(answers).getFirst().get("text").toString();
 		}
 		List<Term> back = new LinkedList<>();
-		// Todo look after format
+
+		// Try to detect new JSON format first
+		try {
+			var parsed = net.minidev.json.JSONValue.parseWithException(text);
+			if (parsed instanceof java.util.Map) {
+				@SuppressWarnings("unchecked")
+				var map = (java.util.Map<String, Object>) parsed;
+				if (map.containsKey("terms")) {
+					@SuppressWarnings("unchecked")
+					var terms = (java.util.List<Object>) map.get("terms");
+					for (var o : terms) {
+						if (o instanceof java.util.Map) {
+							@SuppressWarnings("unchecked")
+							var termObj = (java.util.Map<String, Object>) o;
+							var term = termObj.getOrDefault("term", "").toString();
+							back.add(new Term(term, STR."\{term}-TERM", "term"));
+						}
+					}
+					return back;
+				}
+			}
+		} catch (Exception ignored) {
+			// not JSON or not the new format -> fall back to old parser
+		}
+
+		// Old format: lines like "+ Term | Translation"
 		final var rawPotentialTermLines = text.split("\\\\n");
 		for (var line : rawPotentialTermLines) {
 			if (line.strip().isBlank()) continue;

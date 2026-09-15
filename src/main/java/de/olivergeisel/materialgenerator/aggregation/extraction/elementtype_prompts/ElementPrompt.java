@@ -2,6 +2,8 @@ package de.olivergeisel.materialgenerator.aggregation.extraction.elementtype_pro
 
 
 import de.olivergeisel.materialgenerator.aggregation.knowledgemodel.model.element.KnowledgeElement;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.ollama.api.OllamaChatOptions;
 
 import java.util.List;
 
@@ -49,18 +51,31 @@ import java.util.List;
  * </pre>
  *
  * @author Oliver Geisel
- * @version 1.1.0
+ * @version 1.2.0
  * @see KnowledgeElement
  * @see PromptAnswer
  * @since 1.1.0
  */
-public abstract class ElementPrompt<T extends KnowledgeElement> {
+public abstract class ElementPrompt<T extends KnowledgeElement> extends Prompt {
 
 	/**
 	 * Possible symbol for the start of a new element.
 	 */
 	public static final List<String> START_CHARS              = List.of("+", "-", "*", "#", "~");
 	public static final String START_CHARS_STRING_REGEX = "[+\\-#*~]";
+	public static final String DEFAULT_FORMT_OLLAMA     = """
+			{
+			    "type": "object",
+			    "properties": {
+			        "result": {
+			            "type": "array",
+			            "items": { "type": "string" }
+			        }
+			    },
+			    "required": ["result"]
+			}
+			""";
+
 
 	private String      instruction;
 	private String      wantedFormat;
@@ -69,35 +84,58 @@ public abstract class ElementPrompt<T extends KnowledgeElement> {
 	private Language targetLanguage   = Language.ENGLISH;
 	private DeliverType deliverType;
 
+
+	/**
+	 * Creates a new ElementPrompt.
+	 *
+	 * @param instruction  all the instructions for the model. It is a list of rules to follow.
+	 * @param wantedFormat expected output format. Should be described as an JSON-Format (Schema).
+	 * @param fragment     the text that should be analyzed.
+	 * @param type         the type of the element to be extracted. Can be a single element or multiple elements.
+	 *
+	 * @throws IllegalArgumentException if any of the arguments is null.
+	 */
 	protected ElementPrompt(String instruction, String wantedFormat, String fragment, DeliverType type)
 			throws IllegalArgumentException {
-		if (instruction == null || wantedFormat == null || fragment == null || type == null) {
-			throw new IllegalArgumentException("No argument can be null");
-		}
-		this.instruction = instruction;
-		this.wantedFormat = wantedFormat;
-		this.fragment = fragment;
-		this.deliverType = type;
+		this(instruction, wantedFormat, fragment, type, Language.ENGLISH, Language.ENGLISH);
 	}
 
+	/**
+	 * Creates a new ElementPrompt.
+	 *
+	 * @param instruction      all the instructions for the model. It is a list of rules to follow.
+	 * @param wantedFormat     expected output format. Should be described as an JSON-Format (Schema).
+	 * @param fragment         the text that should be analyzed.
+	 * @param type             the type of the element to be extracted. Can be a single element or multiple elements.
+	 * @param fragmentLanguage the language of the fragment. If null, it will be set to English.
+	 * @param targetLanguage   the language of the answer. If null, it will be set to English.
+	 *
+	 * @throws IllegalArgumentException if any of the first four arguments is null. The languages can be null, then they will be set to English.
+	 */
 	protected ElementPrompt(String instruction, String wantedFormat, String fragment, DeliverType type,
 			Language fragmentLanguage, Language targetLanguage)
 			throws IllegalArgumentException {
-		if (wantedFormat == null || fragment == null || type == null) {
-			throw new IllegalArgumentException("No argument can be null");
-		}
-		this.instruction = instruction;
-		this.wantedFormat = wantedFormat;
-		this.fragment = fragment;
-		this.deliverType = type;
-		this.fragmentLanguage = fragmentLanguage;
-		this.targetLanguage = targetLanguage;
-
+		this(instruction, wantedFormat, fragment, type,
+				fragmentLanguage == null ? Language.ENGLISH.getLanguageText() : fragmentLanguage.getLanguageText(),
+				targetLanguage == null ? Language.ENGLISH.getLanguageText() : targetLanguage.getLanguageText());
 	}
 
+	/**
+	 * Creates a new ElementPrompt.
+	 *
+	 * @param instruction      all the instructions for the model. It is a list of rules to follow.
+	 * @param wantedFormat     expected output format. Should be described as an JSON-Format (Schema).
+	 * @param fragment         the text that should be analyzed.
+	 * @param type             the type of the element to be extracted. Can be a single element or multiple elements.
+	 * @param fragmentLanguage the language of the fragment. If null, it will be set to English.
+	 * @param targetLanguage   the language of the answer. If null, it will be set to English.
+	 *
+	 * @throws IllegalArgumentException if any of the first four arguments is null. The languages can be null, then they will be set to English.
+	 */
 	protected ElementPrompt(String instruction, String wantedFormat, String fragment, DeliverType type,
 			String fragmentLanguage, String targetLanguage)
 			throws IllegalArgumentException {
+		super(instruction, OllamaChatOptions.builder().format(wantedFormat).build());
 		if (instruction == null || wantedFormat == null || fragment == null || type == null) {
 			throw new IllegalArgumentException("No argument can be null");
 		}
@@ -107,6 +145,20 @@ public abstract class ElementPrompt<T extends KnowledgeElement> {
 		this.deliverType = type;
 		this.fragmentLanguage = Language.fromString(fragmentLanguage);
 		this.targetLanguage = Language.fromString(targetLanguage);
+	}
+
+	/**
+	 * Loads a Prompt properties from disk (in the prompts folder) and creates a new instance of the Prompt.
+	 *
+	 * @param userInput The user input (query) that should be analyzed.
+	 *
+	 * @return A new instance of the Prompt with the properties loaded from disk and the user input as fragment.
+	 *
+	 * @throws RuntimeException if the prompt could not be loaded from disk.
+	 */
+	public static <T extends KnowledgeElement> ElementPrompt<T> fromDisk(String userInput) throws RuntimeException {
+		throw new UnsupportedOperationException(
+				"fromDisk method is not implemented for this prompt. Please implement it in the subclass.");
 	}
 
 	//region setter/getter
@@ -121,6 +173,7 @@ public abstract class ElementPrompt<T extends KnowledgeElement> {
 	 * </p>
 	 *
 	 * @return the Prompt for the GPT-Model.
+	 *
 	 * @see ElementPrompt#getWantedFormat
 	 */
 	public abstract String getPrompt();
@@ -161,8 +214,7 @@ public abstract class ElementPrompt<T extends KnowledgeElement> {
 		return targetLanguage;
 	}
 
-	public void setTargetLanguage(
-			Language targetLanguage) {
+	public void setTargetLanguage(Language targetLanguage) {
 		this.targetLanguage = targetLanguage;
 	}
 
@@ -170,8 +222,7 @@ public abstract class ElementPrompt<T extends KnowledgeElement> {
 		return fragmentLanguage;
 	}
 
-	public void setFragmentLanguage(
-			Language fragmentLanguage) {
+	public void setFragmentLanguage(Language fragmentLanguage) {
 		this.fragmentLanguage = fragmentLanguage;
 	}
 

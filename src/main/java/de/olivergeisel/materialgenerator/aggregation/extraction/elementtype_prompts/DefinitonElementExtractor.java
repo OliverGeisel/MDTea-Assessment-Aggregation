@@ -35,7 +35,35 @@ public class DefinitonElementExtractor extends ElementExtractor<Definition, Defi
 
 		final var format = answers.getPrompt().getWantedFormat();
 		List<Definition> back = new LinkedList<>();
-		final var rawPotentialDefinitenLines = getPossibleAnswers(answers, modelLocation);
+		// Try JSON new format first
+		var possibleAnswers = getPossibleAnswers(answers, modelLocation);
+		if (possibleAnswers.length == 1) {
+			try {
+				var parsed = net.minidev.json.JSONValue.parseWithException(possibleAnswers[0]);
+				if (parsed instanceof java.util.Map) {
+					@SuppressWarnings("unchecked")
+					var map = (java.util.Map<String, Object>) parsed;
+					if (map.containsKey("definitions")) {
+						var defs = (java.util.List<Object>) map.get("definitions");
+						for (var o : defs) {
+							if (o instanceof java.util.Map) {
+								@SuppressWarnings("unchecked")
+								var d = (java.util.Map<String, Object>) o;
+								var term = d.getOrDefault("term", "").toString();
+								var definition = d.getOrDefault("definition", "").toString();
+								back.add(new Definition(definition, STR."\{term}-DEFINITION"));
+								termDefinitionMap.put(STR."\{term}-DEFINITION", term);
+							}
+						}
+						return back;
+					}
+				}
+			} catch (Exception ignored) {
+			}
+		}
+
+		// Fallback to old format
+		final var rawPotentialDefinitenLines = possibleAnswers;
 		for (var line : rawPotentialDefinitenLines) {
 			if (line.strip().length() < 4) continue;
 			final var potentialDefinition = line.split("\\|");
@@ -45,7 +73,6 @@ public class DefinitonElementExtractor extends ElementExtractor<Definition, Defi
 			back.add(new Definition(definition, STR."\{term}-DEFINITION"));
 			termDefinitionMap.put(STR."\{term}-DEFINITION", term);
 		}
-		// Todo look after format
 		return back;
 	}
 }

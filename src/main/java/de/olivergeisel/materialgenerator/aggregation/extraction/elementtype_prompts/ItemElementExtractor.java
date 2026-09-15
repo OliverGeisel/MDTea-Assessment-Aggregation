@@ -61,7 +61,47 @@ public class ItemElementExtractor extends ElementExtractor<Item, ItemPromptAnswe
 		final var format = answers.getPrompt().getWantedFormat();
 		List<Item> back = new LinkedList<>();
 
-		final var rawPotentialTaskLines = getPossibleAnswers(answers, modelLocation);
+		// First try new JSON format
+		var possibleAnswers = getPossibleAnswers(answers, modelLocation);
+		if (possibleAnswers.length == 1) {
+			var single = possibleAnswers[0];
+			try {
+				var parsed = net.minidev.json.JSONValue.parseWithException(single);
+				if (parsed instanceof java.util.Map) {
+					@SuppressWarnings("unchecked")
+					var map = (java.util.Map<String, Object>) parsed;
+					if (map.containsKey("items")) {
+						var items = (java.util.List<Object>) map.get("items");
+						for (var o : items) {
+							if (o instanceof java.util.Map) {
+								@SuppressWarnings("unchecked")
+								var it = (java.util.Map<String, Object>) o;
+								var type = it.getOrDefault("type", "").toString();
+								var question = it.getOrDefault("question", "").toString();
+								var optionsObj = it.get("options");
+								String options = "";
+								if (optionsObj instanceof java.util.List) {
+									options = String.join(";", (java.util.List<String>) optionsObj);
+								} else if (optionsObj != null) {
+									options = optionsObj.toString();
+								}
+								try {
+									var item = selectItemType(type, question, options);
+									if (item != null) back.add(item);
+								} catch (IllegalArgumentException e) {
+									LOGGER.debug("The Item could not be created. {}", e.getMessage());
+								}
+							}
+						}
+						return back;
+					}
+				}
+			} catch (Exception ignored) {
+			}
+		}
+
+		// Fallback to old line format
+		final var rawPotentialTaskLines = possibleAnswers;
 		for (var line : rawPotentialTaskLines) {
 			final var potentialTask = line.split("\\|");
 			if (line.strip().length() < 4 || potentialTask.length < 3) continue;

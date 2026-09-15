@@ -1,0 +1,40 @@
+{
+  "instructions": [
+    "List all terms in the following query.",
+    "Terms are the single words in the query.",
+    "Terms are single words in singular.",
+    "Terms are a single nouns.",
+    "Terms start with a capital letter.",
+    "Give to each term a translation, if you find one",
+    "read the example section.",
+    "Look for the given language and wanted language in the query and answer."
+  ],
+  "format": "{\"type\": \"object\",\"properties\": {  \"terms\": {\"type\": \"array\",\"items\": {  \"type\": \"object\",  \"properties\": {\"term\": {  \"type\": \"string\"},\"translation\": {  \"type\": \"string\"}  },  \"required\": [\"term\"  ]}  },  \"required\": [\"terms\"  ]}  }",
+  "deliverType": "multiple",
+  "example-input": "- language: 'The language of the query is english; the language of the answer is english'\n\t\t\t- query: 'A fish is an animal that lives in the water. A fish use gills to breathe.'\n\t\t\t+ Fish | Fisch\n\t\t\t+ Animal | Tier\n\t\t\t+ Water | Wasser\n\t\t\t+ Gill | Kieme",
+  "format-object": {
+    "type": "object",
+    "properties": {
+      "terms": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "term": {
+              "type": "string"
+            },
+            "translation": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "term"
+          ]
+        }
+      }
+    },
+    "required": [
+      "terms"
+    ]
+  }
+}
