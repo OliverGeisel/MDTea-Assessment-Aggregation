@@ -9,6 +9,7 @@ import de.olivergeisel.materialgenerator.core.courseplan.CoursePlanParserExcepti
 import de.olivergeisel.materialgenerator.generation.generator.WrongFileTypeException;
 import de.olivergeisel.materialgenerator.generation.material.MaterialRepository;
 import de.olivergeisel.materialgenerator.generation.templates.TemplateSetRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ import java.util.List;
 
 import static de.olivergeisel.materialgenerator.generation.TemplateSetService.*;
 
+@Slf4j
 @Controller
 @RequestMapping("/generator")
 public class GeneratorController {
@@ -106,38 +108,47 @@ public class GeneratorController {
 			throws FileNotFoundException, WrongFileTypeException, IncompleteJSONException {
 		String planName;
 		try {
+			// Prefer uploaded curriculum over uploaded plan.
 			if (curriculum.isBlank() || curriculum.equals(UPLOAD)) {
+				log.info("Uploaded plan: {}", plan.getOriginalFilename());
 				CoursePlanParser parser = new CoursePlanParser();
 				if (plan == null || plan.isEmpty()) {
 					throw new IllegalArgumentException("No plan uploaded");
 				}
 				var planType = plan.getContentType();
 				if (planType == null || !planType.equals("application/json")) {
+					log.error("Wrong file type. Must be application/json. But was {}", planType);
 					throw new WrongFileTypeException(
 							String.format("Wrong file type. Must be application/json. But was %s",
 									plan.getContentType()));
 				}
 				try {
+					log.info("Parsing uploaded plan: {}", plan.getOriginalFilename());
 					parser.parseFromFile(plan.getInputStream());
 				} catch (IOException | CoursePlanParserException e) {
+					log.error("Error parsing uploaded plan: {}", e.getMessage());
 					throw new IncompleteJSONException(e);
 				}
 				storageService.store(plan);
 				planName = plan.getOriginalFilename();
+				log.info("Storing uploaded plan: {}", planName);
 				storageService.store(plan);
-			} else {
+			} else { // Use existing curriculum from storage.
+				log.info("Using existing curriculum: {}", curriculum);
 				planName = storageService.load(curriculum).getFileName().toString();
 			}
 			model.addAttribute("plan", planName);
 			model.addAttribute("template", template);
 			CoursePlanParser parser = new CoursePlanParser();
-			var completePlan = parser.parseFromFile(storageService.load(planName).toFile());
+			var curriculumFile = storageService.load(planName).toFile();
+			var completePlan = parser.parseFromFile(curriculumFile);
 			model.addAttribute("structure", completePlan.getStructure());
 			model.addAttribute("meta", completePlan.getMetadata());
 			model.addAttribute("testConfiguration", completePlan.getTestConfiguration());
 			return PATH + "overview-all";
 		} catch (Exception e) {
-			redirectAttributes.addFlashAttribute("error", STR."Error: \{e.getMessage()}");
+			redirectAttributes.addFlashAttribute("error",
+					STR."Error: \{e.getClass().getSimpleName()} - \{e.getMessage()}");
 			return STR."redirect:/generator/plan-selection?template=\{template}";
 		}
 

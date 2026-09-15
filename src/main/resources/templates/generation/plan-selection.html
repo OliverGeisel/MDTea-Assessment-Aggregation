@@ -70,6 +70,7 @@
 <body class="d-flex flex-column min-vh-100">
 <nav th:replace="~{main::navigation}"></nav>
 <main class="container flex-grow-1">
+    <th:block th:replace="~{main::message-and-error}"></th:block>
     <section>
         <h2> Gewähltes Template: <span th:text="${templateSetName}"></span></h2>
         <form enctype="multipart/form-data" method="post" th:action="@{/generator/overview}">
@@ -77,8 +78,11 @@
             <h3> Bitte den Lehrplan angeben</h3>
             <div class="row mt-2">
                 <div class="col-md-6">
-                    <div class="drop-zone" id="dropZone" ondragover="handleDragOver(event)"
-                         ondrop="handleFileSelect(event)">
+                    <p class="form-text">Lade einen neuen Lehrplan hoch oder wähle einen bestehenden aus.</p>
+                    <p class="form-text">Wenn du einen neuen Lehrplan hochladen möchtest, kannst du ihn per Drag &
+                        Drop hierherziehen oder den Button unten klicken und die Datei auswählen.</p>
+                    <div aria-roledescription="Dropzone" class="drop-zone" id="dropZone" ondragover="handleDragOver()"
+                         ondrop="handleFileSelect()" role="application">
                         <h4>Drag &amp; Drop</h4>
                         <p>Ziehe deine Datei hierhin, um sie hochzuladen.</p>
                         <p id="fileName"></p>
@@ -93,7 +97,10 @@
                     </button>
                 </div>
                 <div class="col-md-6">
-                    <label for="curriculum">Lehrplan</label>
+                    <label for="curriculum">Existierender Lehrplan</label>
+                    <p class="form-text">Wähle einen bestehenden Lehrplan aus der Liste.</p>
+                    <p class="form-text">Wenn UPLOAD gewählt ist, dann wird die hochgeladene Datei
+                        genommen</p>
                     <select class="form-select input-group" id="curriculum" name="curriculum">
                         <option th:each="option: ${curriculums}" th:text="${option}" th:value="${option}">
                         </option>
