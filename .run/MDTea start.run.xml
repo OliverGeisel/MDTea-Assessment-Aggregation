@@ -6,7 +6,6 @@
     <option name="UPDATE_ACTION_UPDATE_POLICY" value="UpdateClassesAndResources" />
     <method v="2">
       <option name="Make" enabled="true" />
-      <option name="RunConfigurationTask" enabled="false" run_configuration_name="docker-compose.yaml: Compose Deployment" run_configuration_type="docker-deploy" />
     </method>
   </configuration>
 </component>
